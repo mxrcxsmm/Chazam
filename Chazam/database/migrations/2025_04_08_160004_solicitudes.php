@@ -18,8 +18,8 @@ return new class extends Migration
             $table->bigInteger('id_receptor')->unsigned();
             $table->timestamps();
         
-            $table->foreign('id_emisor')->references('id_usuario')->on('usuarios');
-            $table->foreign('id_receptor')->references('id_usuario')->on('usuarios');
+            $table->foreign('id_emisor')->references('id_usuario')->on('users');
+            $table->foreign('id_receptor')->references('id_usuario')->on('users');
         });
     }
 

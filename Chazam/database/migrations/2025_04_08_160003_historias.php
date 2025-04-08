@@ -11,14 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('chat_usuario', function (Blueprint $table) {
-            $table->bigIncrements('id_chat_usuario');
-            $table->bigInteger('id_chat')->unsigned();
+        Schema::create('historias', function (Blueprint $table) {
+            $table->bigIncrements('id_historia');
             $table->bigInteger('id_usuario')->unsigned();
+            $table->datetime('fecha_inicio');
+            $table->datetime('fecha_fin');
+            $table->string('img');
             $table->timestamps();
         
-            $table->foreign('id_chat')->references('id_chat')->on('chats');
-            $table->foreign('id_usuario')->references('id_usuario')->on('usuarios');
+            $table->foreign('id_usuario')->references('id_usuario')->on('users');
         });
     }
 

@@ -18,7 +18,7 @@ return new class extends Migration
             $table->datetime('fecha_envio');
             $table->timestamps();
         
-            $table->foreign('id_chat_usuario')->references('id_chat_usuario')->on('chats_usuarios');
+            $table->foreign('id_chat_usuario')->references('id_chat_usuario')->on('chat_usuario');
         });
     }
 
