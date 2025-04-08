@@ -20,4 +20,4 @@ class NacionalidadSeeder extends Seeder
             ['nombre' => 'Ecuatoriana', 'bandera' => 'ec.png']
         ]);
     }
-} 
+}
