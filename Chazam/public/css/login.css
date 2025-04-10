@@ -1,0 +1,163 @@
+#vanta-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Detrás del contenido */
+}
+body {
+    height: 100vh;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+}
+.login-container .logo {
+    display: block;
+    border-radius: 50%;
+    margin: 0 auto 30px auto; /* Centrado horizontal con margen inferior */
+    max-width: 60%; /* Ajusta según necesidad */
+    height: auto;
+}
+/* @keyframes gradientBG {
+    0% {background-position: 0% 50%, center;}
+    50% {background-position: 100% 50%, center;}
+    100% {background-position: 0% 50%, center;}
+} */
+.login-container {
+    background-color: #d99cec;
+    padding: 40px;
+    border-radius: 15px;
+    width: 360px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    z-index: 3;
+}
+
+h4 {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+}
+
+.tabs .tab a {
+    color: white;
+}
+
+.tabs .tab a.active {
+    background-color: transparent;
+    border-bottom: 2px solid #703ea3;
+    font-weight: bold;
+}
+.hola {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+.btn.btn-custom {
+    background-color: #8c00ff !important;
+    color: #ffffff !important;
+    border-radius: 20px;
+    width: 100%;
+    transition: 0.3s ease;
+}
+
+.btn-custom:hover {
+    background-color: #d0d0d0;
+}
+
+/* CAMBIO DE COLOR AL FOCO Y BORDE DE LOS INPUTS */
+.input-field input:focus {
+    border-bottom: 2px solid #703ea3 !important;
+    box-shadow: 0 1px 0 0 #703ea3 !important;
+}
+
+.input-field input:focus + label {
+    color: #703ea3 !important;
+}
+
+.tabs .indicator {
+background-color: #703ea3 !important;
+}
+
+.tabs .tab a {
+    background-color: transparent !important;
+    color: white !important;
+    transition: background-color 0.3s;
+}
+
+.tabs .tab a.active {
+    background-color: rgba(128, 0, 255, 0.3) !important; /* púrpura translúcido, opcional */
+    color: rgba(128, 0, 255, 0.3) !important;
+    font-weight: bold;
+    border-radius: 5px 5px 0 0;
+}
+    /* ✨ Fix para autocompletado de Chrome (input background) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #d99cec inset !important;
+    -webkit-text-fill-color: #000 !important;
+}
+
+/* SOLUCION DE FLASH PARA QUE NO SE VEA FORMULARIO DE LOGIN Y SIGNUP EN LA MISMA VENTANA */
+#signup {
+    display: none;
+}
+
+#login {
+    display: block;
+}
+
+.tabs .tab a.active + #login,
+.tabs .tab a:not(.active) + #signup {
+    display: block;
+}
+
+.tabs .tab a.active + #signup,
+.tabs .tab a:not(.active) + #login {
+    display: none;
+}
+
+/* Contenedor con scroll */
+.signup-scroll {
+    padding-right: 10px; /* Evita que el scroll tape contenido */
+    margin-bottom: 20px;
+}
+
+/* Ajuste para selects */
+.select-wrapper .caret {
+    fill: #703ea3 !important;
+}
+
+/* Iconos de inputs */
+.input-field .prefix.active {
+    color: #703ea3 !important;
+}
+
+/* Botón de registro */
+.btn-custom {
+    background-color: #5900ff !important;
+    margin-top: 20px;
+}
+
+/* login.css */
+.login-container {
+    width: 360px; /* Ancho por defecto (Login) */
+    transition: width 0.3s ease; /* Transición suave */
+}
+
+/* Clase para Sign Up con más ancho */
+.login-container.signup-mode {
+    width: 1000px; /* 40% más ancho */
+}
+
+@media (max-width: 600px) {
+    .login-container, 
+    .login-container.signup-mode {
+        width: 90% !important; /* Responsive */
+    }
+}
