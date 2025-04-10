@@ -1,0 +1,21 @@
+/* Estilos generales */
+body {
+    background-color: #DFB5FF; /* Color de fondo general */
+}
+
+.logo {
+    width: 40px; /* Ajusta el tamaño según sea necesario */
+    height: 40px; /* Asegúrate de que sea cuadrado */
+    border-radius: 50%;  /* Hace que el logo sea redondo */
+    object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
+    margin-right: 5px; /* Espacio entre el logo y el texto */
+    border: 3px solid #4b0082; /* Agrega un borde de 3px de grosor de color naranja (#FF5733) */
+}
+
+.navbar .navbar-brand {
+    margin-left: 10px; /* Reduce la separación horizontal */
+}
+
+.bg-purple {
+    background-color: #4b0082; /* O el color exacto que quieras */
+}

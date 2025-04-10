@@ -11,4 +11,7 @@ Route::get('usuarios/{id}/edit', [UserController::class, 'edit'])->name('usuario
 Route::put('usuarios/{id}', [UserController::class, 'update'])->name('usuarios.update');
 Route::delete('usuarios/{id}', [UserController::class, 'destroy'])->name('usuarios.destroy');
 
-
+Route::prefix('retos')->name('retos.')->group(function () {
+    Route::view('reto', 'Retos.reto')->name('reto');
+    Route::view('guide', 'Retos.guide')->name('guide');
+});
