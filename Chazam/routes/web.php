@@ -1,9 +1,15 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+
+// Grupo de rutas para el administrador con middleware
+// Route::middleware(['auth'])->group(function () {
+    
+// });
 
 Route::get('/', function () {
     return view('login');
@@ -24,4 +30,9 @@ Route::middleware(['auth'])->group(function () {
 // Grupo de rutas para usuarios normales
 Route::middleware(['auth'])->group(function () {
     Route::get('user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
+});
+
+Route::prefix('retos')->name('retos.')->group(function () {
+    Route::view('reto', 'Retos.reto')->name('reto');
+    Route::view('guide', 'Retos.guide')->name('guide'); // Asegúrate de que el nombre sea 'guide'
 });
