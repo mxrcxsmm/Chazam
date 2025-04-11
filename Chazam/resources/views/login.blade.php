@@ -12,7 +12,7 @@
 <body>
     
     <div id="vanta-bg"></div>
-    <div class="login-container z-depth-2">
+    <div class="login-container">
         <img src="{{ asset('img/logo.png') }}" alt="" style="" class="logo">
 
         <div class="row">
@@ -53,19 +53,19 @@
                     <!-- Primera columna -->
                     <div class="row">
                         <!-- Username -->
-                        <div class="input-field col s12">
+                        <div class="input-field col s4">
                             <i class="material-icons prefix">person_outline</i>
                             <input id="username" name="username" type="text" class="validate" required>
                             <label for="username">Username</label>
                         </div>
                         
                         <!-- Nombre y Apellido -->
-                        <div class="input-field col s6">
+                        <div class="input-field col s4">
                             <i class="material-icons prefix">badge</i>
                             <input id="nombre" name="nombre" type="text" required>
                             <label for="nombre">Nombre</label>
                         </div>
-                        <div class="input-field col s6">
+                        <div class="input-field col s4">
                             <i class="material-icons prefix">people</i>
                             <input id="apellido" name="apellido" type="text" required>
                             <label for="apellido">Apellido</label>
@@ -82,21 +82,12 @@
                     <!-- Segunda columna (Scroll) -->
                     <div class="signup-scroll" style="max-height: 300px; overflow-y: auto;">
                         <!-- Email -->
-                        <div class="input-field col s12">
+                        <div class="input-field col s6">
                             <i class="material-icons prefix">email</i>
                             <input id="email_signup" name="email" type="email" required>
                             <label for="email_signup">Email</label>
                         </div>
-                        
-                        <!-- Password -->
-                        <div class="input-field col s12">
-                            <i class="material-icons prefix">lock</i>
-                            <input id="password_signup" name="password" type="password" required>
-                            <label for="password_signup">Password</label>
-                        </div>
-                        
-                        <!-- Nacionalidad (Select) -->
-                        <div class="input-field col s12">
+                        <div class="input-field col s6">
                             <i class="material-icons prefix">public</i>
                             <select id="id_nacionalidad" name="id_nacionalidad" required>
                                 <option value="" disabled selected>Elige tu país</option>
@@ -106,7 +97,13 @@
                             </select>
                             <label>Nacionalidad</label>
                         </div>
-                        
+                        <!-- Password -->
+                        <div class="input-field col s12">
+                            <i class="material-icons prefix">lock</i>
+                            <input id="password_signup" name="password" type="password" required>
+                            <label for="password_signup">Password</label>
+                        </div>
+
                         <!-- Imagen (Opcional) -->
                         <div class="file-field input-field col s12">
                             <div class="btn btn-small purple">
@@ -148,10 +145,32 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    // Inicializar tabs
-    var tabs = M.Tabs.init(document.querySelectorAll('.tabs'), {
+    const loginContainer = document.querySelector('.login-container');
+    
+    // Inicializar tabs con detección de tamaño de pantalla
+    const tabs = M.Tabs.init(document.querySelectorAll('.tabs'), {
         onShow: function(tab) {
-            setTimeout(() => M.updateTextFields(), 50);
+            // Solo aplicar cambio de ancho en pantallas > 600px
+            if (window.innerWidth > 600) {
+                if (tab.getAttribute('href') === '#signup') {
+                    loginContainer.classList.add('wider');
+                } else {
+                    loginContainer.classList.remove('wider');
+                }
+                // Forzar repintado para la animación
+                void loginContainer.offsetWidth;
+            }
+            
+            // Reiniciar componentes
+            setTimeout(() => {
+                M.updateTextFields();
+                M.FormSelect.init(document.querySelectorAll('select'));
+            }, 50);
+        }
+    });
+    window.addEventListener('resize', function() {
+        if (window.innerWidth <= 600) {
+            loginContainer.classList.remove('wider');
         }
     });
 
@@ -173,12 +192,12 @@
     // Textarea (auto-resize)
     var textareas = document.querySelectorAll('textarea');
     M.CharacterCounter.init(textareas);
-});
+
     VANTA.WAVES({
     el: "#vanta-bg",
     color: 0x703ea3,
     backgroundColor: 0xaa00ff
-  });
+  });});
     </script>
     
 </body>

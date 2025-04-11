@@ -7,7 +7,7 @@
     z-index: -1; /* Detrás del contenido */
 }
 body {
-    height: 100vh;
+    height: 100%;
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     display: flex;
@@ -18,23 +18,31 @@ body {
 .login-container .logo {
     display: block;
     border-radius: 50%;
-    margin: 0 auto 30px auto; /* Centrado horizontal con margen inferior */
-    max-width: 60%; /* Ajusta según necesidad */
+    margin: 0 auto 30px auto; 
+    max-width: 60%; 
     height: auto;
 }
-/* @keyframes gradientBG {
-    0% {background-position: 0% 50%, center;}
-    50% {background-position: 100% 50%, center;}
-    100% {background-position: 0% 50%, center;}
-} */
+
 .login-container {
+    top: 50%;
     background-color: #d99cec;
     padding: 40px;
     border-radius: 15px;
-    width: 360px;
+    width: 400px; 
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.4s ease-out;
+    position: relative;
     z-index: 3;
+    margin: 0 auto;
+    transition: width 0.3s ease;
 }
+
+/* Modificador para Sign Up */
+.login-container.wider {
+    width: 90% !important; 
+    border: 3px solid red !important; 
+}
+
 
 h4 {
     text-align: center;
@@ -89,7 +97,7 @@ background-color: #703ea3 !important;
 }
 
 .tabs .tab a.active {
-    background-color: rgba(128, 0, 255, 0.3) !important; /* púrpura translúcido, opcional */
+    background-color: rgba(128, 0, 255, 0.3) !important; 
     color: rgba(128, 0, 255, 0.3) !important;
     font-weight: bold;
     border-radius: 5px 5px 0 0;
@@ -108,6 +116,22 @@ input:-webkit-autofill:active {
     display: none;
 }
 
+#signup .row {
+    margin-bottom: 0;
+}
+
+#signup .input-field {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.signup-scroll {
+    max-height: 300px;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-top: 15px;
+}
+
 #login {
     display: block;
 }
@@ -122,11 +146,7 @@ input:-webkit-autofill:active {
     display: none;
 }
 
-/* Contenedor con scroll */
-.signup-scroll {
-    padding-right: 10px; /* Evita que el scroll tape contenido */
-    margin-bottom: 20px;
-}
+
 
 /* Ajuste para selects */
 .select-wrapper .caret {
@@ -144,20 +164,20 @@ input:-webkit-autofill:active {
     margin-top: 20px;
 }
 
-/* login.css */
-.login-container {
-    width: 360px; /* Ancho por defecto (Login) */
-    transition: width 0.3s ease; /* Transición suave */
-}
 
-/* Clase para Sign Up con más ancho */
-.login-container.signup-mode {
-    width: 1000px; /* 40% más ancho */
-}
+
 
 @media (max-width: 600px) {
     .login-container, 
-    .login-container.signup-mode {
-        width: 90% !important; /* Responsive */
+    .login-container.wider {
+        width: 80% !important;
+        padding: 30px 20px;
+    }
+    .login-container .logo {
+        max-width: 80%;
+    }
+
+    .tabs .tab {
+        font-size: 14px;
     }
 }
