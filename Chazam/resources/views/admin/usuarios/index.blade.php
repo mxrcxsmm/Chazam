@@ -35,6 +35,11 @@
                         <a class="nav-link" href="#">Reportes</a>
                     </li>
                 </ul>
+                <!-- Botón de cerrar sesión -->
+            <form action="{{ route('logout') }}" method="POST" class="ms-auto">
+                @csrf
+                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+            </form>
             </div>
         </div>
     </nav>
