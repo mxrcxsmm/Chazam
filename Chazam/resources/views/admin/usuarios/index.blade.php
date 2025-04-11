@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Font Awesome -->
@@ -34,6 +35,11 @@
                         <a class="nav-link" href="#">Reportes</a>
                     </li>
                 </ul>
+                <!-- Botón de cerrar sesión -->
+            <form action="{{ route('logout') }}" method="POST" class="ms-auto">
+                @csrf
+                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+            </form>
             </div>
         </div>
     </nav>

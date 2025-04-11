@@ -25,7 +25,7 @@
 
             <!-- Login -->
             <div id="login" class="col s12">
-                <form action="{{ route('login') }}" method="POST">
+                <form action="{{ route('auth.login') }}" method="POST">
                     @csrf
                     <div class="input-field">
                         <input id="email" name="email" type="email" class="validate" required>
