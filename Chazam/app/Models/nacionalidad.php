@@ -42,16 +42,4 @@ class Nacionalidad extends Model
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
-
-
-    // /**
-                        // No se sabe si se va a usar banderas img o emojis
-    //   Get the URL for the bandera image.
-    //  
-    //   @return string|null
-    //  /
-    // public function getBanderaUrlAttribute()
-    // {
-    //     return $this->bandera ? asset('storage/banderas/'.$this->bandera) : null;
-    // }
 }

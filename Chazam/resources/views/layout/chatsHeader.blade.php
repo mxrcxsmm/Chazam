@@ -14,9 +14,8 @@
     @stack('head')
 </head>
 <body>
-
     {{-- Navbar --}}
-    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm px-4 py-2">
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm px-4 py-2">
         <div class="container-fluid d-flex justify-content-between align-items-center">
 
             <!-- Logo o nombre de la app -->
@@ -72,8 +71,10 @@
                     <hr class="border-light">
 
                     <ul class="list-unstyled">
-                        <li class="mb-2"><a href="#" class="text-white text-decoration-none">Personalizar</a></li>
+                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Personalizar</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Amigos</a></li>
+                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Reportar</a></li>
+                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comprar puntos</a></li>
                     </ul>
 
                     <form method="POST" action="#" class="mt-auto">
