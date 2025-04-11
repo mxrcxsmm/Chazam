@@ -21,6 +21,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->integer('puntos')->default(500);
+            $table->integer('racha')->default(0);
             $table->bigInteger('id_nacionalidad')->unsigned();
             $table->bigInteger('id_rol')->unsigned();
             $table->bigInteger('id_estado')->unsigned();
