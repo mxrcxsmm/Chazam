@@ -100,4 +100,41 @@ class AdminController extends Controller
 
         return redirect()->route('admin.usuarios.index')->with('success', 'Usuario eliminado correctamente.');
     }
+    
+    // Filtrar usuarios mediante AJAX
+    public function filtrar(Request $request)
+    {
+        // Iniciar la consulta
+        $query = User::query();
+        
+        // Aplicar filtros si se proporcionan
+        if ($request->has('id') && !empty($request->id)) {
+            $query->where('id_usuario', 'like', '%' . $request->id . '%');
+        }
+        
+        if ($request->has('username') && !empty($request->username)) {
+            $query->where('username', 'like', '%' . $request->username . '%');
+        }
+        
+        if ($request->has('nombre_completo') && !empty($request->nombre_completo)) {
+            $query->where(function($q) use ($request) {
+                $q->where('nombre', 'like', '%' . $request->nombre_completo . '%')
+                  ->orWhere('apellido', 'like', '%' . $request->nombre_completo . '%');
+            });
+        }
+        
+        if ($request->has('nacionalidad') && !empty($request->nacionalidad)) {
+            $query->where('id_nacionalidad', $request->nacionalidad);
+        }
+        
+        if ($request->has('rol') && !empty($request->rol)) {
+            $query->where('id_rol', $request->rol);
+        }
+        
+        // Ejecutar la consulta
+        $admins = $query->get();
+        
+        // Devolver la vista parcial con los resultados
+        return view('admin.usuarios.tabla-usuarios', compact('admins'));
+    }
 }
