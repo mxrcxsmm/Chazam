@@ -5,9 +5,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 
-Route::get('/', function () {
-    return view('login');
-})->name('login');
+Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 
 // Rutas de autenticación
 Route::post('login', [AuthController::class, 'login'])->name('auth.login');

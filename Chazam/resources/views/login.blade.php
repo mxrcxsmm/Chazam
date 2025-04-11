@@ -46,11 +46,10 @@
             </div>
 
             <!-- Sign Up -->
-            <!-- Sign Up -->
             <div id="signup" class="col s12">
                 <form action="{{ route('login') }}" method="POST" class="form-signup">
                     @csrf
-                    <!-- Primera columna -->
+                    <!-- Primera fila -->
                     <div class="row">
                         <!-- Username -->
                         <div class="input-field col s4">
@@ -70,40 +69,49 @@
                             <input id="apellido" name="apellido" type="text" required>
                             <label for="apellido">Apellido</label>
                         </div>
-                        
-                        <!-- Fecha de Nacimiento (Datepicker) -->
-                        <div class="input-field col s12">
+                    </div>
+
+                    <!-- Segunda fila -->
+                    <div class="row">
+                        <!-- Fecha de Nacimiento -->
+                        <div class="input-field col s4">
                             <i class="material-icons prefix">event</i>
                             <input id="fecha_nacimiento" name="fecha_nacimiento" type="text" class="datepicker" required>
                             <label for="fecha_nacimiento">Fecha de Nacimiento</label>
                         </div>
-                    </div>
-                    <!-- Segunda columna (Scroll) -->
-                    <div class="signup-scroll" style="max-height: 300px; overflow-y: auto;">
+
                         <!-- Email -->
-                        <div class="input-field col s6">
+                        <div class="input-field col s4">
                             <i class="material-icons prefix">email</i>
                             <input id="email_signup" name="email" type="email" required>
                             <label for="email_signup">Email</label>
                         </div>
-                        <div class="input-field col s6">
-                            <i class="material-icons prefix">public</i>
+
+                        <!-- Nacionalidad -->
+                        <div class="input-field col s4">
                             <select id="id_nacionalidad" name="id_nacionalidad" required>
                                 <option value="" disabled selected>Elige tu país</option>
-                                {{-- @foreach($paises as $pais)
-                                    <option value="{{ $pais->id }}">{{ $pais->nombre }}</option>
-                                @endforeach --}}
+                                @foreach($nacionalidades as $nacionalidad)
+                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}</option>
+                                @endforeach
                             </select>
                             <label>Nacionalidad</label>
                         </div>
+                    </div>
+
+                    <!-- Tercera fila -->
+                    <div class="row">
                         <!-- Password -->
                         <div class="input-field col s12">
                             <i class="material-icons prefix">lock</i>
                             <input id="password_signup" name="password" type="password" required>
                             <label for="password_signup">Password</label>
                         </div>
+                    </div>
 
-                        <!-- Imagen (Opcional) -->
+                    <!-- Cuarta fila -->
+                    <div class="row">
+                        <!-- Imagen -->
                         <div class="file-field input-field col s12">
                             <div class="btn btn-small purple">
                                 <span>Foto</span>
@@ -113,8 +121,11 @@
                                 <input class="file-path" type="text">
                             </div>
                         </div>
-                        
-                        <!-- Descripción (Textarea) -->
+                    </div>
+
+                    <!-- Quinta fila -->
+                    <div class="row">
+                        <!-- Descripción -->
                         <div class="input-field col s12">
                             <i class="material-icons prefix">edit</i>
                             <textarea id="descripcion" name="descripcion" class="materialize-textarea"></textarea>
@@ -144,59 +155,65 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-    const loginContainer = document.querySelector('.login-container');
-    
-    // Inicializar tabs con detección de tamaño de pantalla
-    const tabs = M.Tabs.init(document.querySelectorAll('.tabs'), {
-        onShow: function(tab) {
-            // Solo aplicar cambio de ancho en pantallas > 600px
-            if (window.innerWidth > 600) {
-                if (tab.getAttribute('href') === '#signup') {
-                    loginContainer.classList.add('wider');
+            const loginContainer = document.querySelector('.login-container');
+            
+            // Función para manejar el cambio de ancho
+            function handleWidthChange() {
+                const activeTab = document.querySelector('.tabs .tab a.active');
+                if (window.innerWidth > 600) {
+                    if (activeTab && activeTab.getAttribute('href') === '#signup') {
+                        loginContainer.classList.add('wider');
+                    } else {
+                        loginContainer.classList.remove('wider');
+                    }
                 } else {
                     loginContainer.classList.remove('wider');
                 }
-                // Forzar repintado para la animación
-                void loginContainer.offsetWidth;
             }
-            
-            // Reiniciar componentes
-            setTimeout(() => {
-                M.updateTextFields();
-                M.FormSelect.init(document.querySelectorAll('select'));
-            }, 50);
-        }
-    });
-    window.addEventListener('resize', function() {
-        if (window.innerWidth <= 600) {
-            loginContainer.classList.remove('wider');
-        }
-    });
 
-    // Datepicker
-    var datepickers = document.querySelectorAll('.datepicker');
-    M.Datepicker.init(datepickers, {
-        format: 'yyyy-mm-dd',
-        yearRange: [1900, new Date().getFullYear()],
-        i18n: {
-            months: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"], // Personaliza si es necesario
-            cancel: 'Cancelar'
-        }
-    });
+            // Inicializar tabs de Materialize
+            const materializeTabs = M.Tabs.init(document.querySelectorAll('.tabs'), {
+                onShow: function(tab) {
+                    handleWidthChange();
+                    
+                    // Reiniciar componentes
+                    setTimeout(() => {
+                        M.updateTextFields();
+                        M.FormSelect.init(document.querySelectorAll('select'));
+                    }, 50);
+                }
+            });
 
-    // Select
-    var selects = document.querySelectorAll('select');
-    M.FormSelect.init(selects);
+            // Manejar cambios de tamaño de ventana
+            window.addEventListener('resize', handleWidthChange);
 
-    // Textarea (auto-resize)
-    var textareas = document.querySelectorAll('textarea');
-    M.CharacterCounter.init(textareas);
+            // Aplicar el ancho inicial
+            handleWidthChange();
 
-    VANTA.WAVES({
-    el: "#vanta-bg",
-    color: 0x703ea3,
-    backgroundColor: 0xaa00ff
-  });});
+            // Inicializar datepicker
+            const datepickers = document.querySelectorAll('.datepicker');
+            M.Datepicker.init(datepickers, {
+                format: 'yyyy-mm-dd',
+                yearRange: [1900, new Date().getFullYear()],
+                i18n: {
+                    months: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+                    cancel: 'Cancelar'
+                }
+            });
+
+            // Inicializar selects
+            M.FormSelect.init(document.querySelectorAll('select'));
+
+            // Inicializar textareas
+            M.CharacterCounter.init(document.querySelectorAll('textarea'));
+
+            // Inicializar Vanta.js
+            VANTA.WAVES({
+                el: "#vanta-bg",
+                color: 0x703ea3,
+                backgroundColor: 0xaa00ff
+            });
+        });
     </script>
     
 </body>
