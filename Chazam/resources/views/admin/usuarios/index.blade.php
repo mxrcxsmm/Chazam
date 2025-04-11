@@ -1,20 +1,25 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"> <!-- Font Awesome -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"> <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap -->
 
     <title>Lista de Usuarios - Admin</title>
 </head>
+
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">Admin Panel</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
@@ -52,35 +57,39 @@
                     <th>Nacionalidad</th> <!-- Nueva columna -->
                     <th>Inicio Ban</th>
                     <th>Fin Ban</th>
+                    <th>Estado</th>
+                    <th>Rol</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($admins as $user)
-                <tr>
-                    <td>{{ $user->id_usuario }}</td>
-                    <td>{{ $user->username }}</td>
-                    <td>{{ $user->email }}</td>
-                    <td>{{ $user->nombre }} {{ $user->apellido }}</td>
-                    <td>{{ $user->fecha_nacimiento->format('Y-m-d') }}</td>
-                    <td>{{ $user->descripcion }}</td>
-                    <td>{{ $user->nacionalidad->nombre ?? 'Sin nacionalidad' }}</td> <!-- Mostrar nacionalidad -->
-                    <td>{{ $user->inicio_ban }}</td>
-                    <td>{{ $user->fin_ban }}</td>
-                    <td>
-                        <!-- Botón para abrir el modal de editar -->
-                        <button class="btn-edit" onclick="openEditModal({{ $user }})">
-                            <i class="fas fa-pencil-alt"></i>
-                        </button>
-                        <form action="{{ route('admin.usuarios.destroy', $user->id_usuario) }}" method="POST" style="display:inline-block;">
-                            @csrf
-                            @method('DELETE')
-                            <button type="submit" class="btn-delete">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </form>
-                    </td>
-                </tr>
+                @foreach ($admins as $user)
+                    <tr>
+                        <td>{{ $user->id_usuario }}</td>
+                        <td>{{ $user->username }}</td>
+                        <td>{{ $user->email }}</td>
+                        <td>{{ $user->nombre }} {{ $user->apellido }}</td>
+                        <td>{{ $user->fecha_nacimiento->format('Y-m-d') }}</td>
+                        <td>{{ $user->descripcion }}</td>
+                        <td>{{ $user->nacionalidad->nombre ?? 'Sin nacionalidad' }}</td>
+                        <td>{{ $user->inicio_ban }}</td>
+                        <td>{{ $user->fin_ban }}</td>
+                        <td>{{ $user->estado->nom_estado ?? 'Sin estado' }}</td> <!-- Mostrar estado -->
+                        <td>{{ $user->rol->nom_rol ?? 'Sin rol' }}</td> <!-- Mostrar rol -->
+                        <td>
+                            <!-- Botón para abrir el modal de editar -->
+                            <a href="javascript:void(0)" onclick="openEditModal({{ $user }})" class="text-warning" title="Editar">
+                                <i class="fas fa-pencil-alt"></i>
+                            </a>
+                            <form action="{{ route('admin.usuarios.destroy', $user->id_usuario) }}" method="POST" style="display:inline-block;">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" style="border: none; background: none; cursor: pointer;" title="Eliminar">
+                                    <i class="fas fa-trash text-danger"></i>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
                 @endforeach
             </tbody>
         </table>
@@ -111,7 +120,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control" required>
+                            <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control"
+                                required>
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
@@ -125,14 +135,14 @@
                             <label for="id_nacionalidad" class="form-label">Nacionalidad</label>
                             <select name="id_nacionalidad" id="id_nacionalidad" class="form-select" required>
                                 <option value="" disabled selected>Seleccione una nacionalidad</option>
-                                @foreach($nacionalidades as $nacionalidad)
-                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}</option>
+                                @foreach ($nacionalidades as $nacionalidad)
+                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         <button type="submit" class="btn btn-primary">Guardar</button>
                     </div>
                 </form>
@@ -166,7 +176,8 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" name="fecha_nacimiento" id="edit_fecha_nacimiento" class="form-control" required>
+                            <input type="date" name="fecha_nacimiento" id="edit_fecha_nacimiento"
+                                class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label for="edit_email" class="form-label">Email</label>
@@ -180,14 +191,14 @@
                             <label for="edit_id_nacionalidad" class="form-label">Nacionalidad</label>
                             <select name="id_nacionalidad" id="edit_id_nacionalidad" class="form-select" required>
                                 <option value="" disabled>Seleccione una nacionalidad</option>
-                                @foreach($nacionalidades as $nacionalidad)
-                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}</option>
+                                @foreach ($nacionalidades as $nacionalidad)
+                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}
+                                    </option>
                                 @endforeach
                             </select>
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                         <button type="submit" class="btn btn-primary">Actualizar</button>
                     </div>
                 </form>
@@ -198,4 +209,5 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/modals.js') }}"></script>
 </body>
+
 </html>
