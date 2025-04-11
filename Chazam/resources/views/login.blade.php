@@ -78,7 +78,6 @@
                             <label for="fecha_nacimiento">Fecha de Nacimiento</label>
                         </div>
                     </div>
-
                     <!-- Segunda columna (Scroll) -->
                     <div class="signup-scroll" style="max-height: 300px; overflow-y: auto;">
                         <!-- Email -->
