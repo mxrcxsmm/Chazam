@@ -12,8 +12,9 @@ class EstadosSeeder extends Seeder
         DB::table('estados')->insert([
             ['nom_estado' => 'Activo'],
             ['nom_estado' => 'Inactivo'],
-            ['nom_estado' => 'Baneado'],
-            ['nom_estado' => 'Suspendido']
+            ['nom_estado' => 'Ban'],
+            ['nom_estado' => 'PermaBan'],
+            ['nom_estado' => 'Disponible']
         ]);
     }
 } 

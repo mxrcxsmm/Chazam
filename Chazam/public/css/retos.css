@@ -1,6 +1,16 @@
 /* Estilos generales */
 body {
     background-color: #DFB5FF; /* Color de fondo general */
+    overflow: hidden;
+}
+
+.logo2 {
+    width: 40vh; /* Ajusta el tamaño según sea necesario */
+    height: auto; /* Asegúrate de que sea cuadrado */
+    border-radius: 50%;  /* Hace que el logo sea redondo */
+    object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
+    margin-right: 5px; /* Espacio entre el logo y el texto */
+    border: 3px solid #4b0082; /* Agrega un borde de 3px de grosor */
 }
 
 .logo {
@@ -9,7 +19,17 @@ body {
     border-radius: 50%;  /* Hace que el logo sea redondo */
     object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
     margin-right: 5px; /* Espacio entre el logo y el texto */
-    border: 3px solid #4b0082; /* Agrega un borde de 3px de grosor de color naranja (#FF5733) */
+    border: 3px solid #4b0082; /* Agrega un borde de 3px de grosor */
+}
+
+.navbar {
+    background-color: #f1dfff; /* Color de fondo de la barra de navegación */
+}
+
+.navbar a {
+    color: #4b0082; /* Cambia el color del texto del enlace a blanco */
+    text-decoration: none; /* Elimina el subrayado del enlace */
+    font-weight: normal; /* Asegura que el texto tenga un peso normal */
 }
 
 .navbar .navbar-brand {
@@ -17,5 +37,119 @@ body {
 }
 
 .bg-purple {
-    background-color: #4b0082; /* O el color exacto que quieras */
+    background-color: #4b0082; /* Color de fondo adicional */
+}
+
+.center-container {
+    display: flex;
+    flex-direction: column; /* Alinea los elementos verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    height: 100%; /* Ocupa toda la altura de la ventana */
+}
+
+/* Estilo del botón */
+.startbutton {
+    background-color: #4b0082; /* Color de fondo púrpura */
+    color: white; /* Color del texto */
+    border: none; /* Sin borde */
+    border-radius: 30px; /* Bordes redondeados */
+    padding: 15px 40px; /* Espaciado interno */
+    font-size: 20px; /* Tamaño de la fuente */
+    font-weight: bold; /* Texto en negrita */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Sombra */
+    transition: transform 0.2s, box-shadow 0.2s; /* Animación suave */
+    text-transform: uppercase; /* Texto en mayúsculas */
+}
+
+.startbutton:hover {
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño al pasar el cursor */
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
+}
+
+.startbutton:active {
+    transform: scale(0.95); /* Reduce ligeramente el tamaño al hacer clic */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más suave */
+}
+
+/* Estilo del texto */
+.startingtext {
+    font-size: 24px; /* Tamaño de la fuente */
+    font-weight: bold; /* Texto en negrita */
+    color: #4b0082; /* Color púrpura */
+    margin-bottom: 20px; /* Espaciado inferior */
+    text-align: center; /* Centrar el texto */
+}
+
+/* ===== NUEVOS ESTILOS (se agregan sin modificar los existentes) ===== */
+
+/* Contenedor principal que se ajusta al espacio */
+.main-container {
+    margin-right: 260px; /* Igual al ancho de la sidebar */
+    min-height: calc(100vh - 56px); /* Resta la altura del navbar */
+    padding: 20px;
+}
+
+/* Sidebar personalizada */
+.custom-sidebar2 {
+    position: fixed;
+    top: 56px; /* Debajo del navbar */
+    right: 0;
+    width: 260px;
+    bottom: 0;
+    background-color: #4b0082; /* Usa tu color bg-purple */
+    color: white;
+    padding: 20px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.sidebar2-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.skip-btn .triangle {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 15px solid currentColor;
+    transform: translateY(2px);
+    margin-left: 6px;
+}
+  
+/* El segundo triángulo no tiene margen para que quede pegado */
+.skip-btn .triangle.tight {
+margin-left: -4px;
+}
+  
+  
+  
+/* Responsive */
+@media (max-width: 768px) {
+    .main-container {
+        margin-right: 0;
+    }
+    
+    .custom-sidebar2 {
+        width: 100%;
+        position: relative;
+        top: auto;
+    }
+}
+
+/* Sidebar del perfil (debe sobreponerse) */
+#sidebar {
+    z-index: 1050; /* Mayor que sidebar2 */
+    /* ... otros estilos ... */
+}
+
+/* Sidebar del reto */
+#sidebar2 {
+    z-index: 1040; /* Menor que sidebar */
+    /* ... otros estilos ... */
 }

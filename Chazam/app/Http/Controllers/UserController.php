@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
+    public function dashboard()
+    {
+        return view('user.dashboard'); // Vista para el usuario normal
+    }
+
     /**
      * Muestra el formulario de personalización del usuario
      */

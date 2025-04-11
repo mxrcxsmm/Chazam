@@ -85,7 +85,6 @@ tr:hover {
 
 /* Sobrescribir estilos de inputs */
 .form-control {
-    border: 2px solid #4CAF50 !important; /* Borde personalizado */
     border-radius: 5px !important;
     padding: 10px !important;
 }
@@ -105,7 +104,6 @@ tr:hover {
 
 .modal-content {
     background-color: #f9f9f9 !important;
-    border: 2px solid #4CAF50 !important;
     border-radius: 10px !important;
     padding: 20px !important;
 }
