@@ -1,0 +1,180 @@
+/* Estilos generales */
+body {
+    background-color: #d8b4d8 !important; /* Color de fondo personalizado */
+    font-family: Arial, sans-serif !important;
+}
+
+.container {
+    padding: 20px !important;
+}
+
+h2 {
+    text-align: center !important;
+    color: #333 !important;
+}
+
+/* Estilos para la tabla */
+.table-responsive {
+    overflow-x: auto; /* Permite el desplazamiento horizontal */
+    -webkit-overflow-scrolling: touch; /* Mejora la experiencia en dispositivos táctiles */
+}
+
+table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin-top: 20px !important;
+}
+
+table th,
+table td {
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+    text-align: left !important;
+}
+
+table th {
+    background-color: black !important;
+    color: white !important;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Botones */
+.btn-edit,
+.btn-ban,
+.btn-unban,
+.btn-delete {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.btn-edit {
+    width: 2%;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-ban {
+    background-color: #ff6666;
+}
+
+.btn-unban {
+    background-color: #00cc66;
+}
+
+.btn-edit i,
+.btn-delete i {
+    font-size: 18px;
+    color: #333;
+}
+
+/* Sobrescribir estilos de botones */
+.btn {
+    background-color: #4CAF50; /* Color personalizado */
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    font-size: 16px !important;
+    border-radius: 5px !important;
+}
+
+/* Sobrescribir estilos de inputs */
+.form-control {
+    border-radius: 5px !important;
+    padding: 10px !important;
+}
+
+/* Estilos para los modales */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.modal-content {
+    background-color: #f9f9f9 !important;
+    border-radius: 10px !important;
+    padding: 20px !important;
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Sobrescribir estilos de etiquetas */
+label {
+    font-weight: bold !important;
+    color: #333 !important;
+}
+
+/* Estilos para la navbar */
+.navbar {
+    background-color: #333 !important;
+}
+
+.navbar .nav-link {
+    color: white !important;
+}
+
+.navbar .nav-link.active {
+    color: white !important;
+}
+
+.navbar .nav-link:hover {
+    color: #575656 !important;
+}
+
+.navbar-toggler {
+    border: none; /* Elimina el borde del botón hamburguesa */
+}
+
+.navbar-toggler-icon {
+    border-radius: 2px;
+    width: 30px;
+    height: 3px;
+    display: block;
+    margin: 5px auto;
+}
+
+/* Estilos responsive */
+@media (max-width: 768px) {
+    .navbar-collapse {
+        background-color: #333; /* Fondo del menú desplegable */
+        padding: 10px;
+    }
+
+    .navbar-nav {
+        text-align: center; /* Centra los enlaces */
+    }
+
+    .navbar-nav .nav-item {
+        margin-bottom: 10px; /* Espaciado entre los enlaces */
+    }
+
+    table th,
+    table td {
+        font-size: 14px; /* Reduce el tamaño de fuente */
+        padding: 6px;
+    }
+}
