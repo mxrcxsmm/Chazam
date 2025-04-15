@@ -27,13 +27,13 @@
                 <!-- Racha de días -->
                 <div class="d-flex align-items-center text-warning fw-semibold">
                     <i class="bi bi-fire me-1"></i>
-                    <span>Racha: (X días)</span>
+                    <span>Racha: {{ isset($racha) ? $racha : 0 }} días</span>
                 </div>
 
                 <!-- Puntos -->
                 <div class="d-flex align-items-center text-success fw-semibold">
                     <i class="bi bi-star-fill me-1"></i>
-                    <span>(X) pts</span>
+                    <span>{{ isset($puntos) ? $puntos : 0 }} pts</span>
                 </div>
 
                 <!-- Botón para abrir el menú -->
@@ -57,13 +57,13 @@
                         <!-- Racha de días -->
                         <div class="d-flex align-items-center text-warning fw-semibold mb-2">
                             <i class="bi bi-fire me-1"></i>
-                            <span>Racha: (X) días</span>
+                            <span>Racha: {{ isset($racha) ? $racha : 0 }} días</span>
                         </div>
                     
                         <!-- Puntos -->
                         <div class="d-flex align-items-center text-success fw-semibold">
                             <i class="bi bi-star-fill me-1"></i>
-                            <span>(X) pts</span>
+                            <span>{{ isset($puntos) ? $puntos : 0 }} pts</span>
                         </div>
                     </div>
                     

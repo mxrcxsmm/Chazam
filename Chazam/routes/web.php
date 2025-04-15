@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\ChatLayoutController;
+use Illuminate\Support\Facades\Auth;
 
 // Grupo de rutas para el administrador con middleware
 // Route::middleware(['auth'])->group(function () {
@@ -30,9 +32,30 @@ Route::middleware(['auth'])->group(function () {
 // Grupo de rutas para usuarios normales
 Route::middleware(['auth'])->group(function () {
     Route::get('user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
+    // mostrar racha y puntos
+    Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
 });
 
 Route::prefix('retos')->name('retos.')->group(function () {
     Route::view('reto', 'Retos.reto')->name('reto');
     Route::view('guide', 'Retos.guide')->name('guide'); // Asegúrate de que el nombre sea 'guide'
+});
+
+// Middleware para pasar variables de racha y puntos a todas las vistas
+Route::middleware(['auth'])->group(function () {
+    Route::get('retos/reto', function () {
+        $user = Auth::user();
+        return view('Retos.reto', [
+            'racha' => $user->racha,
+            'puntos' => $user->puntos,
+        ]);
+    })->name('retos.reto');
+    
+    Route::get('retos/guide', function () {
+        $user = Auth::user();
+        return view('Retos.guide', [
+            'racha' => $user->racha,
+            'puntos' => $user->puntos,
+        ]);
+    })->name('retos.guide');
 });
