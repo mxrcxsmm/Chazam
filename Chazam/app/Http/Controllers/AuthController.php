@@ -82,12 +82,15 @@ class AuthController extends Controller
                 $extension = $image->getClientOriginalExtension();
                 $imageName = $request->username . '_' . time() . '.' . $extension;
                 
-                // Guardar la imagen en storage/app/public/img/profile_img
-                $imagePath = $image->storeAs('public/img/profile_img', $imageName);
-                
-                if (!$imagePath) {
-                    throw new \Exception('Error al guardar la imagen');
+                // Asegurarse de que el directorio existe
+                $directory = public_path('img/profile_img');
+                if (!file_exists($directory)) {
+                    mkdir($directory, 0755, true);
                 }
+                
+                // Guardar la imagen directamente en public/img/profile_img
+                $image->move($directory, $imageName);
+                $imagePath = $imageName;
                 
             } catch (\Exception $e) {
                 return redirect()->back()
@@ -107,7 +110,7 @@ class AuthController extends Controller
             'id_nacionalidad' => $request->id_nacionalidad,
             'id_rol' => 2,
             'id_estado' => 1,
-            'img' => $imagePath ? str_replace('public/', '', $imagePath) : null,
+            'img' => $imagePath,
             'descripcion' => $request->descripcion
         ]);
 
