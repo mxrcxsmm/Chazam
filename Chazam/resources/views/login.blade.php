@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <title>Log In</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
     <!-- Materialize CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
-    <!-- Material Icons (opcional) -->
+    <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
-    
     <div id="vanta-bg"></div>
     <div class="login-container">
         <img src="{{ asset('img/logo.png') }}" alt="" style="" class="logo">
@@ -28,12 +28,12 @@
                 <form action="{{ route('auth.login') }}" method="POST">
                     @csrf
                     <div class="input-field">
-                        <input id="email" name="email" type="email" class="validate" required>
+                        <input id="email" name="email" type="email" class="validate" required autocomplete="email">
                         <label for="email">Email</label>
                     </div>
 
                     <div class="input-field">
-                        <input id="password" name="password" type="password" class="validate" required>
+                        <input id="password" name="password" type="password" class="validate" required autocomplete="current-password">
                         <label for="password">Password</label>
                     </div>
 
@@ -47,26 +47,26 @@
 
             <!-- Sign Up -->
             <div id="signup" class="col s12">
-                <form action="{{ route('login') }}" method="POST" class="form-signup">
+                <form action="{{ route('auth.register') }}" method="POST" class="form-signup" enctype="multipart/form-data">
                     @csrf
                     <!-- Primera fila -->
                     <div class="row">
                         <!-- Username -->
                         <div class="input-field col s4">
                             <i class="material-icons prefix">person_outline</i>
-                            <input id="username" name="username" type="text" class="validate" required>
+                            <input id="username" name="username" type="text" class="validate">
                             <label for="username">Username</label>
                         </div>
                         
                         <!-- Nombre y Apellido -->
                         <div class="input-field col s4">
                             <i class="material-icons prefix">badge</i>
-                            <input id="nombre" name="nombre" type="text" required>
+                            <input id="nombre" name="nombre" type="text" class="validate">
                             <label for="nombre">Nombre</label>
                         </div>
                         <div class="input-field col s4">
                             <i class="material-icons prefix">people</i>
-                            <input id="apellido" name="apellido" type="text" required>
+                            <input id="apellido" name="apellido" type="text" class="validate">
                             <label for="apellido">Apellido</label>
                         </div>
                     </div>
@@ -76,20 +76,20 @@
                         <!-- Fecha de Nacimiento -->
                         <div class="input-field col s4">
                             <i class="material-icons prefix">event</i>
-                            <input id="fecha_nacimiento" name="fecha_nacimiento" type="text" class="datepicker" required>
+                            <input id="fecha_nacimiento" name="fecha_nacimiento" type="text" class="datepicker validate">
                             <label for="fecha_nacimiento">Fecha de Nacimiento</label>
                         </div>
 
                         <!-- Email -->
                         <div class="input-field col s4">
                             <i class="material-icons prefix">email</i>
-                            <input id="email_signup" name="email" type="email" required>
+                            <input id="email_signup" name="email" type="email" class="validate">
                             <label for="email_signup">Email</label>
                         </div>
 
                         <!-- Nacionalidad -->
                         <div class="input-field col s4">
-                            <select id="id_nacionalidad" name="id_nacionalidad" required>
+                            <select id="id_nacionalidad" name="id_nacionalidad" class="validate">
                                 <option value="" disabled selected>Elige tu país</option>
                                 @foreach($nacionalidades as $nacionalidad)
                                     <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}</option>
@@ -102,10 +102,15 @@
                     <!-- Tercera fila -->
                     <div class="row">
                         <!-- Password -->
-                        <div class="input-field col s12">
+                        <div class="input-field col s6">
                             <i class="material-icons prefix">lock</i>
-                            <input id="password_signup" name="password" type="password" required>
-                            <label for="password_signup">Password</label>
+                            <input id="password_signup" name="password" type="password" class="validate" autocomplete="new-password">
+                            <label for="password_signup">Contraseña</label>
+                        </div>
+                        <div class="input-field col s6">
+                            <i class="material-icons prefix">lock_outline</i>
+                            <input id="password_confirm" name="password_confirmation" type="password" class="validate" autocomplete="new-password">
+                            <label for="password_confirm">Repetir Contraseña</label>
                         </div>
                     </div>
 
@@ -115,10 +120,10 @@
                         <div class="file-field input-field col s12">
                             <div class="btn btn-small purple">
                                 <span>Foto</span>
-                                <input type="file" name="img">
+                                <input type="file" name="img" accept="image/jpeg,image/png">
                             </div>
                             <div class="file-path-wrapper">
-                                <input class="file-path" type="text">
+                                <input class="file-path validate" type="text">
                             </div>
                         </div>
                     </div>
@@ -143,16 +148,12 @@
             </div>
         </div>
     </div>
-    
 
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.waves.min.js"></script>
-<script>
-
-</script>
-    <!-- Materialize JS -->
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.waves.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="{{ asset('js/validations.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const loginContainer = document.querySelector('.login-container');
@@ -190,22 +191,13 @@
             // Aplicar el ancho inicial
             handleWidthChange();
 
-            // Inicializar datepicker
-            const datepickers = document.querySelectorAll('.datepicker');
-            M.Datepicker.init(datepickers, {
-                format: 'yyyy-mm-dd',
-                yearRange: [1900, new Date().getFullYear()],
-                i18n: {
-                    months: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-                    cancel: 'Cancelar'
-                }
-            });
-
-            // Inicializar selects
+            // Inicializar componentes
+            initDatepicker();
             M.FormSelect.init(document.querySelectorAll('select'));
-
-            // Inicializar textareas
             M.CharacterCounter.init(document.querySelectorAll('textarea'));
+
+            // Inicializar validaciones
+            validateSignUpForm();
 
             // Inicializar Vanta.js
             VANTA.WAVES({
@@ -215,7 +207,5 @@
             });
         });
     </script>
-    
 </body>
-
 </html>
