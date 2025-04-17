@@ -1,0 +1,152 @@
+/**
+ * Estilos para los filtros de la tabla de usuarios en el panel de administración
+ */
+
+/* Contenedor principal de filtros */
+.filtros-container {
+    background-color: #d092fd;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 25px;
+    padding: 20px;
+    transition: all 0.3s ease;
+}
+
+.filtros-container:hover {
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Encabezado de la sección de filtros */
+.filtros-header {
+    background-color: #343a40;
+    color: white;
+    border-radius: 6px 6px 0 0;
+    padding: 12px 20px;
+    margin-bottom: 15px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+}
+
+.filtros-header i {
+    margin-right: 10px;
+    color: #17a2b8;
+}
+
+/* Campos de filtro */
+.filtro-campo {
+    margin-bottom: 15px;
+}
+
+.filtro-campo label {
+    font-weight: 600;
+    color: #495057;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.filtro-campo input,
+.filtro-campo select {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 10px 12px;
+    width: 100%;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.filtro-campo input:focus,
+.filtro-campo select:focus {
+    border-color: #80bdff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    outline: none;
+}
+
+/* Botón de limpiar filtros */
+#limpiarFiltros {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#limpiarFiltros:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+#limpiarFiltros i {
+    margin-right: 8px;
+}
+
+/* Tabla de usuarios */
+#tablaUsuarios {
+    margin-top: 20px;
+}
+
+#tablaUsuarios table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+#tablaUsuarios th {
+    background-color: #343a40;
+    color: white;
+    font-weight: 600;
+    padding: 12px 15px;
+    text-align: left;
+}
+
+#tablaUsuarios td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #dee2e6;
+}
+
+#tablaUsuarios tr:last-child td {
+    border-bottom: none;
+}
+
+#tablaUsuarios tr:hover {
+    background-color: #f5f5f5;
+}
+
+/* Mensaje cuando no hay resultados */
+#tablaUsuarios .no-resultados {
+    text-align: center;
+    padding: 30px;
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* Spinner de carga */
+.spinner-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .filtros-container {
+        padding: 15px;
+    }
+    
+    .filtro-campo {
+        margin-bottom: 10px;
+    }
+    
+    #tablaUsuarios {
+        overflow-x: auto;
+    }
+}

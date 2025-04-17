@@ -34,7 +34,7 @@ class AuthController extends Controller
             if ($user->rol->nom_rol === 'Administrador') {
                 return redirect()->route('admin.usuarios.index'); // Página de administrador
             } else {
-                return redirect()->route('user.dashboard'); // Página de usuario normal
+                return redirect()->route('retos.guide'); // Página de usuario normal
             }
         }
 
