@@ -1,19 +1,23 @@
-@include('layout.chatsHeader')
+@extends('layout.app')
 
-<div class="main-container">
-    <div class="center-container">
-        <!-- Aquí irá el contenido del chat -->
-        <div class="chat-container">
-            <div class="messages-container">
-                <!-- Los mensajes se cargarán aquí dinámicamente -->
-            </div>
-            <div class="input-container">
-                <input type="text" id="message-input" class="form-control" placeholder="Escribe un mensaje...">
-                <button class="btn btn-primary send-button">Enviar</button>
+@section('content')
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">Chat de Amigos</div>
+
+                <div class="card-body">
+                    <div class="chat-container">
+                        <!-- Aquí irá el contenido del chat -->
+                        <p>Bienvenido al chat de amigos</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
+@endsection
 
 <!-- Sidebar de amigos -->
 <div id="sidebar2" class="position-fixed bottom-0 end-0 bg-purple text-white p-4" style="width: 260px; height: 92.5vh; z-index: 1040;">

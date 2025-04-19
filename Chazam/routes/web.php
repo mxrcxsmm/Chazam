@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatLayoutController;
+use App\Http\Controllers\FriendChatController;
 use Illuminate\Support\Facades\Auth;
 
 // Grupo de rutas para el administrador con middleware
@@ -34,6 +35,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
     // mostrar racha y puntos
     Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
+    Route::get('user/friendchat', [FriendChatController::class, 'index'])->name('user.friendchat');
 });
 
 Route::prefix('retos')->name('retos.')->group(function () {
