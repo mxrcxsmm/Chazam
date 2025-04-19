@@ -30,6 +30,7 @@ Route::middleware(['auth'])->group(function () {
 // Grupo de rutas para usuarios normales
 Route::middleware(['auth'])->group(function () {
     Route::get('user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
+    Route::view('user/friendchat', 'user.friendchat')->name('user.friendchat');
 });
 
 Route::prefix('retos')->name('retos.')->group(function () {

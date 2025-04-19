@@ -72,12 +72,12 @@
 
                     <ul class="list-unstyled">
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Personalizar</a></li>
-                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Amigos</a></li>
+                        <li class="mb-4"><a href="{{ route('user.friendchat') }}" class="text-white text-decoration-none">Amigos</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Reportar</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comprar puntos</a></li>
                     </ul>
 
-                    <form method="POST" action="#" class="mt-auto">
+                    <form method="POST" action="{{ route('logout') }}" class="mt-auto">
                         @csrf
                         <button type="submit" class="btn btn-danger w-100 rounded-pill">Cerrar Sesión</button>
                     </form>
