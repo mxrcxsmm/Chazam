@@ -15,12 +15,12 @@ use App\Models\User;
     
 // });
 
-Route::get('/', function () {
-    return view('login');
-})->name('login');
+Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 
 // Rutas de autenticación
 Route::post('login', [AuthController::class, 'login'])->name('auth.login');
+Route::post('register', [AuthController::class, 'store'])->name('auth.register');
+Route::post('check-availability', [AuthController::class, 'checkAvailability'])->name('auth.check-availability');
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Grupo de rutas para el administrador con middleware
