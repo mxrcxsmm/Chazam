@@ -1,4 +1,5 @@
 <!-- filepath: c:\wamp64\www\DAW2\MP12\Chazam\Chazam\resources\views\user\dashboard.blade.php -->
+
 @extends('layout.chatsHeader')
 
 @section('title', 'Dashboard Usuario')

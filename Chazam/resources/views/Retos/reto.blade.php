@@ -8,7 +8,6 @@
     <ul class="list-unstyled">
         <li class="titulo_reto">{{ $reto->nom_reto }}</li>
         <li class="desc_reto">Descripción del reto: {{ $reto->desc_reto }}</li>
-
         <button type="submit" class="btn btn-warning w-100 rounded-pill skip-btn mt-3">
             Skip
             <span class="triangle"></span>

@@ -8,6 +8,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatLayoutController;
 use App\Http\Controllers\EstadoController;
 use App\Http\Controllers\RetoController;
+use App\Http\Controllers\FriendChatController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
@@ -37,9 +38,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
     // mostrar racha y puntos
     Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
+
     
     // Ruta para actualizar estado
     Route::post('estado/actualizar', [EstadoController::class, 'actualizarEstado'])->name('estado.actualizar');
+
+    Route::get('user/friendchat', [FriendChatController::class, 'index'])->name('user.friendchat');
+});
+
+Route::prefix('retos')->name('retos.')->group(function () {
+    Route::view('reto', 'Retos.reto')->name('reto');
+    Route::view('guide', 'Retos.guide')->name('guide'); // Asegúrate de que el nombre sea 'guide'
+
 });
 
 // Middleware para pasar variables de racha y puntos a todas las vistas
