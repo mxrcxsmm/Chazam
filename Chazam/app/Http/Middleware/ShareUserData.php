@@ -22,9 +22,15 @@ class ShareUserData
             $user = Auth::user();
             View::share('racha', $user->racha);
             View::share('puntos', $user->puntos);
+            View::share('username', $user->username);
+            View::share('nombre_completo', $user->nombre_completo);
+            View::share('imagen_perfil', $user->imagen_perfil);
         } else {
             View::share('racha', 0);
             View::share('puntos', 0);
+            View::share('username', '');
+            View::share('nombre_completo', '');
+            View::share('imagen_perfil', asset('images/avatar-default.png'));
         }
 
         return $next($request);
