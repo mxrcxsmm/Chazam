@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Mi Aplicación')</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -77,7 +78,7 @@
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comprar puntos</a></li>
                     </ul>
 
-                    <form method="POST" action="#" class="mt-auto">
+                    <form method="POST" action="{{ route('logout') }}" class="mt-auto">
                         @csrf
                         <button type="submit" class="btn btn-danger w-100 rounded-pill">Cerrar Sesión</button>
                     </form>
@@ -99,6 +100,7 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/estado-usuario.js') }}"></script>
     @stack('scripts')
 </body>
 </html>
