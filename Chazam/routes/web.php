@@ -45,23 +45,23 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('retos/reto', function () {
         $user = Auth::user();
-        // Actualizar estado a Disponible (5)
-        User::where('id_usuario', $user->id_usuario)->update(['id_estado' => 5]);
-        
         return view('Retos.reto', [
             'racha' => $user->racha,
             'puntos' => $user->puntos,
+            'username' => $user->username,
+            'nombre_completo' => $user->nombre_completo,
+            'imagen_perfil' => $user->imagen_perfil,
         ]);
     })->name('retos.reto');
     
     Route::get('retos/guide', function () {
         $user = Auth::user();
-        // Actualizar estado a Disponible (5)
-        User::where('id_usuario', $user->id_usuario)->update(['id_estado' => 5]);
-        
         return view('Retos.guide', [
             'racha' => $user->racha,
             'puntos' => $user->puntos,
+            'username' => $user->username,
+            'nombre_completo' => $user->nombre_completo,
+            'imagen_perfil' => $user->imagen_perfil,
         ]);
     })->name('retos.guide');
 });

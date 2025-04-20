@@ -13,6 +13,9 @@ class ChatLayoutController extends Controller
         return view('layout.chat', [
             'racha' => $user->racha,
             'puntos' => $user->puntos,
+            'username' => $user->username,
+            'nombre_completo' => $user->nombre_completo,
+            'imagen_perfil' => $user->imagen_perfil,
         ]);
     }
 }
