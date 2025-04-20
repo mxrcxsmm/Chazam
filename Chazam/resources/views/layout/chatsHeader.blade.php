@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>@yield('title', 'Mi Aplicación')</title>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -38,15 +39,24 @@
 
                 <!-- Botón para abrir el menú -->
                 <button class="btn btn-outline-dark" onclick="toggleSidebar()">
+                    @if(isset($imagen_perfil) && $imagen_perfil)
+                    <img src="{{ asset($imagen_perfil) }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
+                @else
                     <i class="bi bi-person-circle"></i>
+                @endif
                 </button>
 
                 <!-- Sidebar estilo perfil -->
                 <div id="sidebar" class="position-fixed top-0 end-0 bg-purple text-white p-4" style="width: 260px; height: 100vh; display: none; z-index: 1050;">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="text-center">
-                            <i class="bi bi-person-circle fs-2"></i>
-                            <div>User</div>
+                            @if(isset($imagen_perfil) && $imagen_perfil)
+                            <img src="{{ asset($imagen_perfil) }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover;">
+                            @else
+                                <i class="bi bi-person-circle fs-2"></i>
+                            @endif
+                            <div>{{ isset($username) ? $username : 'Usuario' }}</div>
+                            <div class="small">{{ isset($nombre_completo) ? $nombre_completo : '' }}</div>
                         </div>
                         <button class="btn btn-danger btn-sm" onclick="toggleSidebar()">
                             <i class="bi bi-x-lg"></i>
@@ -72,6 +82,8 @@
 
                     <ul class="list-unstyled">
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Personalizar</a></li>
+                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Amigos</a></li>
+                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comunidades</a></li>
                         <li class="mb-4"><a href="{{ route('user.friendchat') }}" class="text-white text-decoration-none">Amigos</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Reportar</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comprar puntos</a></li>
