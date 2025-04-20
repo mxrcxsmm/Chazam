@@ -7,6 +7,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatLayoutController;
 use App\Http\Controllers\EstadoController;
+use App\Http\Controllers\RetoController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
@@ -43,16 +44,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Middleware para pasar variables de racha y puntos a todas las vistas
 Route::middleware(['auth'])->group(function () {
-    Route::get('retos/reto', function () {
-        $user = Auth::user();
-        return view('Retos.reto', [
-            'racha' => $user->racha,
-            'puntos' => $user->puntos,
-            'username' => $user->username,
-            'nombre_completo' => $user->nombre_completo,
-            'imagen_perfil' => $user->imagen_perfil,
-        ]);
-    })->name('retos.reto');
+    Route::get('retos/reto', [RetoController::class, 'show'])->name('retos.reto');
     
     Route::get('retos/guide', function () {
         $user = Auth::user();

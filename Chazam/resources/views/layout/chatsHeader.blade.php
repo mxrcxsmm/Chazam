@@ -40,10 +40,10 @@
                 <!-- Botón para abrir el menú -->
                 <button class="btn btn-outline-dark" onclick="toggleSidebar()">
                     @if(isset($imagen_perfil) && $imagen_perfil)
-                        <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
-                    @else
-                        <i class="bi bi-person-circle"></i>
-                    @endif
+                    <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
+                @else
+                    <i class="bi bi-person-circle"></i>
+                @endif
                 </button>
 
                 <!-- Sidebar estilo perfil -->
@@ -51,7 +51,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="text-center">
                             @if(isset($imagen_perfil) && $imagen_perfil)
-                                <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover;">
+                            <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover;">
                             @else
                                 <i class="bi bi-person-circle fs-2"></i>
                             @endif
@@ -83,7 +83,7 @@
                     <ul class="list-unstyled">
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Personalizar</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Amigos</a></li>
-                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Reportar</a></li>
+                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comunidades</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comprar puntos</a></li>
                     </ul>
 
