@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const tablaUsuarios = document.getElementById('tablaUsuarios');
 
     function aplicarFiltros() {
+        // Mostrar spinner de carga
         tablaUsuarios.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
 
         const filtros = {
@@ -23,33 +24,38 @@ document.addEventListener('DOMContentLoaded', function () {
             rol: filtroRol.value
         };
 
+        // Obtener el token CSRF del meta tag
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         fetch('/admin/usuarios/filtrar', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
             },
             body: JSON.stringify(filtros)
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error en la respuesta del servidor');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.html) {
-                    tablaUsuarios.innerHTML = data.html;
-                } else if (data.error) {
-                    tablaUsuarios.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
-                }
-            })
-            .catch(error => {
-                console.error('Error al aplicar filtros:', error);
-                tablaUsuarios.innerHTML = '<div class="alert alert-danger">Error al cargar los datos. Por favor, inténtelo de nuevo.</div>';
-            });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error en la respuesta del servidor');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.html) {
+                tablaUsuarios.innerHTML = data.html;
+            } else if (data.error) {
+                tablaUsuarios.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            }
+        })
+        .catch(error => {
+            console.error('Error al aplicar filtros:', error);
+            tablaUsuarios.innerHTML = '<div class="alert alert-danger">Error al cargar los datos. Por favor, inténtelo de nuevo.</div>';
+        });
     }
 
+    // Evento para limpiar filtros
     limpiarFiltrosBtn.addEventListener('click', function () {
         filtroId.value = '';
         filtroUsername.value = '';
@@ -59,6 +65,7 @@ document.addEventListener('DOMContentLoaded', function () {
         aplicarFiltros();
     });
 
+    // Eventos para aplicar filtros
     filtroId.addEventListener('input', aplicarFiltros);
     filtroUsername.addEventListener('input', aplicarFiltros);
     filtroNombreCompleto.addEventListener('input', aplicarFiltros);

@@ -87,3 +87,6 @@ Route::middleware(['auth'])->group(function () {
         ]);
     })->name('retos.guide');
 });
+
+Route::post('/estado/actualizar', [EstadoController::class, 'actualizarEstado'])->middleware('auth');
+Route::get('/estado/usuarios-en-linea', [EstadoController::class, 'obtenerUsuariosEnLinea'])->middleware('auth');

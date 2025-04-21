@@ -7,6 +7,7 @@ use App\Models\Reto;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Models\User;
 
 class RetoController extends Controller
 {
@@ -17,11 +18,14 @@ class RetoController extends Controller
      */
     public function show()
     {
-        // Obtener el reto del día desde la caché o seleccionar uno nuevo
-        $reto = $this->getRetoDelDia();
-        
         // Obtener el usuario autenticado
         $user = Auth::user();
+        
+        // Actualizar estado a Disponible (5)
+        User::where('id_usuario', $user->id_usuario)->update(['id_estado' => 5]);
+        
+        // Obtener el reto del día desde la caché o seleccionar uno nuevo
+        $reto = $this->getRetoDelDia();
         
         return view('Retos.reto', [
             'reto' => $reto,
