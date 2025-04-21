@@ -12,6 +12,7 @@ use App\Http\Controllers\FriendChatController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\RetoAdminController;
+use App\Http\Controllers\ReporteAdminController;
 
 // Grupo de rutas para el administrador con middleware
 // Route::middleware(['auth'])->group(function () {
@@ -40,6 +41,12 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
     Route::post('retos', [RetoAdminController::class, 'store'])->name('retos.store');
     Route::put('retos/{id}', [RetoAdminController::class, 'update'])->name('retos.update');
     Route::delete('retos/{id}', [RetoAdminController::class, 'destroy'])->name('retos.destroy');
+});
+
+// Grupo de rutas para reportes (administrador)
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('reportes', [ReporteAdminController::class, 'index'])->name('reportes.index');
+    Route::delete('reportes/{id}', [ReporteAdminController::class, 'destroy'])->name('reportes.destroy');
 });
 
 // Grupo de rutas para usuarios normales
