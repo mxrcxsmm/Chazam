@@ -42,7 +42,7 @@ class AdminController extends Controller
                 'email' => $request->email,
                 'descripcion' => $request->descripcion,
                 'password' => bcrypt('qweQWE123'), // Contraseña por defecto
-                'id_rol' => 2, // Rol por defecto
+                'id_rol' => 3, // Rol por defecto
                 'id_estado' => 2, // Estado por defecto
                 'id_nacionalidad' => $request->id_nacionalidad,
                 'puntos' => 500, // Puntos iniciales
