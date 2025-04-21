@@ -11,20 +11,11 @@ class UserController extends Controller
     {
         $user = Auth::user();
         
-        // Asegurarse de que la imagen de perfil tenga la ruta correcta
-        if ($user->imagen_perfil) {
-            // Usar asset() para apuntar a la ubicación correcta
-            $imagen_perfil = asset('IMG/profile_img/' . $user->imagen_perfil);
-        } else {
-            $imagen_perfil = null; // O una imagen por defecto
-        }
-        
         return view('user.dashboard', [
             'racha' => $user->racha,
             'puntos' => $user->puntos,
             'username' => $user->username,
             'nombre_completo' => $user->nombre_completo,
-            'imagen_perfil' => $imagen_perfil,
         ]); // Vista para el usuario normal
     }
 }

@@ -5,7 +5,7 @@
     <p class="startingtext">¿Preparado para conocer a gente nueva?</p>
     <div class="button-container">
         <a href="{{ route('retos.reto') }}"><button class="startbutton">Comenzar</button></a>
-        <a href="{{ route('user.friendchat') }}"><button class="friendbutton">Amigos</button></a>
+        <a href="{{ route('user.friendchat') }}"><button class="startbutton">Amigos</button></a>
     </div>
 </div>
 

@@ -10,6 +10,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <!-- Material Icons -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <div id="vanta-bg"></div>
@@ -157,6 +159,17 @@
     <script src="{{ asset('js/validations.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Mostrar mensaje de error si existe
+            @if(session('error'))
+                Swal.fire({
+                    icon: 'error',
+                    title: '¡Cuenta baneada!',
+                    text: '{{ session('error') }}',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#703ea3'
+                });
+            @endif
+
             const loginContainer = document.querySelector('.login-container');
             
             // Función para manejar el cambio de ancho
