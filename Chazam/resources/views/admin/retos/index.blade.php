@@ -30,7 +30,7 @@
                         <a class="nav-link active" href="{{ route('admin.retos.index') }}">Retos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="">Reportes</a>
+                        <a class="nav-link" href="{{route('admin.reportes.index')}}">Reportes</a>
                     </li>
                 </ul>
                 <form action="{{ route('logout') }}" method="POST" class="ms-auto">
