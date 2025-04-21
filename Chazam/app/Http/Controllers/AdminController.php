@@ -42,7 +42,7 @@ class AdminController extends Controller
                 'email' => $request->email,
                 'descripcion' => $request->descripcion,
                 'password' => bcrypt('qweQWE123'), // Contraseña por defecto
-                'id_rol' => 2, // Rol por defecto
+                'id_rol' => 3, // Rol por defecto
                 'id_estado' => 2, // Estado por defecto
                 'id_nacionalidad' => $request->id_nacionalidad,
                 'puntos' => 500, // Puntos iniciales
@@ -104,37 +104,48 @@ class AdminController extends Controller
     // Filtrar usuarios mediante AJAX
     public function filtrar(Request $request)
     {
-        // Iniciar la consulta
-        $query = User::query();
-        
-        // Aplicar filtros si se proporcionan
-        if ($request->has('id') && !empty($request->id)) {
-            $query->where('id_usuario', 'like', '%' . $request->id . '%');
+        try {
+            // Iniciar la consulta
+            $query = User::query();
+
+            // Aplicar filtros si se proporcionan
+            if ($request->filled('id')) {
+                $query->where('id_usuario', 'like', '%' . $request->id . '%');
+            }
+
+            if ($request->filled('username')) {
+                $query->where('username', 'like', '%' . $request->username . '%');
+            }
+
+            if ($request->filled('nombre_completo')) {
+                $query->where(function ($q) use ($request) {
+                    $q->where('nombre', 'like', '%' . $request->nombre_completo . '%')
+                      ->orWhere('apellido', 'like', '%' . $request->nombre_completo . '%');
+                });
+            }
+
+            if ($request->filled('nacionalidad')) {
+                $query->where('id_nacionalidad', $request->nacionalidad);
+            }
+
+            if ($request->filled('rol')) {
+                $query->where('id_rol', $request->rol);
+            }
+
+            // Ejecutar la consulta
+            $admins = $query->get();
+
+            // Si no hay resultados, devolver un mensaje vacío
+            if ($admins->isEmpty()) {
+                return response()->json(['html' => '<tr><td colspan="12" class="text-center">No se encontraron resultados.</td></tr>']);
+            }
+
+            // Devolver la vista parcial con los resultados
+            $html = view('admin.usuarios.tabla-usuarios', compact('admins'))->render();
+            return response()->json(['html' => $html]);
+        } catch (\Exception $e) {
+            // Manejar errores y devolver un mensaje de error
+            return response()->json(['error' => 'Error al cargar los datos: ' . $e->getMessage()], 500);
         }
-        
-        if ($request->has('username') && !empty($request->username)) {
-            $query->where('username', 'like', '%' . $request->username . '%');
-        }
-        
-        if ($request->has('nombre_completo') && !empty($request->nombre_completo)) {
-            $query->where(function($q) use ($request) {
-                $q->where('nombre', 'like', '%' . $request->nombre_completo . '%')
-                  ->orWhere('apellido', 'like', '%' . $request->nombre_completo . '%');
-            });
-        }
-        
-        if ($request->has('nacionalidad') && !empty($request->nacionalidad)) {
-            $query->where('id_nacionalidad', $request->nacionalidad);
-        }
-        
-        if ($request->has('rol') && !empty($request->rol)) {
-            $query->where('id_rol', $request->rol);
-        }
-        
-        // Ejecutar la consulta
-        $admins = $query->get();
-        
-        // Devolver la vista parcial con los resultados
-        return view('admin.usuarios.tabla-usuarios', compact('admins'));
     }
 }

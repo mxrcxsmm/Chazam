@@ -19,7 +19,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Admin Panel</a>
+            <a class="navbar-brand" href="{{route('admin.usuarios.index')}}">Admin Panel</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -30,10 +30,10 @@
                         <a class="nav-link active" href="{{ route('admin.usuarios.index') }}">Usuarios</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Retos</a>
+                        <a class="nav-link" href="{{route('admin.retos.index')}}">Retos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Reportes</a>
+                        <a class="nav-link" href="{{route('admin.reportes.index')}}">Reportes</a>
                     </li>
                 </ul>
                 <!-- Botón de cerrar sesión -->
@@ -179,15 +179,15 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="username" class="form-label">Nombre de Usuario</label>
-                            <input type="text" name="username" id="username" class="form-control" required>
+                            <input type="text" name="username" id="username" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre</label>
-                            <input type="text" name="nombre" id="nombre" class="form-control" required>
+                            <input type="text" name="nombre" id="nombre" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="apellido" class="form-label">Apellido</label>
-                            <input type="text" name="apellido" id="apellido" class="form-control" required>
+                            <input type="text" name="apellido" id="apellido" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
@@ -196,7 +196,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" name="email" id="email" class="form-control" required>
+                            <input type="email" name="email" id="email" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="descripcion" class="form-label">Descripción</label>
@@ -204,7 +204,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="id_nacionalidad" class="form-label">Nacionalidad</label>
-                            <select name="id_nacionalidad" id="id_nacionalidad" class="form-select" required>
+                            <select name="id_nacionalidad" id="id_nacionalidad" class="form-select">
                                 <option value="" disabled selected>Seleccione una nacionalidad</option>
                                 @foreach ($nacionalidades as $nacionalidad)
                                     <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}
@@ -235,24 +235,24 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="edit_username" class="form-label">Nombre de Usuario</label>
-                            <input type="text" name="username" id="edit_username" class="form-control" required>
+                            <input type="text" name="username" id="edit_username" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="edit_nombre" class="form-label">Nombre</label>
-                            <input type="text" name="nombre" id="edit_nombre" class="form-control" required>
+                            <input type="text" name="nombre" id="edit_nombre" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="edit_apellido" class="form-label">Apellido</label>
-                            <input type="text" name="apellido" id="edit_apellido" class="form-control" required>
+                            <input type="text" name="apellido" id="edit_apellido" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="edit_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
                             <input type="date" name="fecha_nacimiento" id="edit_fecha_nacimiento"
-                                class="form-control" required>
+                                class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="edit_email" class="form-label">Email</label>
-                            <input type="email" name="email" id="edit_email" class="form-control" required>
+                            <input type="email" name="email" id="edit_email" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="edit_descripcion" class="form-label">Descripción</label>
@@ -260,7 +260,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit_id_nacionalidad" class="form-label">Nacionalidad</label>
-                            <select name="id_nacionalidad" id="edit_id_nacionalidad" class="form-select" required>
+                            <select name="id_nacionalidad" id="edit_id_nacionalidad" class="form-select">
                                 <option value="" disabled>Seleccione una nacionalidad</option>
                                 @foreach ($nacionalidades as $nacionalidad)
                                     <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}
