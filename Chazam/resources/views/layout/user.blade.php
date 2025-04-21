@@ -6,26 +6,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Zona de Usuario</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{{ asset('css/perfil.css') }}">
 </head>
-<body class="min-h-screen bg-[#8F00FF] text-white">
+<body>
     <div class="flex min-h-screen">
         <!-- Sidebar -->
-        <aside class="w-64 bg-[#430077] p-6 flex flex-col gap-4">
-            <h2 class="text-xl font-bold mb-4">User</h2>
-            <nav class="flex flex-col gap-2">
-                <a href="{{ route('user.personalizacion') }}" class="bg-[#8750B2] px-3 py-2 rounded hover:bg-[#A76BD1]">Mis datos</a>
-                <a href="{{ route('user.perfil') }}" class="bg-[#8750B2] px-3 py-2 rounded hover:bg-[#A76BD1]">Perfil</a>
-                <a href="{{ route('user.mejoras') }}" class="bg-[#8750B2] px-3 py-2 rounded hover:bg-[#A76BD1]">Comprar Mejoras</a>
-                <a href="{{ route('user.puntos') }}" class="bg-[#8750B2] px-3 py-2 rounded hover:bg-[#A76BD1]">Comprar Puntos</a>
+        <aside class="sidebar">
+            <h2>User</h2>
+            <nav>
+                <a href="{{ route('perfil.personalizacion') }}">Mis datos</a>
+                <a href="{{ route('perfil.vista') }}">Perfil</a>
+                <a href="{{ route('perfil.mejoras') }}">Comprar Mejoras</a>
+                <a href="{{ route('perfil.puntos') }}">Comprar Puntos</a>
             </nav>
         </aside>
 
         <!-- Main content -->
-        <main class="flex-1 p-10 bg-[#8F00FF] relative">
-            <!-- Botón de cerrar (opcional, condicional) -->
-            <a href="{{ route('dashboard') }}" class="absolute top-4 right-6 text-white bg-red-600 w-8 h-8 flex items-center justify-center rounded-full hover:bg-red-700">X</a>
-
-            <!-- Slot para contenido -->
+        <main class="main">
+            <a href="{{ route('perfil.dashboard') }}" class="cerrar">X</a>
             @yield('content')
         </main>
     </div>

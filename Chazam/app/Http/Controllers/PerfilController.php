@@ -5,21 +5,37 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
-class UserController extends Controller
+class PerfilController extends Controller
 {
     public function dashboard()
     {
-        return view('user.dashboard'); // Vista para el usuario normal
+        return view('perfil.dashboard'); // Vista para el usuario normal
     }
 
     /**
      * Muestra el formulario de personalización del usuario
      */
-    public function edit()
+    /*public function edit()
     {
         $user = Auth::user();
-        return view('user.personalizacion', compact('user'));
-    }
+        return view('perfil.personalizacion', compact('user'));
+    }*/
+
+    public function edit()
+{
+    // Usuario de prueba
+    $user = (object)[
+        'nombre' => 'David',
+        'apellido' => 'Gómez',
+        'email' => 'david@example.com',
+        'fecha_nacimiento' => now()->subYears(20),
+        'descripcion' => 'Soy estudiante y me gusta programar.',
+        'img' => 'default.png'
+    ];
+
+    return view('perfil.personalizacion', compact('user'));
+}
+
 
     /**
      * Actualiza los datos del usuario
@@ -34,18 +50,18 @@ class UserController extends Controller
             'descripcion' => 'nullable|string|max:1000',
             'img' => 'nullable|string|max:255',
         ]);
-    
+
         $user = Auth::user();
-    
+
         $user->nombre = $request->input('nombre');
         $user->apellido = $request->input('apellido');
         $user->email = $request->input('email');
         $user->fecha_nacimiento = $request->input('fecha_nacimiento');
         $user->descripcion = $request->input('descripcion');
         $user->img = $request->input('img');
-    
+
         $user->save();
-    
-        return redirect()->route('user.personalizacion')->with('success', 'Tus datos se han actualizado correctamente.');
+
+        return redirect()->route('perfil.personalizacion')->with('success', 'Tus datos se han actualizado correctamente.');
     }    
 }

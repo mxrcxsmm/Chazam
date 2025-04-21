@@ -4,7 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\UserController;
+use App\Http\Controllers\PerfilController;
 
 // Grupo de rutas para el administrador con middleware
 // Route::middleware(['auth'])->group(function () {
@@ -29,7 +29,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Grupo de rutas para usuarios normales
 Route::middleware(['auth'])->group(function () {
-    Route::get('user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
+    Route::get('perfil/dashboard', [PerfilController::class, 'dashboard'])->name('perfil.dashboard');
 });
 
 Route::prefix('retos')->name('retos.')->group(function () {
@@ -38,22 +38,22 @@ Route::prefix('retos')->name('retos.')->group(function () {
 });
 
 // Rutas para usuarios autenticados
-Route::middleware(['auth'])->group(function () {
-    Route::prefix('user')->name('user.')->group(function () {
-        Route::get('/personalizacion', [UserController::class, 'edit'])->name('personalizacion');
-        Route::put('/update', [UserController::class, 'update'])->name('update');
-
+// Route::middleware(['auth'])->group(function () {
+    Route::prefix('perfil')->name('perfil.')->group(function () {
+        Route::get('/personalizacion', [PerfilController::class, 'edit'])->name('personalizacion');
+        Route::put('/update', [PerfilController::class, 'update'])->name('update');
+    
         // Rutas futuras
-        Route::get('/perfil', function () {
-            return view('user.perfil');
-        })->name('perfil');
-
+        Route::get('/vista', function () {
+            return view('perfil.vista');
+        })->name('vista');
+    
         Route::get('/mejoras', function () {
-            return view('user.mejoras');
+            return view('perfil.mejoras');
         })->name('mejoras');
-
+    
         Route::get('/puntos', function () {
-            return view('user.puntos');
+            return view('perfil.puntos');
         })->name('puntos');
-    });
-});
+    });     
+// });
