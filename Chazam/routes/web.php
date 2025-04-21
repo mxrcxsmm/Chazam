@@ -33,6 +33,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('admin', [AdminController::class, 'store'])->name('admin.usuarios.store');
     Route::put('admin/{id}', [AdminController::class, 'update'])->name('admin.usuarios.update');
     Route::delete('admin/{id}', [AdminController::class, 'destroy'])->name('admin.usuarios.destroy');
+    Route::post('admin/usuarios/filtrar', [AdminController::class, 'filtrar'])->name('admin.usuarios.filtrar');
 });
 
 // Grupo de rutas para retos (administrador)
