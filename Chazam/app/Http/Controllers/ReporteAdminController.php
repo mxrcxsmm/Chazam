@@ -10,7 +10,7 @@ class ReporteAdminController extends Controller
     public function index()
     {
         // Obtener todos los reportes
-        $reportes = Reporte::with(['reportante', 'reportado'])->get();
+        $reportes = Reporte::with(['reportador', 'reportado'])->get();
         return view('admin.reportes.index', compact('reportes'));
     }
 

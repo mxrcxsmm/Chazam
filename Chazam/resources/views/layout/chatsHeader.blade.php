@@ -51,7 +51,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="text-center">
                             @if(isset($imagen_perfil) && $imagen_perfil)
-                            <img src="{{ asset($imagen_perfil) }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover;">
+                            <img src="{{ asset($imagen_perfil) }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #E6E6FA;">
                             @else
                                 <i class="bi bi-person-circle fs-2"></i>
                             @endif

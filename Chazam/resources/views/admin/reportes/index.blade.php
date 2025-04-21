@@ -46,10 +46,10 @@
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Reportante</th>
+                    <th>Reportador</th>
                     <th>Reportado</th>
-                    <th>Titulo</th>
-                    <th>Motivo</th>
+                    <th>Título</th>
+                    <th>Descripción</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -57,7 +57,7 @@
                 @foreach ($reportes as $reporte)
                     <tr>
                         <td>{{ $reporte->id_reporte }}</td>
-                        <td>{{ $reporte->reportante->username ?? 'N/A' }}</td>
+                        <td>{{ $reporte->reportador->username ?? 'N/A' }}</td>
                         <td>{{ $reporte->reportado->username ?? 'N/A' }}</td>
                         <td>{{ $reporte->titulo }}</td>
                         <td>{{ $reporte->descripcion }}</td>
