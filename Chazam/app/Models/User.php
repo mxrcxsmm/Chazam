@@ -20,6 +20,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'nombre',
         'apellido',
         'fecha_nacimiento',
+        'genero',
         'email',
         'password',
         'puntos',
