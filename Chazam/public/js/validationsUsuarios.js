@@ -31,80 +31,91 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Validar nombre de usuario
         if (!username.value.trim()) {
-            alert('El nombre de usuario es obligatorio.');
+            showError('El nombre de usuario es obligatorio.');
             return false;
         }
         if (username.value.length > 20) {
-            alert('El nombre de usuario no puede tener más de 20 caracteres.');
+            showError('El nombre de usuario no puede tener más de 20 caracteres.');
             return false;
         }
         if (!/^[a-zA-Z0-9_]+$/.test(username.value)) {
-            alert('El nombre de usuario solo puede contener letras, números y guiones bajos.');
+            showError('El nombre de usuario solo puede contener letras, números y guiones bajos.');
             return false;
         }
 
         // Validar nombre
         if (!nombre.value.trim()) {
-            alert('El nombre es obligatorio.');
+            showError('El nombre es obligatorio.');
             return false;
         }
         if (nombre.value.length > 50) {
-            alert('El nombre no puede tener más de 50 caracteres.');
+            showError('El nombre no puede tener más de 50 caracteres.');
             return false;
         }
-        if (!/^[a-zA-Z\s]+$/.test(nombre.value)) {
-            alert('El nombre solo puede contener letras y espacios.');
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(nombre.value)) {
+            showError('El nombre solo puede contener letras, espacios, acentos y la letra ñ.');
             return false;
         }
 
         // Validar apellido
         if (!apellido.value.trim()) {
-            alert('El apellido es obligatorio.');
+            showError('El apellido es obligatorio.');
             return false;
         }
         if (apellido.value.length > 50) {
-            alert('El apellido no puede tener más de 50 caracteres.');
+            showError('El apellido no puede tener más de 50 caracteres.');
             return false;
         }
-        if (!/^[a-zA-Z\s]+$/.test(apellido.value)) {
-            alert('El apellido solo puede contener letras y espacios.');
+        if (!/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/.test(apellido.value)) {
+            showError('El apellido solo puede contener letras, espacios, acentos y la letra ñ.');
             return false;
         }
 
         // Validar fecha de nacimiento (solo en el formulario de creación)
         if (isCreateForm) {
             if (!fechaNacimiento.value.trim()) {
-                alert('La fecha de nacimiento es obligatoria.');
+                showError('La fecha de nacimiento es obligatoria.');
                 return false;
             }
             if (new Date(fechaNacimiento.value) > new Date()) {
-                alert('La fecha de nacimiento no puede ser posterior a hoy.');
+                showError('La fecha de nacimiento no puede ser posterior a hoy.');
                 return false;
             }
         }
 
         // Validar email
         if (!email.value.trim()) {
-            alert('El email es obligatorio.');
+            showError('El email es obligatorio.');
             return false;
         }
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value)) {
-            alert('El formato del email no es válido.');
+            showError('El formato del email no es válido.');
             return false;
         }
 
         // Validar nacionalidad
         if (!nacionalidad.value) {
-            alert('La nacionalidad es obligatoria.');
+            showError('La nacionalidad es obligatoria.');
             return false;
         }
 
         // Validar descripción (opcional)
         if (descripcion && descripcion.value.length > 200) {
-            alert('La descripción no puede tener más de 200 caracteres.');
+            showError('La descripción no puede tener más de 200 caracteres.');
             return false;
         }
 
         return true;
+    }
+
+    // Función para mostrar errores con SweetAlert2
+    function showError(message) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de Validación',
+            text: message,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Aceptar'
+        });
     }
 });
