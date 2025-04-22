@@ -6,6 +6,7 @@
             <th>Email</th>
             <th>Nombre Completo</th>
             <th>Fecha nacimiento</th>
+            <th>Género</th>
             <th>Descripción</th>
             <th>Nacionalidad</th>
             <th>Inicio Ban</th>
@@ -23,6 +24,7 @@
                 <td>{{ $user->email }}</td>
                 <td>{{ $user->nombre }} {{ $user->apellido }}</td>
                 <td>{{ $user->fecha_nacimiento->format('Y-m-d') }}</td>
+                <td>{{ $user->genero }}</td>
                 <td>{{ $user->descripcion }}</td>
                 <td>{{ $user->nacionalidad->nombre ?? 'Sin nacionalidad' }}</td>
                 <td>{{ $user->inicio_ban }}</td>
