@@ -27,7 +27,7 @@ class AdminController extends Controller
             'username' => 'required|string|max:255|unique:users,username',
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'fecha_nacimiento' => 'required|date',
+            'fecha_nacimiento' => 'required|date|before_or_equal:' . now()->format('Y-m-d'),
             'email' => 'required|email|unique:users,email',
             'descripcion' => 'nullable|string',
             'id_nacionalidad' => 'required|exists:nacionalidad,id_nacionalidad', // Validar que exista en la tabla nacionalidad
@@ -71,11 +71,11 @@ class AdminController extends Controller
             'username' => 'required|string|max:255|unique:users,username,' . $user->id_usuario . ',id_usuario',
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
-            'fecha_nacimiento' => 'required|date',
+            'fecha_nacimiento' => 'required|date|before_or_equal:' . now()->format('Y-m-d'),
             'email' => 'required|email|unique:users,email,' . $user->id_usuario . ',id_usuario',
             'descripcion' => 'nullable|string',
             'password' => 'nullable|string|min:8',
-            'id_nacionalidad' => 'required|exists:nacionalidad,id_nacionalidad', // Validar que exista en la tabla nacionalidad
+            'id_nacionalidad' => 'required|exists:nacionalidad,id_nacionalidad',
         ]);
 
         $user->update([
@@ -86,10 +86,10 @@ class AdminController extends Controller
             'email' => $request->email,
             'descripcion' => $request->descripcion,
             'password' => $request->password ? bcrypt($request->password) : $user->password,
-            'id_nacionalidad' => $request->id_nacionalidad, // Actualizar la nacionalidad
+            'id_nacionalidad' => $request->id_nacionalidad,
         ]);
 
-        return redirect()->route('admin.usuarios.index')->with('success', 'Usuario actualizado correctamente.');
+        return redirect()->route('admin.usuarios.index')->with('update', 'Usuario actualizado correctamente.');
     }
 
     // Eliminar un administrador de la base de datos

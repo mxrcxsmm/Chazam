@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <title>Lista de Retos - Admin</title>
+    <title>Lista de Productos - Admin</title>
 </head>
 
 <body 
@@ -19,7 +19,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{ route('admin.retos.index') }}">Admin Panel - Retos</a>
+            <a class="navbar-brand" href="{{route('admin.usuarios.index')}}">Admin Panel</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -30,7 +30,7 @@
                         <a class="nav-link" href="{{ route('admin.usuarios.index') }}">Usuarios</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('admin.retos.index') }}">Retos</a>
+                        <a class="nav-link" href="{{route('admin.retos.index')}}">Retos</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('admin.reportes.index')}}">Reportes</a>
@@ -39,40 +39,42 @@
                         <a class="nav-link active" href="{{ route('admin.productos.index') }}">Productos</a>
                     </li>
                 </ul>
-                <form action="{{ route('logout') }}" method="POST" class="ms-auto">
-                    @csrf
-                    <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
-                </form>
+                <!-- Botón de cerrar sesión -->
+            <form action="{{ route('logout') }}" method="POST" class="ms-auto">
+                @csrf
+                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+            </form>
             </div>
         </div>
     </nav>
-
     <div class="container mt-4">
-        <h1>Lista de Retos</h1>
-        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Crear Reto</button>
+        <h1>Lista de Productos</h1>
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#createModal">Crear Producto</button>
 
         <table class="table table-striped table-hover">
             <thead>
                 <tr>
                     <th>ID</th>
-                    <th>Nombre</th>
+                    <th>Título</th>
                     <th>Descripción</th>
+                    <th>Valor</th>
+                    <th>Tipo de Producto</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach ($retos as $reto)
+                @foreach ($productos as $producto)
                     <tr>
-                        <td>{{ $reto->id_reto }}</td>
-                        <td>{{ $reto->nom_reto }}</td>
-                        <td>{{ $reto->desc_reto }}</td>
+                        <td>{{ $producto->id_producto }}</td>
+                        <td>{{ $producto->titulo }}</td>
+                        <td>{{ $producto->descripcion }}</td>
+                        <td>{{ $producto->valor }}</td>
+                        <td>{{ $producto->tipoProducto->tipo_producto ?? 'Sin tipo' }}</td>
                         <td>
-                            <!-- Botón para abrir el modal de editar -->
-                            <a href="javascript:void(0)" onclick="openEditModal({{ $reto }})" class="text-warning" title="Editar">
+                            <a href="javascript:void(0)" onclick="openEditModal({{ $producto }})" class="text-warning" title="Editar">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
-                            <!-- Botón para eliminar -->
-                            <form action="{{ route('admin.retos.destroy', $reto->id_reto) }}" method="POST" class="delete-form" style="display:inline-block;">
+                            <form action="{{ route('admin.productos.destroy', $producto->id_producto) }}" method="POST" style="display:inline-block;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" style="border: none; background: none; cursor: pointer;" title="Eliminar">
@@ -86,24 +88,37 @@
         </table>
     </div>
 
-    <!-- Modal para Crear Reto -->
+    <!-- Modal para Crear Producto -->
     <div id="createModal" class="modal fade" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form id="createForm" action="{{ route('admin.retos.store') }}" method="POST">
+                <form id="createForm" action="{{ route('admin.productos.store') }}" method="POST">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title" id="createModalLabel">Crear Reto</h5>
+                        <h5 class="modal-title" id="createModalLabel">Crear Producto</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="nom_reto" class="form-label">Nombre del Reto</label>
-                            <input type="text" name="nom_reto" id="nom_reto" class="form-control">
+                            <label for="titulo" class="form-label">Título</label>
+                            <input type="text" name="titulo" id="titulo" class="form-control">
                         </div>
                         <div class="mb-3">
-                            <label for="desc_reto" class="form-label">Descripción</label>
-                            <textarea name="desc_reto" id="desc_reto" class="form-control"></textarea>
+                            <label for="descripcion" class="form-label">Descripción</label>
+                            <textarea name="descripcion" id="descripcion" class="form-control"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="valor" class="form-label">Valor</label>
+                            <input type="number" name="valor" id="valor" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="id_tipo_producto" class="form-label">Tipo de Producto</label>
+                            <select name="id_tipo_producto" id="id_tipo_producto" class="form-select">
+                                <option value="" disabled selected>Seleccione un tipo</option>
+                                @foreach ($tiposProducto as $tipo)
+                                    <option value="{{ $tipo->id_tipo_producto }}">{{ $tipo->tipo_producto }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -114,7 +129,7 @@
         </div>
     </div>
 
-    <!-- Modal para Editar Reto -->
+    <!-- Modal para Editar Producto -->
     <div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -122,17 +137,30 @@
                     @csrf
                     @method('PUT')
                     <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Editar Reto</h5>
+                        <h5 class="modal-title" id="editModalLabel">Editar Producto</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="edit_nom_reto" class="form-label">Nombre del Reto</label>
-                            <input type="text" name="nom_reto" id="edit_nom_reto" class="form-control">
+                            <label for="edit_titulo" class="form-label">Título</label>
+                            <input type="text" name="titulo" id="edit_titulo" class="form-control">
                         </div>
                         <div class="mb-3">
-                            <label for="edit_desc_reto" class="form-label">Descripción</label>
-                            <textarea name="desc_reto" id="edit_desc_reto" class="form-control"></textarea>
+                            <label for="edit_descripcion" class="form-label">Descripción</label>
+                            <textarea name="descripcion" id="edit_descripcion" class="form-control"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_valor" class="form-label">Valor</label>
+                            <input type="number" name="valor" id="edit_valor" class="form-control">
+                        </div>
+                        <div class="mb-3">
+                            <label for="edit_id_tipo_producto" class="form-label">Tipo de Producto</label>
+                            <select name="id_tipo_producto" id="edit_id_tipo_producto" class="form-select">
+                                <option value="" disabled>Seleccione un tipo</option>
+                                @foreach ($tiposProducto as $tipo)
+                                    <option value="{{ $tipo->id_tipo_producto }}">{{ $tipo->tipo_producto }}</option>
+                                @endforeach
+                            </select>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -142,21 +170,23 @@
             </div>
         </div>
     </div>
-    
+
     <script>
-        function openEditModal(reto) {
-            document.getElementById('edit_nom_reto').value = reto.nom_reto;
-            document.getElementById('edit_desc_reto').value = reto.desc_reto;
+        function openEditModal(producto) {
+            document.getElementById('edit_titulo').value = producto.titulo;
+            document.getElementById('edit_descripcion').value = producto.descripcion;
+            document.getElementById('edit_valor').value = producto.valor;
+            document.getElementById('edit_id_tipo_producto').value = producto.id_tipo_producto;
 
             const editForm = document.getElementById('editForm');
-            editForm.action = `/admin/retos/${reto.id_reto}`;
+            editForm.action = `/admin/productos/${producto.id_producto}`;
 
             const editModal = new bootstrap.Modal(document.getElementById('editModal'));
             editModal.show();
         }
     </script>
-    <script src="{{ asset('js/retos.js') }}"></script>
-    <script src="{{ asset('js/validationsRetos.js') }}"></script>
+    <script src="{{ asset('js/productos.js') }}"></script>
+    <script src="{{ asset('js/validationsProductos.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 
