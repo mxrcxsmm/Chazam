@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\RetoAdminController;
 use App\Http\Controllers\ReporteAdminController;
+use App\Http\Controllers\ProductosAdminController;
 
 // Grupo de rutas para el administrador con middleware
 // Route::middleware(['auth'])->group(function () {
@@ -48,6 +49,14 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('reportes', [ReporteAdminController::class, 'index'])->name('reportes.index');
     Route::delete('reportes/{id}', [ReporteAdminController::class, 'destroy'])->name('reportes.destroy');
+});
+
+// Grupo de rutas para productos (administrador)
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('productos', [ProductosAdminController::class, 'index'])->name('productos.index');
+    Route::post('productos', [ProductosAdminController::class, 'store'])->name('productos.store');
+    Route::put('productos/{id}', [ProductosAdminController::class, 'update'])->name('productos.update');
+    Route::delete('productos/{id}', [ProductosAdminController::class, 'destroy'])->name('productos.destroy');
 });
 
 // Grupo de rutas para usuarios normales

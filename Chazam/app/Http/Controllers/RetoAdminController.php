@@ -50,7 +50,7 @@ class RetoAdminController extends Controller
             'desc_reto' => $request->desc_reto,
         ]);
 
-        return redirect()->route('admin.retos.index')->with('success', 'Reto actualizado correctamente.');
+        return redirect()->route('admin.retos.index')->with('update', 'Reto actualizado correctamente.');
     }
 
     public function destroy($id_reto)
