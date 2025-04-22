@@ -23,7 +23,7 @@
 
         <!-- Main content -->
         <main class="main">
-            <a href="{{ route('perfil.dashboard') }}" class="cerrar">X</a>
+            <a href="{{ route('retos.guide') }}" class="cerrar">X</a>
             @yield('content')
         </main>
     </div>
