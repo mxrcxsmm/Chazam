@@ -4,6 +4,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PerfilController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ChatLayoutController;
 use App\Http\Controllers\EstadoController;
@@ -61,6 +62,7 @@ Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () 
 
 // Grupo de rutas para usuarios normales
 Route::middleware(['auth'])->group(function () {
+    Route::get('perfil/dashboard', [PerfilController::class, 'dashboard'])->name('perfil.dashboard');
     Route::get('user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
     // mostrar racha y puntos
     Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
@@ -75,8 +77,28 @@ Route::middleware(['auth'])->group(function () {
 Route::prefix('retos')->name('retos.')->group(function () {
     Route::view('reto', 'Retos.reto')->name('reto');
     Route::view('guide', 'Retos.guide')->name('guide'); // Asegúrate de que el nombre sea 'guide'
-
 });
+
+// Rutas para usuarios autenticados
+// Route::middleware(['auth'])->group(function () {
+    Route::prefix('perfil')->name('perfil.')->group(function () {
+        Route::get('/personalizacion', [PerfilController::class, 'edit'])->name('personalizacion');
+        Route::put('/update', [PerfilController::class, 'update'])->name('update');
+    
+        // Rutas futuras
+        Route::get('/vista', function () {
+            return view('perfil.vista');
+        })->name('vista');
+    
+        Route::get('/mejoras', function () {
+            return view('perfil.mejoras');
+        })->name('mejoras');
+    
+        Route::get('/puntos', function () {
+            return view('perfil.puntos');
+        })->name('puntos');
+    });     
+// });
 
 // Middleware para pasar variables de racha y puntos a todas las vistas
 Route::middleware(['auth'])->group(function () {
