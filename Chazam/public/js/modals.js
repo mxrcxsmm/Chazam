@@ -14,13 +14,16 @@ function openEditModal(user) {
     document.getElementById('edit_nombre').value = user.nombre;
     document.getElementById('edit_apellido').value = user.apellido;
     document.getElementById('edit_fecha_nacimiento').value = user.fecha_nacimiento;
+    document.getElementById('edit_genero').value = user.genero;
     document.getElementById('edit_email').value = user.email;
     document.getElementById('edit_descripcion').value = user.descripcion;
     document.getElementById('edit_id_nacionalidad').value = user.id_nacionalidad;
 
+    // Configurar la URL de acción del formulario
     const editForm = document.getElementById('editForm');
-    editForm.action = `/admin/${user.id_usuario}`; // Configurar la URL de acción
+    editForm.action = `/admin/usuarios/${user.id_usuario}`; // Asegúrate de que esta URL sea válida
 
+    // Mostrar el modal
     const editModal = new bootstrap.Modal(document.getElementById('editModal'));
     editModal.show();
 }
