@@ -80,7 +80,7 @@ Route::prefix('retos')->name('retos.')->group(function () {
 });
 
 // Rutas para usuarios autenticados
-// Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::prefix('perfil')->name('perfil.')->group(function () {
         Route::get('/personalizacion', [PerfilController::class, 'edit'])->name('personalizacion');
         Route::put('/update', [PerfilController::class, 'update'])->name('update');
@@ -98,7 +98,7 @@ Route::prefix('retos')->name('retos.')->group(function () {
             return view('perfil.puntos');
         })->name('puntos');
     });     
-// });
+});
 
 // Middleware para pasar variables de racha y puntos a todas las vistas
 Route::middleware(['auth'])->group(function () {

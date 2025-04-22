@@ -15,13 +15,13 @@ class PerfilController extends Controller
     /**
      * Muestra el formulario de personalización del usuario
      */
-    /*public function edit()
+    public function edit()
     {
         $user = Auth::user();
         return view('perfil.personalizacion', compact('user'));
-    }*/
+    }
 
-    public function edit()
+    /*public function edit()
 {
     // Usuario de prueba
     $user = (object)[
@@ -34,7 +34,7 @@ class PerfilController extends Controller
     ];
 
     return view('perfil.personalizacion', compact('user'));
-}
+}*/
 
 
     /**
