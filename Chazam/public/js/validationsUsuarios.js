@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Validar formulario de creación
     if (createForm) {
         createForm.addEventListener('submit', function (e) {
-            if (!validateUsuarioForm(createForm)) {
+            if (!validateUsuarioForm(createForm, true)) { // true indica que es el formulario de creación
                 e.preventDefault();
             }
         });
@@ -14,13 +14,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // Validar formulario de edición
     if (editForm) {
         editForm.addEventListener('submit', function (e) {
-            if (!validateUsuarioForm(editForm)) {
+            if (!validateUsuarioForm(editForm, false)) { // false indica que es el formulario de edición
                 e.preventDefault();
             }
         });
     }
 
-    function validateUsuarioForm(form) {
+    function validateUsuarioForm(form, isCreateForm) {
         const username = form.querySelector('[name="username"]');
         const nombre = form.querySelector('[name="nombre"]');
         const apellido = form.querySelector('[name="apellido"]');
@@ -71,14 +71,16 @@ document.addEventListener('DOMContentLoaded', function () {
             return false;
         }
 
-        // Validar fecha de nacimiento
-        if (!fechaNacimiento.value.trim()) {
-            alert('La fecha de nacimiento es obligatoria.');
-            return false;
-        }
-        if (new Date(fechaNacimiento.value) > new Date()) {
-            alert('La fecha de nacimiento no puede ser posterior a hoy.');
-            return false;
+        // Validar fecha de nacimiento (solo en el formulario de creación)
+        if (isCreateForm) {
+            if (!fechaNacimiento.value.trim()) {
+                alert('La fecha de nacimiento es obligatoria.');
+                return false;
+            }
+            if (new Date(fechaNacimiento.value) > new Date()) {
+                alert('La fecha de nacimiento no puede ser posterior a hoy.');
+                return false;
+            }
         }
 
         // Validar email
