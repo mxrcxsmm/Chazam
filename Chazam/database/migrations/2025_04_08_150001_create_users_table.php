@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('nombre', 100);
             $table->string('apellido', 100);
             $table->date('fecha_nacimiento');
+            $table->enum('genero', ['hombre', 'mujer']);
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
