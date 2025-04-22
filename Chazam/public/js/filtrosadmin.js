@@ -3,8 +3,7 @@
  * Este script maneja la funcionalidad de filtrado de usuarios mediante AJAX
  */
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Elementos del formulario de filtros
+document.addEventListener('DOMContentLoaded', function () {
     const filtroId = document.getElementById('filtro_id');
     const filtroUsername = document.getElementById('filtro_username');
     const filtroNombreCompleto = document.getElementById('filtro_nombre_completo');
@@ -13,12 +12,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const limpiarFiltrosBtn = document.getElementById('limpiarFiltros');
     const tablaUsuarios = document.getElementById('tablaUsuarios');
 
-    // Función para aplicar los filtros
     function aplicarFiltros() {
-        // Mostrar indicador de carga
+        // Mostrar spinner de carga
         tablaUsuarios.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></div>';
-        
-        // Recopilar los valores de los filtros
+
         const filtros = {
             id: filtroId.value.trim(),
             username: filtroUsername.value.trim(),
@@ -27,12 +24,15 @@ document.addEventListener('DOMContentLoaded', function() {
             rol: filtroRol.value
         };
 
-        // Realizar la petición AJAX
+        // Obtener el token CSRF del meta tag
+        const token = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         fetch('/admin/usuarios/filtrar', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                'X-CSRF-TOKEN': token,
+                'Accept': 'application/json'
             },
             body: JSON.stringify(filtros)
         })
@@ -40,11 +40,14 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!response.ok) {
                 throw new Error('Error en la respuesta del servidor');
             }
-            return response.text();
+            return response.json();
         })
-        .then(html => {
-            // Actualizar la tabla con los resultados filtrados
-            tablaUsuarios.innerHTML = html;
+        .then(data => {
+            if (data.html) {
+                tablaUsuarios.innerHTML = data.html;
+            } else if (data.error) {
+                tablaUsuarios.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+            }
         })
         .catch(error => {
             console.error('Error al aplicar filtros:', error);
@@ -52,23 +55,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Función para limpiar los filtros
-    function limpiarFiltros() {
-        // Restablecer todos los campos del formulario
+    // Evento para limpiar filtros
+    limpiarFiltrosBtn.addEventListener('click', function () {
         filtroId.value = '';
         filtroUsername.value = '';
         filtroNombreCompleto.value = '';
         filtroNacionalidad.value = '';
         filtroRol.value = '';
-        
-        // Volver a cargar la tabla con todos los usuarios
         aplicarFiltros();
-    }
+    });
 
-    // Event listener para el botón de limpiar filtros
-    limpiarFiltrosBtn.addEventListener('click', limpiarFiltros);
-
-    // Aplicar filtros automáticamente al cambiar cualquier campo
+    // Eventos para aplicar filtros
     filtroId.addEventListener('input', aplicarFiltros);
     filtroUsername.addEventListener('input', aplicarFiltros);
     filtroNombreCompleto.addEventListener('input', aplicarFiltros);

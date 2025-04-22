@@ -18,7 +18,7 @@ class UsersSeeder extends Seeder
                 'fecha_nacimiento' => '1990-01-01',
                 'email' => 'admin@example.com',
                 'password' => Hash::make('qweQWE123'),
-                'puntos' => 500,
+                'puntos' => 1000,
                 'id_nacionalidad' => 1,
                 'id_rol' => 1,
                 'id_estado' => 1,
@@ -32,7 +32,7 @@ class UsersSeeder extends Seeder
                 'fecha_nacimiento' => '1990-01-01',
                 'email' => 'moderador@example.com',
                 'password' => Hash::make('qweQWE123'),
-                'puntos' => 500,
+                'puntos' => 800,
                 'id_nacionalidad' => 1,
                 'id_rol' => 2,
                 'id_estado' => 1,
@@ -60,7 +60,7 @@ class UsersSeeder extends Seeder
                 'fecha_nacimiento' => '1992-07-20',
                 'email' => 'carlos@example.com',
                 'password' => Hash::make('qweQWE123'),
-                'puntos' => 500,
+                'puntos' => 450,
                 'id_nacionalidad' => 3, // Colombiana
                 'id_rol' => 3,
                 'id_estado' => 1,
@@ -74,7 +74,7 @@ class UsersSeeder extends Seeder
                 'fecha_nacimiento' => '1993-08-15',
                 'email' => 'ana@example.com',
                 'password' => Hash::make('qweQWE123'),
-                'puntos' => 500,
+                'puntos' => 470,
                 'id_nacionalidad' => 4, // Argentina
                 'id_rol' => 3,
                 'id_estado' => 1,
@@ -88,7 +88,7 @@ class UsersSeeder extends Seeder
                 'fecha_nacimiento' => '1994-09-10',
                 'email' => 'luis@example.com',
                 'password' => Hash::make('qweQWE123'),
-                'puntos' => 500,
+                'puntos' => 480,
                 'id_nacionalidad' => 5, // Chilena
                 'id_rol' => 3,
                 'id_estado' => 1,
@@ -102,7 +102,7 @@ class UsersSeeder extends Seeder
                 'fecha_nacimiento' => '1995-10-05',
                 'email' => 'maria@example.com',
                 'password' => Hash::make('qweQWE123'),
-                'puntos' => 500,
+                'puntos' => 490,
                 'id_nacionalidad' => 6, // Peruana
                 'id_rol' => 3,
                 'id_estado' => 1,

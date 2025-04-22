@@ -16,14 +16,11 @@ function openEditModal(user) {
     document.getElementById('edit_fecha_nacimiento').value = user.fecha_nacimiento;
     document.getElementById('edit_email').value = user.email;
     document.getElementById('edit_descripcion').value = user.descripcion;
+    document.getElementById('edit_id_nacionalidad').value = user.id_nacionalidad;
 
-    // Preseleccionar la nacionalidad
-    const nacionalidadSelect = document.getElementById('edit_id_nacionalidad');
-    nacionalidadSelect.value = user.id_nacionalidad;
-
-    // Actualizar la acción del formulario
     const editForm = document.getElementById('editForm');
-    editForm.action = `/admin/${user.id_usuario}`;
+    editForm.action = `/admin/${user.id_usuario}`; // Configurar la URL de acción
 
-    openModal('editModal');
+    const editModal = new bootstrap.Modal(document.getElementById('editModal'));
+    editModal.show();
 }

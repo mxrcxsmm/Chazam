@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     <link rel="stylesheet" href="{{ asset('css/filtros.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap -->
@@ -19,7 +20,7 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="#">Admin Panel</a>
+            <a class="navbar-brand" href="{{route('admin.usuarios.index')}}">Admin Panel</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -30,10 +31,13 @@
                         <a class="nav-link active" href="{{ route('admin.usuarios.index') }}">Usuarios</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Retos</a>
+                        <a class="nav-link" href="{{route('admin.retos.index')}}">Retos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Reportes</a>
+                        <a class="nav-link" href="{{route('admin.reportes.index')}}">Reportes</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ route('admin.productos.index') }}">Productos</a>
                     </li>
                 </ul>
                 <!-- Botón de cerrar sesión -->
@@ -151,7 +155,7 @@
                                 <a href="javascript:void(0)" onclick="openEditModal({{ $user }})" class="text-warning" title="Editar">
                                     <i class="fas fa-pencil-alt"></i>
                                 </a>
-                                <form action="{{ route('admin.usuarios.destroy', $user->id_usuario) }}" method="POST" style="display:inline-block;">
+                                <form action="{{ route('admin.usuarios.destroy', $user->id_usuario) }}" method="POST" class="delete-form" style="display:inline-block;">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" style="border: none; background: none; cursor: pointer;" title="Eliminar">
@@ -179,24 +183,23 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="username" class="form-label">Nombre de Usuario</label>
-                            <input type="text" name="username" id="username" class="form-control" required>
+                            <input type="text" name="username" id="username" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre</label>
-                            <input type="text" name="nombre" id="nombre" class="form-control" required>
+                            <input type="text" name="nombre" id="nombre" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="apellido" class="form-label">Apellido</label>
-                            <input type="text" name="apellido" id="apellido" class="form-control" required>
+                            <input type="text" name="apellido" id="apellido" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control"
-                                required>
+                            <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control" max="{{ date('Y-m-d') }}">
                         </div>
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" name="email" id="email" class="form-control" required>
+                            <input type="email" name="email" id="email" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="descripcion" class="form-label">Descripción</label>
@@ -204,7 +207,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="id_nacionalidad" class="form-label">Nacionalidad</label>
-                            <select name="id_nacionalidad" id="id_nacionalidad" class="form-select" required>
+                            <select name="id_nacionalidad" id="id_nacionalidad" class="form-select">
                                 <option value="" disabled selected>Seleccione una nacionalidad</option>
                                 @foreach ($nacionalidades as $nacionalidad)
                                     <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}
@@ -235,24 +238,23 @@
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="edit_username" class="form-label">Nombre de Usuario</label>
-                            <input type="text" name="username" id="edit_username" class="form-control" required>
+                            <input type="text" name="username" id="edit_username" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="edit_nombre" class="form-label">Nombre</label>
-                            <input type="text" name="nombre" id="edit_nombre" class="form-control" required>
+                            <input type="text" name="nombre" id="edit_nombre" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="edit_apellido" class="form-label">Apellido</label>
-                            <input type="text" name="apellido" id="edit_apellido" class="form-control" required>
+                            <input type="text" name="apellido" id="edit_apellido" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="edit_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" name="fecha_nacimiento" id="edit_fecha_nacimiento"
-                                class="form-control" required>
+                            <input type="date" name="fecha_nacimiento" id="edit_fecha_nacimiento" class="form-control" max="{{ date('Y-m-d') }}">
                         </div>
                         <div class="mb-3">
                             <label for="edit_email" class="form-label">Email</label>
-                            <input type="email" name="email" id="edit_email" class="form-control" required>
+                            <input type="email" name="email" id="edit_email" class="form-control">
                         </div>
                         <div class="mb-3">
                             <label for="edit_descripcion" class="form-label">Descripción</label>
@@ -260,11 +262,10 @@
                         </div>
                         <div class="mb-3">
                             <label for="edit_id_nacionalidad" class="form-label">Nacionalidad</label>
-                            <select name="id_nacionalidad" id="edit_id_nacionalidad" class="form-select" required>
+                            <select name="id_nacionalidad" id="edit_id_nacionalidad" class="form-select">
                                 <option value="" disabled>Seleccione una nacionalidad</option>
                                 @foreach ($nacionalidades as $nacionalidad)
-                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}
-                                    </option>
+                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -278,8 +279,14 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/modals.js') }}"></script>
-    <script src="{{ asset('js/filtrosadmin.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <!-- Scripts personalizados -->
+    <script src="{{ asset('js/filtrosadmin.js') }}"></script> <!-- Filtros generales -->
+    <script src="{{ asset('js/modals.js') }}"></script> <!-- Manejo de modales -->
+    <script src="{{ asset('js/validationsUsuarios.js') }}"></script> <!-- Validaciones de formularios -->
+    <script src="{{ asset('js/usuarios.js') }}"></script> <!-- Funcionalidades específicas de usuarios -->
+    
 </body>
 
 </html>

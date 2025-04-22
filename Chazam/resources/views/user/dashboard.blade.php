@@ -1,13 +1,14 @@
 <!-- filepath: c:\wamp64\www\DAW2\MP12\Chazam\Chazam\resources\views\user\dashboard.blade.php -->
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Usuario</title>
-</head>
-<body>
-    <h1>Bienvenido, Usuario</h1>
-    <p>Esta es la página principal para usuarios normales.</p>
-</body>
-</html>
+
+@extends('layout.chatsHeader')
+
+@section('title', 'Dashboard Usuario')
+
+@section('content')
+    <div class="container">
+        <h1>Bienvenido, {{ isset($username) ? $username : 'Usuario' }}</h1>
+        <p>Esta es la página principal para usuarios normales.</p>
+        
+        <!-- Aquí puedes agregar más contenido para el dashboard -->
+    </div>
+@endsection
