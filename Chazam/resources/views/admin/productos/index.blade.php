@@ -136,36 +136,28 @@
                 <form id="editForm" method="POST">
                     @csrf
                     @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Editar Producto</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="mb-3">
+                        <label for="edit_titulo" class="form-label">Título</label>
+                        <input type="text" name="titulo" id="edit_titulo" class="form-control">
                     </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="edit_titulo" class="form-label">Título</label>
-                            <input type="text" name="titulo" id="edit_titulo" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_descripcion" class="form-label">Descripción</label>
-                            <textarea name="descripcion" id="edit_descripcion" class="form-control"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_valor" class="form-label">Valor</label>
-                            <input type="number" name="valor" id="edit_valor" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_id_tipo_producto" class="form-label">Tipo de Producto</label>
-                            <select name="id_tipo_producto" id="edit_id_tipo_producto" class="form-select">
-                                <option value="" disabled>Seleccione un tipo</option>
-                                @foreach ($tiposProducto as $tipo)
-                                    <option value="{{ $tipo->id_tipo_producto }}">{{ $tipo->tipo_producto }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="mb-3">
+                        <label for="edit_descripcion" class="form-label">Descripción</label>
+                        <textarea name="descripcion" id="edit_descripcion" class="form-control"></textarea>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    <div class="mb-3">
+                        <label for="edit_valor" class="form-label">Valor</label>
+                        <input type="number" name="valor" id="edit_valor" class="form-control">
                     </div>
+                    <div class="mb-3">
+                        <label for="edit_id_tipo_producto" class="form-label">Tipo de Producto</label>
+                        <select name="id_tipo_producto" id="edit_id_tipo_producto" class="form-select">
+                            <option value="" disabled>Seleccione un tipo</option>
+                            @foreach ($tiposProducto as $tipo)
+                                <option value="{{ $tipo->id_tipo_producto }}">{{ $tipo->tipo_producto }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Actualizar</button>
                 </form>
             </div>
         </div>
