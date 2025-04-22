@@ -21,7 +21,7 @@ function openEditModal(user) {
 
     // Configurar la URL de acción del formulario
     const editForm = document.getElementById('editForm');
-    editForm.action = `/admin/usuarios/${user.id_usuario}`; // Asegúrate de que esta URL sea válida
+    editForm.action = `/admin/usuarios/${user.id_usuario}`;
 
     // Mostrar el modal
     const editModal = new bootstrap.Modal(document.getElementById('editModal'));

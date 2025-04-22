@@ -31,7 +31,7 @@ class AuthController extends Controller
             $user = Auth::user();
             
             // Verificar si el usuario está baneado
-            if ($user->id_rol == 3 || $user->id_rol == 4) {
+            if ($user->id_estado == 3 || $user->id_estado == 4) {
                 Auth::logout();
                 return back()->with('error', 'Tu cuenta está baneada. Por favor, contacta con el administrador.');
             }
