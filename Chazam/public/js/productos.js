@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Confirmación al eliminar un producto
-    const deleteForms = document.querySelectorAll('form[action*="productos"][method="POST"]');
+    const deleteForms = document.querySelectorAll('form[action*="productos"][method="POST"].delete-form');
     deleteForms.forEach(form => {
         form.addEventListener('submit', function (e) {
             e.preventDefault(); // Evitar el envío del formulario

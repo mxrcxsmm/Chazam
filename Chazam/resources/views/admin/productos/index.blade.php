@@ -74,7 +74,7 @@
                             <a href="javascript:void(0)" onclick="openEditModal({{ $producto }})" class="text-warning" title="Editar">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
-                            <form action="{{ route('admin.productos.destroy', $producto->id_producto) }}" method="POST" style="display:inline-block;">
+                            <form action="{{ route('admin.productos.destroy', $producto->id_producto) }}" method="POST" class="delete-form" style="display:inline-block;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" style="border: none; background: none; cursor: pointer;" title="Eliminar">

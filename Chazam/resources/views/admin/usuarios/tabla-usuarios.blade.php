@@ -9,8 +9,6 @@
             <th>Género</th>
             <th>Descripción</th>
             <th>Nacionalidad</th>
-            <th>Inicio Ban</th>
-            <th>Fin Ban</th>
             <th>Estado</th>
             <th>Rol</th>
             <th>Acciones</th>
@@ -27,12 +25,20 @@
                 <td>{{ $user->genero }}</td>
                 <td>{{ $user->descripcion }}</td>
                 <td>{{ $user->nacionalidad->nombre ?? 'Sin nacionalidad' }}</td>
-                <td>{{ $user->inicio_ban }}</td>
-                <td>{{ $user->fin_ban }}</td>
                 <td>{{ $user->estado->nom_estado ?? 'Sin estado' }}</td>
                 <td>{{ $user->rol->nom_rol ?? 'Sin rol' }}</td>
                 <td>
-                    <a href="javascript:void(0)" onclick="openEditModal({{ $user }})" class="text-warning" title="Editar">
+                    <a href="javascript:void(0)" onclick="openEditModal({
+                        id_usuario: {{ $user->id_usuario }},
+                        username: '{{ addslashes($user->username) }}',
+                        nombre: '{{ addslashes($user->nombre) }}',
+                        apellido: '{{ addslashes($user->apellido) }}',
+                        fecha_nacimiento: '{{ $user->fecha_nacimiento->format('Y-m-d') }}',
+                        genero: '{{ $user->genero }}',
+                        email: '{{ addslashes($user->email) }}',
+                        descripcion: '{{ addslashes($user->descripcion) }}',
+                        id_nacionalidad: {{ $user->id_nacionalidad }}
+                    })" class="text-warning" title="Editar">
                         <i class="fas fa-pencil-alt"></i>
                     </a>
                     <form action="{{ route('admin.usuarios.destroy', $user->id_usuario) }}" method="POST" style="display:inline-block;">

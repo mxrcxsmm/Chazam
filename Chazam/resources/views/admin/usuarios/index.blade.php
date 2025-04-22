@@ -13,7 +13,10 @@
     <title>Lista de Usuarios - Admin</title>
 </head>
 
-<body>
+<body 
+    @if(session('success')) data-success-message="{{ session('success') }}" @endif
+    @if(session('update')) data-update-message="{{ session('update') }}" @endif
+>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
@@ -82,9 +85,8 @@
                             <label for="filtro_genero">Género</label>
                             <select class="form-select" id="filtro_genero" name="filtro_genero">
                                 <option value="">Todos los géneros</option>
-                                <option value="M">Hombre</option>
-                                <option value="F">Mujer</option>
-                                <option value="Otro">Otro</option>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
                             </select>
                         </div>
                     </div>
@@ -155,7 +157,17 @@
                             <td>{{ $user->estado->nom_estado ?? 'Sin estado' }}</td>
                             <td>{{ $user->rol->nom_rol ?? 'Sin rol' }}</td>
                             <td>
-                                <a href="javascript:void(0)" onclick="openEditModal({{ $user->toJson() }})" class="text-warning" title="Editar">
+                                <a href="javascript:void(0)" onclick="openEditModal({
+                                    id_usuario: {{ $user->id_usuario }},
+                                    username: '{{ addslashes($user->username) }}',
+                                    nombre: '{{ addslashes($user->nombre) }}',
+                                    apellido: '{{ addslashes($user->apellido) }}',
+                                    fecha_nacimiento: '{{ $user->fecha_nacimiento->format('Y-m-d') }}',
+                                    genero: '{{ addslashes($user->genero) }}',
+                                    email: '{{ addslashes($user->email) }}',
+                                    descripcion: '{{ addslashes($user->descripcion) }}',
+                                    id_nacionalidad: {{ $user->id_nacionalidad }}
+                                })" class="text-warning" title="Editar">
                                     <i class="fas fa-pencil-alt"></i>
                                 </a>
                                 <form action="{{ route('admin.usuarios.destroy', $user->id_usuario) }}" method="POST" class="delete-form" style="display:inline-block;">
@@ -265,8 +277,8 @@
                             <label for="edit_genero" class="form-label">Género</label>
                             <select name="genero" id="edit_genero" class="form-select">
                                 <option value="" disabled>Seleccione un género</option>
-                                <<option value="Hombre" {{ $user->genero == 'Hombre' ? 'selected' : '' }}>Hombre</option>
-                                <option value="Mujer" {{ $user->genero == 'Mujer' ? 'selected' : '' }}>Mujer</option>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
                             </select>
                         </div>
                         <div class="mb-3">
