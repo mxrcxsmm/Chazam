@@ -15,9 +15,9 @@ return new class extends Migration
             $table->bigIncrements('id_producto');
             $table->string('titulo', 100);
             $table->text('descripcion');
-            $table->bigInteger('valor');
+            $table->decimal('precio', 10, 2);
+            $table->enum('tipo_valor', ['euros', 'puntos']);
             $table->bigInteger('id_tipo_producto')->unsigned();
-
 
             $table->timestamps();
 
