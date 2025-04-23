@@ -9,18 +9,18 @@
     <link rel="stylesheet" href="{{ asset('css/filtros.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <!-- Font Awesome -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap -->
-
     <title>Lista de Usuarios - Admin</title>
 </head>
 
-<body>
+<body 
+    @if(session('success')) data-success-message="{{ session('success') }}" @endif
+    @if(session('update')) data-update-message="{{ session('update') }}" @endif
+>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <a class="navbar-brand" href="{{route('admin.usuarios.index')}}">Admin Panel</a>
+            <a class="navbar-brand" href="{{ route('admin.usuarios.index') }}">Admin Panel</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -31,30 +31,28 @@
                         <a class="nav-link active" href="{{ route('admin.usuarios.index') }}">Usuarios</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{route('admin.retos.index')}}">Retos</a>
+                        <a class="nav-link" href="{{ route('admin.retos.index') }}">Retos</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{route('admin.reportes.index')}}">Reportes</a>
+                        <a class="nav-link" href="{{ route('admin.reportes.index') }}">Reportes</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link active" href="{{ route('admin.productos.index') }}">Productos</a>
+                        <a class="nav-link" href="{{ route('admin.productos.index') }}">Productos</a>
                     </li>
                 </ul>
-                <!-- Botón de cerrar sesión -->
-            <form action="{{ route('logout') }}" method="POST" class="ms-auto">
-                @csrf
-                <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
-            </form>
+                <form action="{{ route('logout') }}" method="POST" class="ms-auto">
+                    @csrf
+                    <button type="submit" class="btn btn-danger">Cerrar Sesión</button>
+                </form>
             </div>
         </div>
     </nav>
 
-    <div class="container">
+    <div class="container mt-4">
         <h1>Lista de Usuarios</h1>
-        <!-- Botón para abrir el modal de crear -->
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Crear Usuario</button>
     </div>
-    
+
     <!-- Sección de filtros -->
     <div class="container mt-4">
         <div class="filtros-container">
@@ -84,6 +82,16 @@
                     </div>
                     <div class="col-md-3 mb-3">
                         <div class="filtro-campo">
+                            <label for="filtro_genero">Género</label>
+                            <select class="form-select" id="filtro_genero" name="filtro_genero">
+                                <option value="">Todos los géneros</option>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <div class="filtro-campo">
                             <label for="filtro_nacionalidad">Nacionalidad</label>
                             <select class="form-select" id="filtro_nacionalidad">
                                 <option value="">Todas las nacionalidades</option>
@@ -101,8 +109,8 @@
                             <select class="form-select" id="filtro_rol">
                                 <option value="">Todos los roles</option>
                                 <option value="1">Administrador</option>
-                                <option value="3">Usuario</option>
-                                <option value="4">Premium</option>
+                                <option value="2">Usuario</option>
+                                <option value="3">Premium</option>
                             </select>
                         </div>
                     </div>
@@ -115,7 +123,7 @@
             </form>
         </div>
     </div>
-    
+
     <div class="container mt-4">
         <h2>Usuarios Registrados</h2>
         <div id="tablaUsuarios">
@@ -127,10 +135,9 @@
                         <th>Email</th>
                         <th>Nombre Completo</th>
                         <th>Fecha nacimiento</th>
+                        <th>Género</th>
                         <th>Descripción</th>
-                        <th>Nacionalidad</th> <!-- Nueva columna -->
-                        <th>Inicio Ban</th>
-                        <th>Fin Ban</th>
+                        <th>Nacionalidad</th>
                         <th>Estado</th>
                         <th>Rol</th>
                         <th>Acciones</th>
@@ -144,15 +151,23 @@
                             <td>{{ $user->email }}</td>
                             <td>{{ $user->nombre }} {{ $user->apellido }}</td>
                             <td>{{ $user->fecha_nacimiento->format('Y-m-d') }}</td>
+                            <td>{{ $user->genero }}</td>
                             <td>{{ $user->descripcion }}</td>
                             <td>{{ $user->nacionalidad->nombre ?? 'Sin nacionalidad' }}</td>
-                            <td>{{ $user->inicio_ban }}</td>
-                            <td>{{ $user->fin_ban }}</td>
-                            <td>{{ $user->estado->nom_estado ?? 'Sin estado' }}</td> <!-- Mostrar estado -->
-                            <td>{{ $user->rol->nom_rol ?? 'Sin rol' }}</td> <!-- Mostrar rol -->
+                            <td>{{ $user->estado->nom_estado ?? 'Sin estado' }}</td>
+                            <td>{{ $user->rol->nom_rol ?? 'Sin rol' }}</td>
                             <td>
-                                <!-- Botón para abrir el modal de editar -->
-                                <a href="javascript:void(0)" onclick="openEditModal({{ $user }})" class="text-warning" title="Editar">
+                                <a href="javascript:void(0)" onclick="openEditModal({
+                                    id_usuario: {{ $user->id_usuario }},
+                                    username: '{{ addslashes($user->username) }}',
+                                    nombre: '{{ addslashes($user->nombre) }}',
+                                    apellido: '{{ addslashes($user->apellido) }}',
+                                    fecha_nacimiento: '{{ $user->fecha_nacimiento->format('Y-m-d') }}',
+                                    genero: '{{ addslashes($user->genero) }}',
+                                    email: '{{ addslashes($user->email) }}',
+                                    descripcion: '{{ addslashes($user->descripcion) }}',
+                                    id_nacionalidad: {{ $user->id_nacionalidad }}
+                                })" class="text-warning" title="Editar">
                                     <i class="fas fa-pencil-alt"></i>
                                 </a>
                                 <form action="{{ route('admin.usuarios.destroy', $user->id_usuario) }}" method="POST" class="delete-form" style="display:inline-block;">
@@ -174,12 +189,12 @@
     <div id="createModal" class="modal fade" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="createModalLabel">Crear Usuario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
                 <form action="{{ route('admin.usuarios.store') }}" method="POST">
                     @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createModalLabel">Crear Usuario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="username" class="form-label">Nombre de Usuario</label>
@@ -198,6 +213,14 @@
                             <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control" max="{{ date('Y-m-d') }}">
                         </div>
                         <div class="mb-3">
+                            <label for="genero" class="form-label">Género</label>
+                            <select name="genero" id="genero" class="form-select">
+                                <option value="" disabled>Seleccione un género</option>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input type="email" name="email" id="email" class="form-control">
                         </div>
@@ -208,10 +231,8 @@
                         <div class="mb-3">
                             <label for="id_nacionalidad" class="form-label">Nacionalidad</label>
                             <select name="id_nacionalidad" id="id_nacionalidad" class="form-select">
-                                <option value="" disabled selected>Seleccione una nacionalidad</option>
                                 @foreach ($nacionalidades as $nacionalidad)
-                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}
-                                    </option>
+                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}</option>
                                 @endforeach
                             </select>
                         </div>
@@ -228,13 +249,13 @@
     <div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editModalLabel">Editar Usuario</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
                 <form id="editForm" method="POST">
                     @csrf
                     @method('PUT')
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="editModalLabel">Editar Usuario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
                     <div class="modal-body">
                         <div class="mb-3">
                             <label for="edit_username" class="form-label">Nombre de Usuario</label>
@@ -253,6 +274,14 @@
                             <input type="date" name="fecha_nacimiento" id="edit_fecha_nacimiento" class="form-control" max="{{ date('Y-m-d') }}">
                         </div>
                         <div class="mb-3">
+                            <label for="edit_genero" class="form-label">Género</label>
+                            <select name="genero" id="edit_genero" class="form-select">
+                                <option value="" disabled>Seleccione un género</option>
+                                <option value="Hombre">Hombre</option>
+                                <option value="Mujer">Mujer</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
                             <label for="edit_email" class="form-label">Email</label>
                             <input type="email" name="email" id="edit_email" class="form-control">
                         </div>
@@ -263,7 +292,6 @@
                         <div class="mb-3">
                             <label for="edit_id_nacionalidad" class="form-label">Nacionalidad</label>
                             <select name="id_nacionalidad" id="edit_id_nacionalidad" class="form-select">
-                                <option value="" disabled>Seleccione una nacionalidad</option>
                                 @foreach ($nacionalidades as $nacionalidad)
                                     <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}</option>
                                 @endforeach
@@ -282,11 +310,10 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <!-- Scripts personalizados -->
-    <script src="{{ asset('js/filtrosadmin.js') }}"></script> <!-- Filtros generales -->
-    <script src="{{ asset('js/modals.js') }}"></script> <!-- Manejo de modales -->
-    <script src="{{ asset('js/validationsUsuarios.js') }}"></script> <!-- Validaciones de formularios -->
-    <script src="{{ asset('js/usuarios.js') }}"></script> <!-- Funcionalidades específicas de usuarios -->
-    
+    <script src="{{ asset('js/filtrosadmin.js') }}"></script>
+    <script src="{{ asset('js/modals.js') }}"></script>
+    <script src="{{ asset('js/validationsUsuarios.js') }}"></script>
+    <script src="{{ asset('js/usuarios.js') }}"></script>
 </body>
 
 </html>
