@@ -77,21 +77,32 @@
                     <!-- Segunda fila -->
                     <div class="row">
                         <!-- Fecha de Nacimiento -->
-                        <div class="input-field col s4">
+                        <div class="input-field col s3">
                             <i class="material-icons prefix">event</i>
                             <input id="fecha_nacimiento" name="fecha_nacimiento" type="text" class="datepicker validate">
                             <label for="fecha_nacimiento">Fecha de Nacimiento</label>
                         </div>
-
+                        
                         <!-- Email -->
-                        <div class="input-field col s4">
+                        <div class="input-field col s3">
                             <i class="material-icons prefix">email</i>
                             <input id="email_signup" name="email" type="email" class="validate">
                             <label for="email_signup">Email</label>
                         </div>
 
+                        <!-- Género -->
+                        <div class="input-field col s3">
+                            {{-- <i class="material-icons prefix">wc</i> --}}
+                            <select id="genero" name="genero" class="validate">
+                                <option value="" disabled selected>Selecciona</option>
+                                <option value="H">Hombre</option>
+                                <option value="M">Mujer</option>
+                            </select>
+                            <label>Género</label>
+                        </div>
+
                         <!-- Nacionalidad -->
-                        <div class="input-field col s4">
+                        <div class="input-field col s3">
                             <select id="id_nacionalidad" name="id_nacionalidad" class="validate">
                                 <option value="" disabled selected>Elige tu país</option>
                                 @foreach($nacionalidades as $nacionalidad)
