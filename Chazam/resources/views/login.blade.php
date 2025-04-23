@@ -95,8 +95,8 @@
                             {{-- <i class="material-icons prefix">wc</i> --}}
                             <select id="genero" name="genero" class="validate">
                                 <option value="" disabled selected>Selecciona</option>
-                                <option value="H">Hombre</option>
-                                <option value="M">Mujer</option>
+                                <option value="hombre">Hombre</option>
+                                <option value="mujer">Mujer</option>
                             </select>
                             <label>Género</label>
                         </div>

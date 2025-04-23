@@ -67,7 +67,7 @@ class AuthController extends Controller
             'id_nacionalidad' => 'required|exists:nacionalidad,id_nacionalidad',
             'img' => 'nullable|image|mimes:jpg,png|max:2048',
             'descripcion' => 'nullable|string|max:200',
-            'genero' => 'required|in:H,M',
+            'genero' => 'required|in:hombre,mujer',
         ], [
             'password.regex' => 'La contraseña debe contener al menos una mayúscula, una minúscula y un número.',
             'fecha_nacimiento.before_or_equal' => 'Debes tener al menos 13 años para registrarte.',

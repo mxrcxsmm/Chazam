@@ -100,7 +100,7 @@ function validateSignUpForm() {
             element: document.getElementById('genero'),
             validate: (value) => {
                 if (!value) return 'El género es requerido';
-                if (!['H', 'M'].includes(value)) return 'El género debe ser Hombre o Mujer';
+                if (!['hombre', 'mujer'].includes(value)) return 'El género debe ser Hombre o Mujer';
                 return null;
             }
         }
