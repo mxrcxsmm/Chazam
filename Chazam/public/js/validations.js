@@ -95,6 +95,14 @@ function validateSignUpForm() {
                 if (!value) return 'La nacionalidad es requerida';
                 return null;
             }
+        },
+        genero: {
+            element: document.getElementById('genero'),
+            validate: (value) => {
+                if (!value) return 'El género es requerido';
+                if (!['hombre', 'mujer'].includes(value)) return 'El género debe ser Hombre o Mujer';
+                return null;
+            }
         }
     };
 

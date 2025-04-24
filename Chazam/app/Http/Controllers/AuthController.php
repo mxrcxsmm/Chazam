@@ -66,7 +66,8 @@ class AuthController extends Controller
             'password_confirmation' => 'required|same:password',
             'id_nacionalidad' => 'required|exists:nacionalidad,id_nacionalidad',
             'img' => 'nullable|image|mimes:jpg,png|max:2048',
-            'descripcion' => 'nullable|string|max:200'
+            'descripcion' => 'nullable|string|max:200',
+            'genero' => 'required|in:hombre,mujer',
         ], [
             'password.regex' => 'La contraseña debe contener al menos una mayúscula, una minúscula y un número.',
             'fecha_nacimiento.before_or_equal' => 'Debes tener al menos 13 años para registrarte.',
@@ -74,7 +75,9 @@ class AuthController extends Controller
             'apellido.regex' => 'El apellido solo puede contener letras, espacios y guiones.',
             'username.unique' => 'Este nombre de usuario ya está en uso.',
             'email.unique' => 'Este email ya está registrado.',
-            'password_confirmation.same' => 'Las contraseñas no coinciden.'
+            'password_confirmation.same' => 'Las contraseñas no coinciden.',
+            'genero.required' => 'El género es requerido',
+            'genero.in' => 'El género debe ser Hombre o Mujer',
         ]);
 
         if ($validator->fails()) {
@@ -120,7 +123,8 @@ class AuthController extends Controller
             'id_rol' => 2,
             'id_estado' => 1,
             'img' => $imagePath,
-            'descripcion' => $request->descripcion
+            'descripcion' => $request->descripcion,
+            'genero' => $request->genero,
         ]);
 
         Auth::login($user);
