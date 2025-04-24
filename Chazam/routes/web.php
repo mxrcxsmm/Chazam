@@ -15,6 +15,8 @@ use App\Models\User;
 use App\Http\Controllers\RetoAdminController;
 use App\Http\Controllers\ReporteAdminController;
 use App\Http\Controllers\ProductosAdminController;
+use App\Http\Controllers\TiendaController;
+use App\Http\Controllers\CompraController;
 
 // Grupo de rutas para el administrador con middleware
 // Route::middleware(['auth'])->group(function () {
@@ -121,3 +123,8 @@ Route::middleware(['auth'])->group(function () {
 
 Route::post('/estado/actualizar', [EstadoController::class, 'actualizarEstado'])->middleware('auth');
 Route::get('/estado/usuarios-en-linea', [EstadoController::class, 'obtenerUsuariosEnLinea'])->middleware('auth');
+
+Route::get('/tienda', [TiendaController::class, 'index'])->name('tienda.index');
+
+Route::get('/producto/{id}/comprar', [CompraController::class, 'show'])->name('producto.comprar');
+Route::post('/producto/{id}/checkout', [CompraController::class, 'checkout'])->name('producto.checkout');

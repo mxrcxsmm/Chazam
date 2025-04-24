@@ -21,7 +21,8 @@ class ProductosAdminController extends Controller
             Producto::create([
                 'titulo' => $request->titulo,
                 'descripcion' => $request->descripcion,
-                'valor' => $request->valor,
+                'precio' => $request->precio,
+                'tipo_valor' => $request->tipo_valor,
                 'id_tipo_producto' => $request->id_tipo_producto,
             ]);
 
@@ -38,7 +39,8 @@ class ProductosAdminController extends Controller
             $producto->update([
                 'titulo' => $request->titulo,
                 'descripcion' => $request->descripcion,
-                'valor' => $request->valor,
+                'precio' => $request->precio,
+                'tipo_valor' => $request->tipo_valor,
                 'id_tipo_producto' => $request->id_tipo_producto,
             ]);
 
