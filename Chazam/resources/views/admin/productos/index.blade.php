@@ -162,7 +162,7 @@
                         <label for="edit_tipo_valor" class="form-label">Tipo de Valor</label>
                         <select name="tipo_valor" id="edit_tipo_valor" class="form-select">
                             <option value="" disabled selected>Seleccione un tipo</option>
-                            <option value="moneda">Euros</option>
+                            <option value="euros">Euros</option>
                             <option value="puntos">Puntos</option>
                         </select>
                     </div>
