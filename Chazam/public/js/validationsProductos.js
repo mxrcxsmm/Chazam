@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const titulo = form.querySelector('[name="titulo"]');
         const descripcion = form.querySelector('[name="descripcion"]');
-        const precio = form.querySelector('[name="valor"]');
+        const precio = form.querySelector('[name="precio"]'); // Actualizado
         const tipoValor = form.querySelector('[name="tipo_valor"]');
         const tipoProducto = form.querySelector('[name="id_tipo_producto"]');
 
@@ -41,6 +41,9 @@ document.addEventListener('DOMContentLoaded', function () {
             isValid = false;
         } else if (titulo.value.length > 100) {
             showFieldError(titulo, 'El título no puede tener más de 100 caracteres.');
+            isValid = false;
+        } else if (!/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,-]+$/.test(titulo.value)) {
+            showFieldError(titulo, 'El título solo puede contener letras, números, espacios y algunos caracteres especiales (.,-).');
             isValid = false;
         } else if (!/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,-]+$/.test(titulo.value)) {
             showFieldError(titulo, 'El título solo puede contener letras, números, espacios y algunos caracteres especiales (.,-).');
