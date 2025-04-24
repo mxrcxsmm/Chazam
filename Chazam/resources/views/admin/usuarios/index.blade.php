@@ -189,7 +189,7 @@
     <div id="createModal" class="modal fade" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="{{ route('admin.usuarios.store') }}" method="POST">
+                <form action="{{ route('admin.usuarios.store') }}" method="POST" id="createForm">
                     @csrf
                     <div class="modal-header">
                         <h5 class="modal-title" id="createModalLabel">Crear Usuario</h5>

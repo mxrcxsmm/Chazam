@@ -45,8 +45,12 @@ class AuthController extends Controller
             $nuevaRacha = 1;
 
             if ($ultimoLogin) {
-                $ayer = $now->copy()->subDay()->startOfDay();
-                $ultimoLoginDia = $ultimoLogin->startOfDay();
+                // Obtener la fecha de hoy a las 00:00
+                $hoy = $now->copy()->setTime(0, 0, 0);
+                // Obtener la fecha de ayer a las 00:00
+                $ayer = $hoy->copy()->subDay();
+                // Obtener la fecha del último login a las 00:00
+                $ultimoLoginDia = $ultimoLogin->copy()->setTime(0, 0, 0);
 
                 if ($ultimoLoginDia->eq($ayer)) {
                     // Si el último login fue ayer, incrementar la racha
