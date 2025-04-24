@@ -39,11 +39,35 @@ class AuthController extends Controller
             // Actualizar estado a Activo (1) al iniciar sesión
             User::where('id_usuario', $user->id_usuario)->update(['id_estado' => 1]);
 
+            // Manejar la racha de login
+            $now = now();
+            $ultimoLogin = $user->ultimo_login;
+            $nuevaRacha = 1;
+
+            if ($ultimoLogin) {
+                $ayer = $now->copy()->subDay()->startOfDay();
+                $ultimoLoginDia = $ultimoLogin->startOfDay();
+
+                if ($ultimoLoginDia->eq($ayer)) {
+                    // Si el último login fue ayer, incrementar la racha
+                    $nuevaRacha = $user->racha + 1;
+                } elseif ($ultimoLoginDia->lt($ayer)) {
+                    // Si el último login fue antes de ayer, resetear la racha
+                    $nuevaRacha = 1;
+                }
+            }
+
+            // Actualizar último login y racha
+            User::where('id_usuario', $user->id_usuario)->update([
+                'ultimo_login' => $now,
+                'racha' => $nuevaRacha
+            ]);
+
             // Redirigir según el rol del usuario
             if ($user->rol->nom_rol === 'Administrador') {
-                return redirect()->route('admin.usuarios.index'); // Página de administrador
+                return redirect()->route('admin.usuarios.index');
             } else {
-                return redirect()->route('retos.guide'); // Página de usuario normal
+                return redirect()->route('retos.guide');
             }
         }
 

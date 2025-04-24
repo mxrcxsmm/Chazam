@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             NacionalidadSeeder::class,
             UsersSeeder::class,
             RetoSeeder::class,
+            TipoProductosSeeder::class,
+            ProductosSeeder::class,
         ]);
     }
 }
