@@ -31,7 +31,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         const titulo = form.querySelector('[name="titulo"]');
         const descripcion = form.querySelector('[name="descripcion"]');
-        const valor = form.querySelector('[name="valor"]');
+        const precio = form.querySelector('[name="precio"]'); // Actualizado
+        const tipoValor = form.querySelector('[name="tipo_valor"]');
         const tipoProducto = form.querySelector('[name="id_tipo_producto"]');
 
         // Validar título
@@ -40,6 +41,9 @@ document.addEventListener('DOMContentLoaded', function () {
             isValid = false;
         } else if (titulo.value.length > 100) {
             showFieldError(titulo, 'El título no puede tener más de 100 caracteres.');
+            isValid = false;
+        } else if (!/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,-]+$/.test(titulo.value)) {
+            showFieldError(titulo, 'El título solo puede contener letras, números, espacios y algunos caracteres especiales (.,-).');
             isValid = false;
         } else if (!/^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s.,-]+$/.test(titulo.value)) {
             showFieldError(titulo, 'El título solo puede contener letras, números, espacios y algunos caracteres especiales (.,-).');
@@ -62,18 +66,29 @@ document.addEventListener('DOMContentLoaded', function () {
             clearFieldError(descripcion);
         }
 
-        // Validar valor
-        if (!valor.value.trim()) {
-            showFieldError(valor, 'El valor es obligatorio.');
+        // Validar precio
+        if (!precio.value.trim()) {
+            showFieldError(precio, 'El precio es obligatorio.');
             isValid = false;
-        } else if (isNaN(valor.value) || valor.value <= 0) {
-            showFieldError(valor, 'El valor debe ser un número mayor a 0.');
+        } else if (!/^\d{1,6}([.,]\d{1,2})?$/.test(precio.value)) {
+            showFieldError(precio, 'El precio debe ser un número válido con hasta 2 decimales.');
             isValid = false;
-        } else if (valor.value > 1000000) {
-            showFieldError(valor, 'El valor no puede ser mayor a 1,000,000.');
+        } else if (parseFloat(precio.value.replace(',', '.')) > 1000000) {
+            showFieldError(precio, 'El precio no puede ser mayor a 1,000,000.');
             isValid = false;
         } else {
-            clearFieldError(valor);
+            clearFieldError(precio);
+        }
+
+        // Validar tipo de valor
+        if (!tipoValor.value.trim()) {
+            showFieldError(tipoValor, 'Debe seleccionar un tipo de valor.');
+            isValid = false;
+        } else if (!['euros', 'puntos'].includes(tipoValor.value)) {
+            showFieldError(tipoValor, 'El tipo de valor seleccionado no es válido.');
+            isValid = false;
+        } else {
+            clearFieldError(tipoValor);
         }
 
         // Validar tipo de producto
