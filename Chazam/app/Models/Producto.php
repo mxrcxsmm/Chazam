@@ -32,7 +32,8 @@ class Producto extends Model
     protected $fillable = [
         'titulo',
         'descripcion',
-        'valor',
+        'precio',
+        'tipo_valor',
         'id_tipo_producto'
     ];
 
@@ -42,7 +43,7 @@ class Producto extends Model
      * @var array
      */
     protected $casts = [
-        'valor' => 'integer',
+        'precio' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];

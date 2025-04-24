@@ -31,7 +31,7 @@ class AuthController extends Controller
             $user = Auth::user();
             
             // Verificar si el usuario está baneado
-            if ($user->id_rol == 3 || $user->id_rol == 4) {
+            if ($user->id_estado == 3 || $user->id_estado == 4) {
                 Auth::logout();
                 return back()->with('error', 'Tu cuenta está baneada. Por favor, contacta con el administrador.');
             }
@@ -39,11 +39,39 @@ class AuthController extends Controller
             // Actualizar estado a Activo (1) al iniciar sesión
             User::where('id_usuario', $user->id_usuario)->update(['id_estado' => 1]);
 
+            // Manejar la racha de login
+            $now = now();
+            $ultimoLogin = $user->ultimo_login;
+            $nuevaRacha = 1;
+
+            if ($ultimoLogin) {
+                // Obtener la fecha de hoy a las 00:00
+                $hoy = $now->copy()->setTime(0, 0, 0);
+                // Obtener la fecha de ayer a las 00:00
+                $ayer = $hoy->copy()->subDay();
+                // Obtener la fecha del último login a las 00:00
+                $ultimoLoginDia = $ultimoLogin->copy()->setTime(0, 0, 0);
+
+                if ($ultimoLoginDia->eq($ayer)) {
+                    // Si el último login fue ayer, incrementar la racha
+                    $nuevaRacha = $user->racha + 1;
+                } elseif ($ultimoLoginDia->lt($ayer)) {
+                    // Si el último login fue antes de ayer, resetear la racha
+                    $nuevaRacha = 1;
+                }
+            }
+
+            // Actualizar último login y racha
+            User::where('id_usuario', $user->id_usuario)->update([
+                'ultimo_login' => $now,
+                'racha' => $nuevaRacha
+            ]);
+
             // Redirigir según el rol del usuario
             if ($user->rol->nom_rol === 'Administrador') {
-                return redirect()->route('admin.usuarios.index'); // Página de administrador
+                return redirect()->route('admin.usuarios.index');
             } else {
-                return redirect()->route('retos.guide'); // Página de usuario normal
+                return redirect()->route('retos.guide');
             }
         }
 
@@ -66,7 +94,8 @@ class AuthController extends Controller
             'password_confirmation' => 'required|same:password',
             'id_nacionalidad' => 'required|exists:nacionalidad,id_nacionalidad',
             'img' => 'nullable|image|mimes:jpg,png|max:2048',
-            'descripcion' => 'nullable|string|max:200'
+            'descripcion' => 'nullable|string|max:200',
+            'genero' => 'required|in:hombre,mujer',
         ], [
             'password.regex' => 'La contraseña debe contener al menos una mayúscula, una minúscula y un número.',
             'fecha_nacimiento.before_or_equal' => 'Debes tener al menos 13 años para registrarte.',
@@ -74,7 +103,9 @@ class AuthController extends Controller
             'apellido.regex' => 'El apellido solo puede contener letras, espacios y guiones.',
             'username.unique' => 'Este nombre de usuario ya está en uso.',
             'email.unique' => 'Este email ya está registrado.',
-            'password_confirmation.same' => 'Las contraseñas no coinciden.'
+            'password_confirmation.same' => 'Las contraseñas no coinciden.',
+            'genero.required' => 'El género es requerido',
+            'genero.in' => 'El género debe ser Hombre o Mujer',
         ]);
 
         if ($validator->fails()) {
@@ -120,7 +151,8 @@ class AuthController extends Controller
             'id_rol' => 2,
             'id_estado' => 1,
             'img' => $imagePath,
-            'descripcion' => $request->descripcion
+            'descripcion' => $request->descripcion,
+            'genero' => $request->genero,
         ]);
 
         Auth::login($user);

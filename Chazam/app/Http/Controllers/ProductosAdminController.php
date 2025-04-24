@@ -17,11 +17,24 @@ class ProductosAdminController extends Controller
 
     public function store(Request $request)
     {
+        $request->merge([
+            'precio' => str_replace(',', '.', $request->precio), // Convierte comas a puntos
+        ]);
+
+        $request->validate([
+            'titulo' => 'required|string|max:100',
+            'descripcion' => 'required|string|min:10|max:500',
+            'precio' => 'required|regex:/^\d{1,6}(\.\d{1,2})?$/|max:1000000',
+            'tipo_valor' => 'required|in:euros,puntos',
+            'id_tipo_producto' => 'required|exists:tipo_producto,id_tipo_producto',
+        ]);
+
         try {
             Producto::create([
                 'titulo' => $request->titulo,
                 'descripcion' => $request->descripcion,
-                'valor' => $request->valor,
+                'precio' => $request->precio,
+                'tipo_valor' => $request->tipo_valor,
                 'id_tipo_producto' => $request->id_tipo_producto,
             ]);
 
@@ -33,12 +46,25 @@ class ProductosAdminController extends Controller
 
     public function update(Request $request, $id)
     {
+        $request->merge([
+            'precio' => str_replace(',', '.', $request->precio), // Convierte comas a puntos
+        ]);
+
+        $request->validate([
+            'titulo' => 'required|string|max:100',
+            'descripcion' => 'required|string|min:10|max:500',
+            'precio' => 'required|regex:/^\d{1,6}(\.\d{1,2})?$/|max:1000000',
+            'tipo_valor' => 'required|in:euros,puntos',
+            'id_tipo_producto' => 'required|exists:tipo_producto,id_tipo_producto',
+        ]);
+
         try {
             $producto = Producto::findOrFail($id);
             $producto->update([
                 'titulo' => $request->titulo,
                 'descripcion' => $request->descripcion,
-                'valor' => $request->valor,
+                'precio' => $request->precio,
+                'tipo_valor' => $request->tipo_valor,
                 'id_tipo_producto' => $request->id_tipo_producto,
             ]);
 

@@ -30,6 +30,7 @@ return new class extends Migration
             $table->text('descripcion')->nullable();
             $table->dateTime('inicio_ban')->nullable();
             $table->dateTime('fin_ban')->nullable();
+            $table->dateTime('ultimo_login')->nullable();
             $table->rememberToken();
             $table->timestamps();
 

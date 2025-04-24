@@ -28,6 +28,7 @@ class AdminController extends Controller
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
             'fecha_nacimiento' => 'required|date|before_or_equal:' . now()->format('Y-m-d'),
+            'genero' => 'required|in:Hombre,Mujer', // Validar género como Hombre o Mujer
             'email' => 'required|email|unique:users,email',
             'descripcion' => 'nullable|string',
             'id_nacionalidad' => 'required|exists:nacionalidad,id_nacionalidad', // Validar que exista en la tabla nacionalidad
@@ -39,10 +40,11 @@ class AdminController extends Controller
                 'nombre' => $request->nombre,
                 'apellido' => $request->apellido,
                 'fecha_nacimiento' => $request->fecha_nacimiento,
+                'genero' => $request->genero,
                 'email' => $request->email,
                 'descripcion' => $request->descripcion,
                 'password' => bcrypt('qweQWE123'), // Contraseña por defecto
-                'id_rol' => 3, // Rol por defecto
+                'id_rol' => 2, // Rol por defecto
                 'id_estado' => 2, // Estado por defecto
                 'id_nacionalidad' => $request->id_nacionalidad,
                 'puntos' => 500, // Puntos iniciales
@@ -63,18 +65,18 @@ class AdminController extends Controller
     }
 
     // Actualizar un administrador en la base de datos
-    public function update(Request $request, $id_usuario)
+    public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id_usuario);
+        $user = User::findOrFail($id);
 
         $request->validate([
             'username' => 'required|string|max:255|unique:users,username,' . $user->id_usuario . ',id_usuario',
             'nombre' => 'required|string|max:255',
             'apellido' => 'required|string|max:255',
             'fecha_nacimiento' => 'required|date|before_or_equal:' . now()->format('Y-m-d'),
+            'genero' => 'required|string|in:Hombre,Mujer', // Validar género como Hombre o Mujer
             'email' => 'required|email|unique:users,email,' . $user->id_usuario . ',id_usuario',
             'descripcion' => 'nullable|string',
-            'password' => 'nullable|string|min:8',
             'id_nacionalidad' => 'required|exists:nacionalidad,id_nacionalidad',
         ]);
 
@@ -83,9 +85,9 @@ class AdminController extends Controller
             'nombre' => $request->nombre,
             'apellido' => $request->apellido,
             'fecha_nacimiento' => $request->fecha_nacimiento,
+            'genero' => $request->genero,
             'email' => $request->email,
             'descripcion' => $request->descripcion,
-            'password' => $request->password ? bcrypt($request->password) : $user->password,
             'id_nacionalidad' => $request->id_nacionalidad,
         ]);
 
@@ -104,48 +106,36 @@ class AdminController extends Controller
     // Filtrar usuarios mediante AJAX
     public function filtrar(Request $request)
     {
-        try {
-            // Iniciar la consulta
-            $query = User::query();
+        $query = User::query();
 
-            // Aplicar filtros si se proporcionan
-            if ($request->filled('id')) {
-                $query->where('id_usuario', 'like', '%' . $request->id . '%');
-            }
-
-            if ($request->filled('username')) {
-                $query->where('username', 'like', '%' . $request->username . '%');
-            }
-
-            if ($request->filled('nombre_completo')) {
-                $query->where(function ($q) use ($request) {
-                    $q->where('nombre', 'like', '%' . $request->nombre_completo . '%')
-                      ->orWhere('apellido', 'like', '%' . $request->nombre_completo . '%');
-                });
-            }
-
-            if ($request->filled('nacionalidad')) {
-                $query->where('id_nacionalidad', $request->nacionalidad);
-            }
-
-            if ($request->filled('rol')) {
-                $query->where('id_rol', $request->rol);
-            }
-
-            // Ejecutar la consulta
-            $admins = $query->get();
-
-            // Si no hay resultados, devolver un mensaje vacío
-            if ($admins->isEmpty()) {
-                return response()->json(['html' => '<tr><td colspan="12" class="text-center">No se encontraron resultados.</td></tr>']);
-            }
-
-            // Devolver la vista parcial con los resultados
-            $html = view('admin.usuarios.tabla-usuarios', compact('admins'))->render();
-            return response()->json(['html' => $html]);
-        } catch (\Exception $e) {
-            // Manejar errores y devolver un mensaje de error
-            return response()->json(['error' => 'Error al cargar los datos: ' . $e->getMessage()], 500);
+        if ($request->filled('id')) {
+            $query->where('id_usuario', $request->id);
         }
+
+        if ($request->filled('username')) {
+            $query->where('username', 'like', '%' . $request->username . '%');
+        }
+
+        if ($request->filled('nombre_completo')) {
+            $query->whereRaw("CONCAT(nombre, ' ', apellido) LIKE ?", ['%' . $request->nombre_completo . '%']);
+        }
+
+        if ($request->filled('nacionalidad')) {
+            $query->where('id_nacionalidad', $request->nacionalidad);
+        }
+
+        if ($request->filled('rol')) {
+            $query->where('id_rol', $request->rol);
+        }
+
+        if ($request->filled('genero')) {
+            $query->where('genero', $request->genero);
+        }
+
+        $admins = $query->get();
+
+        $html = view('admin.usuarios.tabla-usuarios', compact('admins'))->render();
+
+        return response()->json(['html' => $html]);
     }
 }

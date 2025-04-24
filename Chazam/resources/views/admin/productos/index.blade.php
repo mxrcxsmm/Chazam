@@ -57,7 +57,8 @@
                     <th>ID</th>
                     <th>Título</th>
                     <th>Descripción</th>
-                    <th>Valor</th>
+                    <th>Precio</th>
+                    <th>Tipo de Valor</th>
                     <th>Tipo de Producto</th>
                     <th>Acciones</th>
                 </tr>
@@ -68,13 +69,14 @@
                         <td>{{ $producto->id_producto }}</td>
                         <td>{{ $producto->titulo }}</td>
                         <td>{{ $producto->descripcion }}</td>
-                        <td>{{ $producto->valor }}</td>
+                        <td>{{ $producto->precio }}</td>
+                        <td>{{ $producto->tipo_valor }}</td>
                         <td>{{ $producto->tipoProducto->tipo_producto ?? 'Sin tipo' }}</td>
                         <td>
                             <a href="javascript:void(0)" onclick="openEditModal({{ $producto }})" class="text-warning" title="Editar">
                                 <i class="fas fa-pencil-alt"></i>
                             </a>
-                            <form action="{{ route('admin.productos.destroy', $producto->id_producto) }}" method="POST" style="display:inline-block;">
+                            <form action="{{ route('admin.productos.destroy', $producto->id_producto) }}" method="POST" class="delete-form" style="display:inline-block;">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" style="border: none; background: none; cursor: pointer;" title="Eliminar">
@@ -108,8 +110,16 @@
                             <textarea name="descripcion" id="descripcion" class="form-control"></textarea>
                         </div>
                         <div class="mb-3">
-                            <label for="valor" class="form-label">Valor</label>
-                            <input type="number" name="valor" id="valor" class="form-control">
+                            <label for="valor" class="form-label">Precio</label>
+                            <input type="number" name="precio" id="precio" class="form-control" step="0.01" min="0">
+                        </div>
+                        <div class="mb-3">
+                            <label for="tipo_valor" class="form-label">Tipo de Valor</label>
+                            <select name="tipo_valor" id="tipo_valor" class="form-select">
+                                <option value="" disabled selected>Seleccione un tipo</option>
+                                <option value="euros">Euros</option>
+                                <option value="puntos">Puntos</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="id_tipo_producto" class="form-label">Tipo de Producto</label>
@@ -136,36 +146,36 @@
                 <form id="editForm" method="POST">
                     @csrf
                     @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Editar Producto</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="mb-3">
+                        <label for="edit_titulo" class="form-label">Título</label>
+                        <input type="text" name="titulo" id="edit_titulo" class="form-control">
                     </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="edit_titulo" class="form-label">Título</label>
-                            <input type="text" name="titulo" id="edit_titulo" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_descripcion" class="form-label">Descripción</label>
-                            <textarea name="descripcion" id="edit_descripcion" class="form-control"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_valor" class="form-label">Valor</label>
-                            <input type="number" name="valor" id="edit_valor" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_id_tipo_producto" class="form-label">Tipo de Producto</label>
-                            <select name="id_tipo_producto" id="edit_id_tipo_producto" class="form-select">
-                                <option value="" disabled>Seleccione un tipo</option>
-                                @foreach ($tiposProducto as $tipo)
-                                    <option value="{{ $tipo->id_tipo_producto }}">{{ $tipo->tipo_producto }}</option>
-                                @endforeach
-                            </select>
-                        </div>
+                    <div class="mb-3">
+                        <label for="edit_descripcion" class="form-label">Descripción</label>
+                        <textarea name="descripcion" id="edit_descripcion" class="form-control"></textarea>
                     </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Actualizar</button>
+                    <div class="mb-3">
+                        <label for="edit_valor" class="form-label">Precio</label>
+                        <input type="number" name="precio" id="edit_precio" class="form-control" step="0.01" min="0">
                     </div>
+                    <div class="mb-3">
+                        <label for="edit_tipo_valor" class="form-label">Tipo de Valor</label>
+                        <select name="tipo_valor" id="edit_tipo_valor" class="form-select">
+                            <option value="" disabled selected>Seleccione un tipo</option>
+                            <option value="euros">Euros</option>
+                            <option value="puntos">Puntos</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_id_tipo_producto" class="form-label">Tipo de Producto</label>
+                        <select name="id_tipo_producto" id="edit_id_tipo_producto" class="form-select">
+                            <option value="" disabled>Seleccione un tipo</option>
+                            @foreach ($tiposProducto as $tipo)
+                                <option value="{{ $tipo->id_tipo_producto }}">{{ $tipo->tipo_producto }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Actualizar</button>
                 </form>
             </div>
         </div>
@@ -175,7 +185,8 @@
         function openEditModal(producto) {
             document.getElementById('edit_titulo').value = producto.titulo;
             document.getElementById('edit_descripcion').value = producto.descripcion;
-            document.getElementById('edit_valor').value = producto.valor;
+            document.getElementById('edit_precio').value = producto.precio;
+            document.getElementById('edit_tipo_valor').value = producto.tipo_valor;
             document.getElementById('edit_id_tipo_producto').value = producto.id_tipo_producto;
 
             const editForm = document.getElementById('editForm');

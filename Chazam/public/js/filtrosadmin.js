@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const filtroId = document.getElementById('filtro_id');
     const filtroUsername = document.getElementById('filtro_username');
     const filtroNombreCompleto = document.getElementById('filtro_nombre_completo');
+    const filtroGenero = document.getElementById('filtro_genero');
     const filtroNacionalidad = document.getElementById('filtro_nacionalidad');
     const filtroRol = document.getElementById('filtro_rol');
     const limpiarFiltrosBtn = document.getElementById('limpiarFiltros');
@@ -21,7 +22,8 @@ document.addEventListener('DOMContentLoaded', function () {
             username: filtroUsername.value.trim(),
             nombre_completo: filtroNombreCompleto.value.trim(),
             nacionalidad: filtroNacionalidad.value,
-            rol: filtroRol.value
+            rol: filtroRol.value,
+            genero: filtroGenero.value // Capturar el filtro de género
         };
 
         // Obtener el token CSRF del meta tag
@@ -62,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
         filtroNombreCompleto.value = '';
         filtroNacionalidad.value = '';
         filtroRol.value = '';
+        filtroGenero.value = ''; // Limpiar el filtro de género
         aplicarFiltros();
     });
 
@@ -71,4 +74,5 @@ document.addEventListener('DOMContentLoaded', function () {
     filtroNombreCompleto.addEventListener('input', aplicarFiltros);
     filtroNacionalidad.addEventListener('change', aplicarFiltros);
     filtroRol.addEventListener('change', aplicarFiltros);
+    filtroGenero.addEventListener('change', aplicarFiltros); // Evento para el filtro de género
 });
