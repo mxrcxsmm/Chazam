@@ -1,175 +1,137 @@
-/* Fuente y color base */
 body {
-    min-height: 100vh;
-    background-color: #DFB5FF; /* Fondo igual que en guide.blade.php */
-    color: white;
-    font-family: 'Segoe UI', sans-serif;
-    margin: 0;
-    display: flex;
-}
-
-/* Sidebar lateral */
-.sidebar {
-    width: 16rem;
-    background-color: #4B0082; /* Mismo púrpura del menú principal */
-    padding: 2rem 1.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-
-.sidebar h2 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    text-align: center;
-}
-
-/* Botones del menú lateral */
-.sidebar nav {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-.sidebar a {
-    display: block;
-    background-color: #8750B2;
-    color: white;
-    text-decoration: none;
-    padding: 0.75rem 1rem;
-    border-radius: 0.5rem;
-    text-align: center;
-    font-size: 1.1rem;
-    font-weight: 600;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-}
-
-.sidebar a:hover {
-    background-color: #A76BD1;
-    transform: scale(1.03);
-}
-
-/* Área principal de contenido */
-.main {
-    flex: 1;
-    padding: 2.5rem;
     background-color: #DFB5FF;
-    position: relative;
-}
-
-/* Botón cerrar */
-.main .cerrar {
-    position: absolute;
-    top: 1rem;
-    right: 1.5rem;
-    background-color: #dc2626;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 9999px;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
     color: white;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1.2rem;
 }
 
-.main .cerrar:hover {
-    background-color: #b91c1c;
+/* Sidebar fijo */
+.sidebar {
+    background-color: #4B0082;
+    width: 260px;
+    height: 100vh;
+    padding: 20px;
+    color: white;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #E6E6FA;
+    margin-bottom: 0.5rem;
+}
+
+.main-content {
+    margin-left: 260px; /* igual al ancho del sidebar */
+    padding: 2rem;
+    background-color: #DFB5FF;
+    min-height: 100vh;
 }
 
 /* Contenedor del formulario */
 .form-container {
-    width: 100%;
-    max-width: 70rem;
-    margin: 0 auto;
-    padding: 3rem 2rem;
-    background-color: #8F00FF;
-    border-radius: 0.5rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    background-color: #EBD2FF;
+    padding: 2rem 3rem;
+    border-radius: 15px;
+    max-width: 900px;
+    margin: 2rem auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    color: #4B0082;
 }
 
-/* Título del formulario */
-.titulo {
-    font-size: 1.875rem;
-    font-weight: bold;
-    margin-bottom: 2.5rem;
+/* Título */
+.form-container .titulo {
     text-align: center;
+    color: #4B0082;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
 }
 
-/* Campos del formulario */
+/* Grid del formulario */
 .formulario {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
 }
 
+/* Ocupa ancho completo para textarea, etc */
 .formulario .full {
     grid-column: span 2;
 }
 
-form label {
+/* Etiquetas */
+.formulario label {
     display: block;
     margin-bottom: 0.25rem;
+    color: #4B0082;
+    font-size: 0.95rem;
     font-weight: 500;
 }
 
-form input,
-form textarea {
+/* Inputs y textarea */
+.formulario input {
     width: 100%;
-    border-radius: 0.375rem;
-    padding: 0.5rem 1rem;
-    color: black;
-    font-size: 1rem;
     border: none;
+    border-bottom: 2px solid #ccc;
+    border-radius: 0;
+    background-color: transparent;
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.formulario input:focus {
+    border-bottom: 2px solid #703ea3;
+    outline: none;
 }
 
 /* Botón guardar */
-form button {
-    background-color: #129401;
-    padding: 0.75rem 1.5rem;
-    border-radius: 9999px;
-    font-weight: 600;
+.formulario button[type="submit"] {
+    background-color: #4B0082;
     color: white;
+    padding: 0.75rem 2rem;
     font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 9999px;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: background-color 0.2s ease;
 }
 
-form button:hover {
-    background-color: #15803d;
+.formulario button[type="submit"]:hover {
+    background-color: #8750B2;
 }
 
-/* Responsive para tablets y móviles */
-@media (max-width: 768px) {
-    body {
-        flex-direction: column;
-    }
+/* Centrar botón */
+.formulario .center {
+    display: flex;
+    justify-content: center;
+}
 
-    .sidebar {
-        width: 100%;
-        flex-direction: row;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-        padding: 1rem;
-    }
+.error-message {
+    font-size: 0.85rem;
+    color: #e53935;
+    margin-top: 0.2rem;
+}
 
-    .sidebar h2 {
-        width: 100%;
-        text-align: center;
-    }
+.input-icon-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
 
-    .main {
-        padding: 1.5rem;
-    }
-
-    .formulario {
-        grid-template-columns: 1fr;
-    }
-
-    .formulario .full {
-        grid-column: span 1;
-    }
+.input-icon-group i {
+    color: #4B0082;
+    font-size: 1.2rem;
 }
