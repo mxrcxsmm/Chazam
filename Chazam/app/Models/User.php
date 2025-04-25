@@ -30,7 +30,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'img',
         'descripcion',
         'inicio_ban',
-        'fin_ban'
+        'fin_ban',
+        'ultimo_login',
+        'racha'
     ];
 
     protected $hidden = [
@@ -44,6 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'puntos' => 'integer',
         'inicio_ban' => 'datetime',
         'fin_ban' => 'datetime',
+        'ultimo_login' => 'datetime',
     ];
 
     /* RELACIONES */

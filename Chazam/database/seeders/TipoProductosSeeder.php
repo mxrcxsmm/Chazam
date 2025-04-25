@@ -15,7 +15,11 @@ class TipoProductosSeeder extends Seeder
         DB::table('tipo_producto')->insert([
             ['tipo_producto' => 'Suscripciones'],
             ['tipo_producto' => 'Compras únicas'],
-            ['tipo_producto' => 'Packs']
+            ['tipo_producto' => 'Packs'],
+            ['tipo_producto' => 'Compras repetibles'],
+            ['tipo_producto' => 'Descuentos'],
+            ['tipo_producto' => 'Donaciones'],
+            ['tipo_producto' => 'Créditos']
         ]);
     }
 }
