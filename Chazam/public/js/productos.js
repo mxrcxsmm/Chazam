@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
         Swal.fire({
             icon: 'success',
             title: '¡Actualizado!',
-            text: document.body.dataset.updateMessage,
+            text: document.body.dataset.updateMessage, 
             confirmButtonColor: '#3085d6',
             confirmButtonText: 'Aceptar'
         });
