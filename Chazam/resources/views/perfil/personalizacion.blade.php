@@ -4,7 +4,7 @@
 @section('content')
 <div class="form-container">
     <h4 class="titulo">Mis datos</h4>
-    <form action="{{ route('perfil.update') }}" method="POST" class="formulario">
+    <form action="{{ route('perfil.update') }}" method="POST" enctype="multipart/form-data" class="formulario">
         @csrf
         @method('PUT')
 
@@ -16,10 +16,9 @@
             <label for="apellido">Apellido</label>
             <input type="text" id="apellido" name="apellido" value="{{ old('apellido', $user->apellido) }}">
         </div>
-
         <div>
-            <label for="email">Email</label>
-            <input type="email" id="email" name="email" value="{{ old('email', $user->email) }}">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" value="{{ old('username', $user->username) }}">
         </div>
         <div>
             <label for="fecha_nacimiento">Fecha de nacimiento</label>
@@ -29,11 +28,6 @@
         <div class="full">
             <label for="descripcion">Descripción</label>
             <input type="text" id="descripcion" name="descripcion" value="{{ old('descripcion', $user->descripcion) }}">
-        </div>        
-
-        <div class="full">
-            <label for="img">Ruta de imagen (temporal)</label>
-            <input type="text" id="img" name="img" value="{{ old('img', $user->img) }}">
         </div>
 
         <div class="full text-center">

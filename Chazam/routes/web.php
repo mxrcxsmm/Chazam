@@ -79,7 +79,7 @@ Route::middleware(['auth'])->group(function () {
                 'puntos' => $user->puntos,
                 'username' => $user->username,
                 'nombre_completo' => $user->nombre_completo,
-                'imagen_perfil' => $user->img ? 'img/profile_img/' . $user->img : null,
+                'imagen_perfil' => $user->img,
             ]);
         })->name('guide');
     });
