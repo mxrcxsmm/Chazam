@@ -15,6 +15,7 @@ use App\Models\User;
 use App\Http\Controllers\RetoAdminController;
 use App\Http\Controllers\ReporteAdminController;
 use App\Http\Controllers\ProductosAdminController;
+use App\Http\Controllers\MomentmsController;
 
 // Grupo de rutas para el administrador con middleware
 // Route::middleware(['auth'])->group(function () {
@@ -72,6 +73,12 @@ Route::middleware(['auth'])->group(function () {
     Route::post('estado/actualizar', [EstadoController::class, 'actualizarEstado'])->name('estado.actualizar');
 
     Route::get('user/friendchat', [FriendChatController::class, 'index'])->name('user.friendchat');
+    Route::get('user/momentms', [FriendChatController::class, 'momentms'])->name('user.momentms');
+
+    Route::get('momentms', [MomentmsController::class, 'index'])->name('user.momentms');
+    Route::get('momentms/create', [MomentmsController::class, 'create'])->name('momentms.create');
+    Route::post('momentms', [MomentmsController::class, 'store'])->name('momentms.store');
+    Route::get('momentms/{id}', [MomentmsController::class, 'show'])->name('momentms.show');
 });
 
 Route::prefix('retos')->name('retos.')->group(function () {

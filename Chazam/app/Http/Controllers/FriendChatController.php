@@ -10,4 +10,9 @@ class FriendChatController extends Controller
     {
         return view('user.friendchat');
     }
+
+    public function momentms()
+    {
+        return view('user.momentms');
+    }
 } 

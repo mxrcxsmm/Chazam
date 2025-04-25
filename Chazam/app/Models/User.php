@@ -62,6 +62,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Nacionalidad::class, 'id_nacionalidad');
     }
 
+    public function amigos()
+    {
+        return $this->belongsToMany(User::class, 'solicitudes', 'id_usuario_emisor', 'id_usuario_receptor')
+                    ->where('estado', '=', 'aceptada')
+                    ->union(
+                        $this->belongsToMany(User::class, 'solicitudes', 'id_usuario_receptor', 'id_usuario_emisor')
+                            ->where('estado', '=', 'aceptada')
+                    );
+    }
+
     /* Extras */
     // nombre completo 
     public function getNombreCompletoAttribute(): string

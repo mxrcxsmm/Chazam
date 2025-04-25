@@ -4,7 +4,10 @@
     <div class="chat-sidebar">
         <!-- Header del sidebar -->
         <div class="sidebar-header">
-            <h2>Chats</h2>
+            <div class="header-titles">
+                <h2>Chats</h2>
+                <a href="{{ route('user.momentms') }}" class="momentms-btn">Momentms</a>
+            </div>
             <div class="header-icons">
                 <i class="fas fa-edit"></i>
                 <i class="fas fa-ellipsis-v"></i>
