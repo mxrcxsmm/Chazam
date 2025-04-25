@@ -67,10 +67,10 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function amigos()
     {
-        return $this->belongsToMany(User::class, 'solicitudes', 'id_usuario_emisor', 'id_usuario_receptor')
+        return $this->belongsToMany(User::class, 'solicitudes', 'id_emisor', 'id_receptor')
                     ->where('estado', '=', 'aceptada')
                     ->union(
-                        $this->belongsToMany(User::class, 'solicitudes', 'id_usuario_receptor', 'id_usuario_emisor')
+                        $this->belongsToMany(User::class, 'solicitudes', 'id_receptor', 'id_emisor')
                             ->where('estado', '=', 'aceptada')
                     );
     }

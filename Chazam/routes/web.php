@@ -74,7 +74,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('momentms', [MomentmsController::class, 'index'])->name('user.momentms');
     Route::get('momentms/create', [MomentmsController::class, 'create'])->name('momentms.create');
-    Route::post('momentms', [MomentmsController::class, 'store'])->name('momentms.store');
+    Route::post('/momentms', [MomentmsController::class, 'store'])->name('momentms.store');
     Route::get('momentms/{id}', [MomentmsController::class, 'show'])->name('momentms.show');
 });
 

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
 use App\Models\Historia;
+use App\Models\Solicitud;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class MomentmsController extends Controller
@@ -12,13 +13,31 @@ class MomentmsController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $amigos = $user->amigos()->get();
         
-        // Obtener los IDs de los amigos
-        $amigoIds = $amigos->pluck('id_usuario')->toArray();
-        
-        $momentms = Historia::where(function($query) use ($user, $amigoIds) {
-            $query->whereIn('id_usuario', $amigoIds)
+        // Obtener IDs de amigos directamente de la tabla solicitudes
+        $solicitudesAceptadas = Solicitud::where('estado', 'aceptada')
+            ->where(function($query) use ($user) {
+                $query->where('id_emisor', $user->id_usuario)
+                      ->orWhere('id_receptor', $user->id_usuario);
+            })
+            ->get();
+
+        // Recolectar IDs de amigos
+        $amigosIds = collect();
+        foreach ($solicitudesAceptadas as $solicitud) {
+            if ($solicitud->id_usuario_solicitante == $user->id_usuario) {
+                $amigosIds->push($solicitud->id_usuario_solicitado);
+            } else {
+                $amigosIds->push($solicitud->id_usuario_solicitante);
+            }
+        }
+
+        // Obtener usuarios amigos
+        $amigos = User::whereIn('id_usuario', $amigosIds)->get();
+
+        // Obtener momentms del usuario y sus amigos
+        $momentms = Historia::where(function($query) use ($user, $amigosIds) {
+            $query->whereIn('id_usuario', $amigosIds)
                   ->orWhere('id_usuario', $user->id_usuario);
         })
         ->where('created_at', '>=', now()->subDay())
@@ -47,19 +66,50 @@ class MomentmsController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'contenido' => 'required|file|mimes:jpeg,png,jpg,gif,mp4|max:10240', // 10MB max
-            'descripcion' => 'nullable|string|max:255'
-        ]);
+        try {
+            $request->validate([
+                'contenido' => 'required|string',
+            ]);
 
-        $path = $request->file('contenido')->store('public/momentms');
+            // Obtener la imagen base64
+            $image_data = $request->input('contenido');
+            
+            // Extraer la parte de datos de la cadena base64
+            $image_parts = explode(",", $image_data);
+            $image_base64 = base64_decode($image_parts[1]);
 
-        Historia::create([
-            'id_usuario' => Auth::id(),
-            'contenido' => basename($path),
-            'descripcion' => $request->descripcion
-        ]);
+            // Crear el directorio si no existe
+            $directory = public_path('img/momentms');
+            if (!file_exists($directory)) {
+                mkdir($directory, 0777, true);
+            }
 
-        return redirect()->route('user.momentms')->with('success', 'Momentm creado exitosamente');
+            // Generar nombre único para el archivo
+            $fileName = time() . '_' . uniqid() . '.jpg';
+            $filePath = $directory . '/' . $fileName;
+
+            // Guardar la imagen
+            file_put_contents($filePath, $image_base64);
+
+            // Crear el registro en la base de datos
+            $momentm = new Historia();
+            $momentm->id_usuario = auth()->id();
+            $momentm->img = 'img/momentms/' . $fileName;
+            $momentm->fecha_inicio = now();
+            $momentm->fecha_fin = now()->addDay();
+            $momentm->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Momentm guardado exitosamente'
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Error al guardar Momentm: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al guardar el Momentm: ' . $e->getMessage()
+            ], 400);
+        }
     }
 } 
