@@ -13,10 +13,10 @@ use App\Http\Controllers\RetoAdminController;
 use App\Http\Controllers\ReporteAdminController;
 use App\Http\Controllers\ProductosAdminController;
 use App\Http\Controllers\TiendaController;
-use App\Http\Controllers\CompraController;
 use App\Http\Controllers\PagosAdminController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Http\Controllers\StripeController;
 
 // Ruta de inicio de sesión
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -58,42 +58,41 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/pagos/{id}', [PagosAdminController::class, 'update'])->name('pagos.update');
     });
 
-// Grupo de rutas para usuarios normales
-Route::middleware(['auth'])->group(function () {
-    Route::get('perfil/dashboard', [PerfilController::class, 'dashboard'])->name('perfil.dashboard');
-    Route::get('user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
-    // mostrar racha y puntos
-    Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
+    // Grupo de rutas para usuarios normales
+    Route::middleware(['auth'])->group(function () {
+        Route::get('perfil/dashboard', [PerfilController::class, 'dashboard'])->name('perfil.dashboard');
+        Route::get('user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
+        // mostrar racha y puntos
+        Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
 
-    
-    // Ruta para actualizar estado
-    Route::post('estado/actualizar', [EstadoController::class, 'actualizarEstado'])->name('estado.actualizar');
+        // Ruta para actualizar estado
+        Route::post('estado/actualizar', [EstadoController::class, 'actualizarEstado'])->name('estado.actualizar');
 
-    Route::get('user/friendchat', [FriendChatController::class, 'index'])->name('user.friendchat');
-});
+        Route::get('user/friendchat', [FriendChatController::class, 'index'])->name('user.friendchat');
+    });
 
-Route::prefix('retos')->name('retos.')->group(function () {
-    Route::view('reto', 'Retos.reto')->name('reto');
-    Route::view('guide', 'Retos.guide')->name('guide'); // Asegúrate de que el nombre sea 'guide'
-});
+    Route::prefix('retos')->name('retos.')->group(function () {
+        Route::view('reto', 'Retos.reto')->name('reto');
+        Route::view('guide', 'Retos.guide')->name('guide'); // Asegúrate de que el nombre sea 'guide'
+    });
 
-// Rutas para usuarios autenticados
-Route::middleware(['auth'])->group(function () {
-    Route::prefix('perfil')->name('perfil.')->group(function () {
-        Route::get('/dashboard', [PerfilController::class, 'dashboard'])->name('dashboard');
-        Route::get('/personalizacion', [PerfilController::class, 'edit'])->name('personalizacion');
-        Route::put('/update', [PerfilController::class, 'update'])->name('update');
-        Route::get('/vista', function () {
-            return view('perfil.vista');
-        })->name('vista');
-        Route::get('/mejoras', function () {
-            return view('perfil.mejoras');
-        })->name('mejoras');
-        Route::get('/puntos', function () {
-            return view('perfil.puntos');
-        })->name('puntos');
-    });     
-});
+    // Rutas para usuarios autenticados
+    Route::middleware(['auth'])->group(function () {
+        Route::prefix('perfil')->name('perfil.')->group(function () {
+            Route::get('/dashboard', [PerfilController::class, 'dashboard'])->name('dashboard');
+            Route::get('/personalizacion', [PerfilController::class, 'edit'])->name('personalizacion');
+            Route::put('/update', [PerfilController::class, 'update'])->name('update');
+            Route::get('/vista', function () {
+                return view('perfil.vista');
+            })->name('vista');
+            Route::get('/mejoras', function () {
+                return view('perfil.mejoras');
+            })->name('mejoras');
+            Route::get('/puntos', function () {
+                return view('perfil.puntos');
+            })->name('puntos');
+        });
+    });
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {
         Route::get('reto', [RetoController::class, 'show'])->name('reto');
@@ -122,5 +121,12 @@ Route::middleware(['auth'])->group(function () {
     // Rutas para el chat
     Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
     Route::get('user/friendchat', [FriendChatController::class, 'index'])->name('user.friendchat');
-});
 
+    // Rutas para la tienda
+    Route::get('tienda', [TiendaController::class, 'index'])->name('tienda.index');
+
+    // Rutas para Stripe
+    Route::get('/producto/{id}/checkout', [StripeController::class, 'checkout'])->name('producto.comprar');
+    Route::get('/stripe/success/{id}', [StripeController::class, 'success'])->name('stripe.success');
+    Route::get('/stripe/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+});
