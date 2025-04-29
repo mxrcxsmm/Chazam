@@ -5,6 +5,83 @@ body {
     color: white;
 }
 
+/* .file-upload-wrapper {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
+input[type="file"] {
+    display: none; // Oculta el input original
+}
+
+.custom-file-upload {
+    background-color: #8750B2;
+    color: white;
+    padding: 0.75rem 2rem;
+    border-radius: 9999px;
+    font-weight: bold;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-align: center;
+}
+
+.custom-file-upload:hover {
+    background-color: #4B0082;
+} */
+
+.custom-button {
+    background-color: #8750B2;
+    color: white;
+    padding: 0.6rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: bold;
+    cursor: pointer;
+    border: none;
+    font-size: 1rem;
+}
+
+.photo-options {
+    margin-top: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.option {
+    background-color: #EBD2FF;
+    color: #4B0082;
+    padding: 0.4rem 1rem;
+    border: 1px solid #8750B2;
+    border-radius: 10px;
+    cursor: pointer;
+    text-align: center;
+}
+
+.hidden {
+    display: none;
+}
+
+#cameraContainer {
+    margin-top: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+video {
+    width: 200px;
+    height: 150px;
+    border-radius: 10px;
+    border: 2px solid #4B0082;
+}
+
+canvas {
+    display: none;
+}
+
 /* Sidebar fijo */
 .sidebar {
     background-color: #4B0082;
