@@ -6,6 +6,8 @@ use Illuminate\Http\Request;
 use Stripe\Stripe;
 use Stripe\Checkout\Session as StripeSession;
 use App\Models\Producto;
+use App\Models\Pago;
+use Illuminate\Support\Facades\Auth;
 
 class StripeController extends Controller
 {
@@ -42,7 +44,13 @@ class StripeController extends Controller
     {
         $producto = Producto::findOrFail($id);
 
-        // Aquí puedes registrar el pago en la base de datos o realizar otras acciones
+        // Registrar el pago en la base de datos
+        Pago::create([
+            'id_comprador' => Auth::id(), // ID del usuario autenticado
+            'id_producto' => $producto->id_producto,
+            'fecha_pago' => now(),
+        ]);
+
         return view('stripe.success', compact('producto'));
     }
 

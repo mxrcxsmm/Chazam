@@ -52,7 +52,6 @@
 
     <div class="container mt-4">
         <h1>Lista de Usuarios</h1>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Crear Usuario</button>
     </div>
 
     <!-- Sección de filtros -->
