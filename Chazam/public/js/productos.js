@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function () {
             confirmButtonText: 'Aceptar'
         });
     }
-
+ 
     // Confirmación al eliminar un producto
     const deleteForms = document.querySelectorAll('form[action*="productos"][method="POST"].delete-form');
     deleteForms.forEach(form => {
