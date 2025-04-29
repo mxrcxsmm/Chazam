@@ -55,4 +55,12 @@ class Chat extends Model
     {
         return $this->belongsTo(Reto::class, 'id_reto', 'id_reto');
     }
+
+    /**
+     * Get the chat usuarios associated with this chat.
+     */
+    public function chatUsuarios()
+    {
+        return $this->hasMany(ChatUsuario::class, 'id_chat', 'id_chat');
+    }
 }

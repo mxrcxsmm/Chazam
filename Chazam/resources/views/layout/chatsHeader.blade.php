@@ -12,7 +12,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
     <link rel="stylesheet" href="{{ asset('css/retos.css') }}">
-    @stack('head')
+    @yield('head')
 </head>
 <body>
     {{-- Navbar --}}
@@ -20,7 +20,7 @@
         <div class="container-fluid d-flex justify-content-between align-items-center">
 
             <!-- Logo o nombre de la app -->
-            <a href="#"><img src="{{ asset('IMG/Logo_Chazam.png') }}" alt="Logo" class="logo">Chazam</a>
+            <a href="{{ route('retos.guide') }}"><img src="{{ asset('IMG/Logo_Chazam.png') }}" alt="Logo" class="logo">Chazam</a>
 
             <!-- Racha, puntos y perfil -->
             <div class="d-flex align-items-center gap-4">

@@ -31,7 +31,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'descripcion',
         'strikes',
         'inicio_ban',
-        'fin_ban'
+        'fin_ban',
+        'ultimo_login',
+        'racha'
     ];
 
     protected $hidden = [
@@ -45,6 +47,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'puntos' => 'integer',
         'inicio_ban' => 'datetime',
         'fin_ban' => 'datetime',
+        'ultimo_login' => 'datetime',
     ];
 
     /* RELACIONES */
@@ -61,6 +64,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function nacionalidad(): BelongsTo
     {
         return $this->belongsTo(Nacionalidad::class, 'id_nacionalidad');
+    }
+
+    /**
+     * Get the chat usuarios associated with this user.
+     */
+    public function chatUsuarios()
+    {
+        return $this->hasMany(ChatUsuario::class, 'id_usuario', 'id_usuario');
     }
 
     /* Extras */

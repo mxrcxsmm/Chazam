@@ -58,7 +58,27 @@ Route::middleware(['auth'])->group(function () {
         Route::put('/pagos/{id}', [PagosAdminController::class, 'update'])->name('pagos.update');
     });
 
-    // Rutas para usuarios normales
+// Grupo de rutas para usuarios normales
+Route::middleware(['auth'])->group(function () {
+    Route::get('perfil/dashboard', [PerfilController::class, 'dashboard'])->name('perfil.dashboard');
+    Route::get('user/dashboard', [UserController::class, 'dashboard'])->name('user.dashboard');
+    // mostrar racha y puntos
+    Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
+
+    
+    // Ruta para actualizar estado
+    Route::post('estado/actualizar', [EstadoController::class, 'actualizarEstado'])->name('estado.actualizar');
+
+    Route::get('user/friendchat', [FriendChatController::class, 'index'])->name('user.friendchat');
+});
+
+Route::prefix('retos')->name('retos.')->group(function () {
+    Route::view('reto', 'Retos.reto')->name('reto');
+    Route::view('guide', 'Retos.guide')->name('guide'); // Asegúrate de que el nombre sea 'guide'
+});
+
+// Rutas para usuarios autenticados
+Route::middleware(['auth'])->group(function () {
     Route::prefix('perfil')->name('perfil.')->group(function () {
         Route::get('/dashboard', [PerfilController::class, 'dashboard'])->name('dashboard');
         Route::get('/personalizacion', [PerfilController::class, 'edit'])->name('personalizacion');
@@ -72,8 +92,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/puntos', function () {
             return view('perfil.puntos');
         })->name('puntos');
-    });
-
+    });     
+});
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {
         Route::get('reto', [RetoController::class, 'show'])->name('reto');
@@ -87,6 +107,12 @@ Route::middleware(['auth'])->group(function () {
                 'imagen_perfil' => $user->img ? 'img/profile_img/' . $user->img : null,
             ]);
         })->name('guide');
+
+        // Rutas para el chat aleatorio
+        Route::post('buscar-companero', [RetoController::class, 'buscarCompanero'])->name('buscar-companero');
+        Route::post('enviar-mensaje', [RetoController::class, 'enviarMensaje'])->name('enviar-mensaje');
+        Route::get('mensajes/{chatId}', [RetoController::class, 'obtenerMensajes'])->name('obtener-mensajes');
+        Route::post('verificar-estado-chats', [RetoController::class, 'verificarEstadoChats'])->name('verificar-estado-chats');
     });
 
     // Rutas para el estado de los usuarios
@@ -97,3 +123,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
     Route::get('user/friendchat', [FriendChatController::class, 'index'])->name('user.friendchat');
 });
+
