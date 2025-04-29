@@ -1,0 +1,322 @@
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Navbar superior (header) */
+.navbar {
+    height: 60px;
+    background-color: #1a1a1a;
+    border-bottom: 1px solid #2d2d2d;
+}
+
+.main-container {
+    display: flex;
+    width: 100%;
+    height: calc(100vh - 60px); /* Altura total menos el header */
+    background-color: #1a1a1a;
+    position: relative;
+    overflow: hidden;
+}
+
+.container {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+}
+
+.py-4 {
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+}
+
+.chat-sidebar {
+    width: 350px;
+    min-width: 350px;
+    border-right: 1px solid #2d2d2d;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    background-color: #1a1a1a;
+}
+
+.chat-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    transition: all 0.3s ease;
+    background-color: #1a1a1a;
+}
+
+.chat-main.shifted {
+    padding-right: 300px;
+}
+
+.messages-container {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background-color: #1a1a1a;
+}
+
+.message-input-container {
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background-color: #1a1a1a;
+    border-top: 1px solid #2d2d2d;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.message-input-container input {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background-color: #2d2d2d;
+    color: white;
+    outline: none;
+}
+
+.message-input-container i {
+    color: #9147ff;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+.sidebar-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #2d2d2d;
+}
+
+.sidebar-header h2 {
+    color: white;
+    font-size: 1.2rem;
+    margin: 0;
+}
+
+.header-icons {
+    display: flex;
+    gap: 20px;
+    color: #9147ff;
+}
+
+.search-container {
+    padding: 10px 15px;
+}
+
+.search-box {
+    background-color: #2d2d2d;
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.search-box input {
+    background: none;
+    border: none;
+    color: white;
+    width: 100%;
+    outline: none;
+}
+
+.search-box i {
+    color: #9147ff;
+}
+
+.chats-list {
+    flex: 1;
+    overflow-y: auto;
+}
+
+.chat-item {
+    display: flex;
+    padding: 12px 15px;
+    gap: 12px;
+    cursor: pointer;
+    border-bottom: 1px solid #2d2d2d;
+    transition: background-color 0.2s ease;
+}
+
+.chat-item:hover {
+    background-color: #2d2d2d;
+}
+
+.chat-item.active {
+    background-color: #2d2d2d;
+}
+
+.chat-avatar img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.chat-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.chat-header h3 {
+    color: white;
+    font-size: 1rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.time {
+    color: #9147ff;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+.last-message {
+    color: #888;
+    font-size: 0.9rem;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.chat-contact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.chat-contact img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.contact-info h3 {
+    color: white;
+    margin: 0;
+    font-size: 1rem;
+}
+
+.contact-info p {
+    color: #9147ff;
+    margin: 0;
+    font-size: 0.8rem;
+}
+
+.chat-actions {
+    display: flex;
+    gap: 20px;
+    color: #9147ff;
+}
+
+.chat-actions i {
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.chat-actions i:hover {
+    color: #7a30dd;
+}
+
+.options-sidebar {
+    position: fixed;
+    right: -300px;
+    top: 60px; /* Ajustado para estar debajo del header */
+    width: 300px;
+    height: calc(100vh - 60px); /* Altura total menos el header */
+    background-color: #1a1a1a;
+    border-left: 1px solid #2d2d2d;
+    transition: right 0.3s ease;
+    z-index: 1000;
+}
+
+.options-sidebar.active {
+    right: 0;
+}
+
+.options-header {
+    padding: 20px;
+    border-bottom: 1px solid #2d2d2d;
+    display: flex;
+    align-items: center;
+    color: white;
+}
+
+.options-header h3 {
+    margin: 0 0 0 15px;
+}
+
+.close-options {
+    cursor: pointer;
+    color: #9147ff;
+}
+
+.options-content {
+    padding: 20px;
+}
+
+.option-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.option-item:hover {
+    background-color: #2d2d2d;
+}
+
+.option-item i {
+    margin-right: 15px;
+    color: #9147ff;
+}
+
+.option-item.logout {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+}
+
+/* Estilos para la barra de desplazamiento */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1a1a1a;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #9147ff;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #7a30dd;
+}

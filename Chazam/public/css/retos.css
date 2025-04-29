@@ -1,0 +1,547 @@
+/* Estilos generales */
+body {
+    background-color: #DFB5FF; /* Color de fondo general */
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+.logo2 {
+    width: 40vh; /* Ajusta el tamaño según sea necesario */
+    height: auto; /* Asegúrate de que sea cuadrado */
+    border-radius: 50%;  /* Hace que el logo sea redondo */
+    object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
+    margin-right: 5px; /* Espacio entre el logo y el texto */
+    border: 3px solid #4b0082; /* Agrega un borde de 3px de grosor */
+}
+
+.logo {
+    width: 40px; /* Ajusta el tamaño según sea necesario */
+    height: 40px; /* Asegúrate de que sea cuadrado */
+    border-radius: 50%;  /* Hace que el logo sea redondo */
+    object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
+    margin-right: 5px; /* Espacio entre el logo y el texto */
+    border: 3px solid #4b0082; /* Agrega un borde de 3px de grosor */
+}
+
+.navbar {
+    background-color: #f1dfff; /* Color de fondo de la barra de navegación */
+    margin-bottom: 0;
+    border: none;
+}
+
+.navbar a {
+    color: #4b0082; /* Cambia el color del texto del enlace a blanco */
+    text-decoration: none; /* Elimina el subrayado del enlace */
+    font-weight: normal; /* Asegura que el texto tenga un peso normal */
+}
+
+.navbar .navbar-brand {
+    margin-left: 10px; /* Reduce la separación horizontal */
+}
+
+.bg-purple {
+    background-color: #4b0082; /* Color de fondo adicional */
+}
+
+.center-container {
+    display: flex;
+    flex-direction: column; /* Alinea los elementos verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    height: 100%; /* Ocupa toda la altura de la ventana */
+}
+
+/* Estilo del botón */
+.startbutton {
+    background-color: #4b0082; /* Color de fondo púrpura */
+    color: white; /* Color del texto */
+    border: none; /* Sin borde */
+    border-radius: 30px; /* Bordes redondeados */
+    padding: 15px 40px; /* Espaciado interno */
+    font-size: 20px; /* Tamaño de la fuente */
+    font-weight: bold; /* Texto en negrita */
+    cursor: pointer; /* Cambia el cursor al pasar por encima */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2); /* Sombra */
+    transition: transform 0.2s, box-shadow 0.2s; /* Animación suave */
+    text-transform: uppercase; /* Texto en mayúsculas */
+}
+
+.startbutton:hover {
+    transform: scale(1.05); /* Aumenta ligeramente el tamaño al pasar el cursor */
+    box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3); /* Sombra más intensa */
+}
+
+.startbutton:active {
+    transform: scale(0.95); /* Reduce ligeramente el tamaño al hacer clic */
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); /* Sombra más suave */
+}
+
+/* Estilo del texto */
+.startingtext {
+    font-size: 24px; /* Tamaño de la fuente */
+    font-weight: bold; /* Texto en negrita */
+    color: #4b0082; /* Color púrpura */
+    margin-bottom: 20px; /* Espaciado inferior */
+    text-align: center; /* Centrar el texto */
+}
+
+/* ===== NUEVOS ESTILOS (se agregan sin modificar los existentes) ===== */
+
+/* Contenedor principal que se ajusta al espacio */
+.main-container {
+    margin-right: 260px; /* Igual al ancho de la sidebar */
+    min-height: calc(100vh - 56px); /* Resta la altura del navbar */
+    padding: 20px;
+}
+
+/* Sidebar personalizada */
+.custom-sidebar2 {
+    position: fixed;
+    top: 56px; /* Debajo del navbar */
+    right: 0;
+    width: 260px;
+    bottom: 0;
+    background-color: #4b0082; /* Usa tu color bg-purple */
+    color: white;
+    padding: 20px;
+    overflow-y: auto;
+    z-index: 1000;
+}
+
+.sidebar2-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.skip-btn .triangle {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-bottom: 10px solid transparent;
+    border-left: 15px solid currentColor;
+    transform: translateY(2px);
+    margin-left: 6px;
+}
+  
+/* El segundo triángulo no tiene margen para que quede pegado */
+.skip-btn .triangle.tight {
+margin-left: -4px;
+}
+  
+  
+  
+/* Responsive */
+@media (max-width: 768px) {
+    /* Ajustes generales */
+    body {
+        overflow-x: hidden;
+        margin: 0;
+        padding: 0;
+        background-color: #DFB5FF;
+    }
+
+    /* Ajustes para el logo */
+    .logo2 {
+        width: 30vh;
+    }
+
+    /* Ajustes para el texto */
+    .startingtext {
+        font-size: 20px;
+        padding: 0 15px;
+        text-align: center;
+    }
+
+    /* Ajustes para los botones */
+    .button-container {
+        flex-direction: column;
+        gap: 15px;
+        width: 100%;
+        padding: 0 20px;
+    }
+
+    .startbutton {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 18px;
+    }
+
+    /* Ajustes para las sidebars */
+    #sidebar, #sidebar2 {
+        position: static;
+        width: 100%;
+        height: auto;
+        margin: 0;
+        padding: 15px;
+        z-index: 1030;
+        transform: none !important;
+    }
+
+    /* Ajustes para el chat */
+    .reto-chat-container {
+        position: fixed;
+        width: 100%;
+        left: 0;
+        right: 0;
+        top: calc(56px + 150px); /* Navbar + altura aproximada del sidebar */
+        bottom: 0;
+        margin: 0;
+        height: auto;
+    }
+
+    .reto-chat-main {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .reto-chat-header {
+        padding: 10px 15px;
+    }
+
+    .reto-messages-container {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .reto-message-input {
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        background: white;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        padding: 10px;
+    }
+
+    /* Ajustes para el navbar */
+    .navbar {
+        position: relative;
+        z-index: 1040;
+        margin: 0;
+    }
+
+    /* Ajustes para el contenido principal */
+    .container {
+        padding: 0;
+        margin: 0;
+        width: 100%;
+        max-width: none;
+    }
+
+    /* Eliminar espacios innecesarios */
+    .container > *:not(:last-child) {
+        margin-bottom: 0;
+    }
+
+    .row {
+        margin: 0;
+    }
+
+    [class*="col-"] {
+        padding: 0;
+    }
+}
+
+/* Ajustes para tablets */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .logo2 {
+        width: 35vh;
+    }
+
+    .button-container {
+        gap: 15px;
+    }
+
+    .startbutton {
+        padding: 12px 30px;
+        font-size: 18px;
+    }
+
+    #sidebar2 {
+        width: 220px;
+    }
+
+    .reto-chat-container {
+        margin-right: 220px;
+    }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    body {
+        overflow-y: auto;
+    }
+
+    .logo2 {
+        width: 25vh;
+    }
+
+    .startingtext {
+        font-size: 18px;
+    }
+
+    .startbutton {
+        padding: 10px 15px;
+        font-size: 16px;
+    }
+
+    .reto-chat-header h5 {
+        font-size: 16px;
+        margin: 0;
+    }
+
+    .reto-message-input {
+        padding: 8px;
+    }
+
+    #sidebar2 {
+        padding: 10px;
+    }
+
+    .titulo_reto, .desc_reto {
+        margin-bottom: 10px;
+    }
+
+    .reto-chat-container {
+        top: calc(56px + 130px); /* Ajuste para pantallas más pequeñas */
+    }
+}
+
+/* Sidebar del perfil (debe sobreponerse) */
+#sidebar {
+    z-index: 1050; /* Mayor que sidebar2 */
+    /* ... otros estilos ... */
+}
+
+/* Sidebar del reto */
+#sidebar2 {
+    position: fixed;
+    right: 0;
+    top: 56px;
+    width: 260px;
+    height: calc(100vh - 56px);
+    z-index: 1040;
+    overflow-y: auto;
+    border-top: none;
+}
+
+.reto-header h5 {
+    font-size: 1.5rem;
+    color: #ffd700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.reto-content {
+    display: flex;
+    flex-direction: column;
+    height: calc(100% - 60px);
+}
+
+.titulo_reto {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: white;
+}
+
+.desc_reto {
+    flex: 1;
+    color: rgba(255, 255, 255, 0.9);
+    line-height: 1.5;
+}
+
+.reto-chat-container {
+    position: fixed;
+    left: 0;
+    top: 56px;
+    right: 260px;
+    height: calc(100vh - 56px);
+    display: flex;
+    flex-direction: column;
+    border-top: none;
+}
+
+.reto-chat-main {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.reto-messages-container {
+    flex: 1;
+    overflow-y: auto;
+    background-color: #f8f9fa;
+}
+
+/* Estilos para el chat de retos */
+.reto-chat-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.reto-chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.reto-message-input {
+    border-top: 1px solid #dee2e6;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.reto-message-input .input-group {
+    background-color: #fff;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.reto-message-input .form-control {
+    border: none;
+    padding: 10px 15px;
+}
+
+.reto-message-input .btn {
+    padding: 10px 15px;
+}
+
+.reto-message-input .btn-outline-secondary {
+    border: none;
+}
+
+.reto-message-input .btn-primary {
+    background-color: #4b0082;
+    border: none;
+}
+
+/* Estilos para los mensajes */
+.reto-message {
+    margin-bottom: 15px;
+    max-width: 80%;
+}
+
+.reto-message.sent {
+    margin-left: auto;
+}
+
+.reto-message.received {
+    margin-right: auto;
+}
+
+.reto-message-content {
+    padding: 10px 15px;
+    border-radius: 15px;
+    display: inline-block;
+}
+
+.reto-message.sent .reto-message-content {
+    background-color: #4b0082;
+    color: white;
+}
+
+.reto-message.received .reto-message-content {
+    background-color: #e9ecef;
+    color: #212529;
+}
+
+/* Ajustes Responsive */
+@media (max-width: 768px) {
+    #sidebar2 {
+        width: 100%;
+        height: auto;
+        min-height: auto;
+        margin: 0;
+        padding: 15px;
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+    }
+
+    .reto-chat-container {
+        position: fixed;
+        width: 100%;
+        left: 0;
+        right: 0;
+        top: calc(56px + 150px); /* Navbar + altura aproximada del sidebar */
+        bottom: 0;
+        margin: 0;
+        height: auto;
+    }
+
+    .reto-chat-main {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .reto-messages-container {
+        flex: 1;
+        overflow-y: auto;
+    }
+
+    .reto-message-input {
+        position: relative;
+        bottom: 0;
+        width: 100%;
+        background: white;
+        border-top: 1px solid rgba(0,0,0,0.1);
+        padding: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    #sidebar2 {
+        padding: 10px;
+    }
+
+    .reto-chat-container {
+        top: calc(56px + 130px); /* Ajuste para pantallas más pequeñas */
+    }
+
+    .reto-header h5 {
+        font-size: 1.25rem;
+    }
+
+    .titulo_reto {
+        font-size: 1.1rem;
+    }
+
+    .desc_reto {
+        font-size: 0.9rem;
+    }
+
+    .skip-btn {
+        padding: 8px 15px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Asegurar que no haya espacios entre elementos */
+.navbar + #sidebar2,
+.navbar + .reto-chat-container {
+    margin-top: 0;
+}
+
+/* Ajustes para el contenedor principal */
+.container-fluid, .container {
+    padding: 0;
+    margin: 0;
+}
+
+/* Reset de márgenes y paddings para elementos específicos */
+.bg-purple {
+    margin: 0;
+    padding: 15px;
+}
+
+.reto-content {
+    margin: 0;
+}

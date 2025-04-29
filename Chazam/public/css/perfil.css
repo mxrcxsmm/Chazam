@@ -1,0 +1,137 @@
+body {
+    background-color: #DFB5FF;
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    color: white;
+}
+
+/* Sidebar fijo */
+.sidebar {
+    background-color: #4B0082;
+    width: 260px;
+    height: 100vh;
+    padding: 20px;
+    color: white;
+    position: fixed;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.sidebar img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #E6E6FA;
+    margin-bottom: 0.5rem;
+}
+
+.main-content {
+    margin-left: 260px; /* igual al ancho del sidebar */
+    padding: 2rem;
+    background-color: #DFB5FF;
+    min-height: 100vh;
+}
+
+/* Contenedor del formulario */
+.form-container {
+    background-color: #EBD2FF;
+    padding: 2rem 3rem;
+    border-radius: 15px;
+    max-width: 900px;
+    margin: 2rem auto;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+    color: #4B0082;
+}
+
+/* Título */
+.form-container .titulo {
+    text-align: center;
+    color: #4B0082;
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+}
+
+/* Grid del formulario */
+.formulario {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+}
+
+/* Ocupa ancho completo para textarea, etc */
+.formulario .full {
+    grid-column: span 2;
+}
+
+/* Etiquetas */
+.formulario label {
+    display: block;
+    margin-bottom: 0.25rem;
+    color: #4B0082;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+/* Inputs y textarea */
+.formulario input {
+    width: 100%;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    border-radius: 0;
+    background-color: transparent;
+    padding: 0.5rem 0;
+    font-size: 1rem;
+    color: #333;
+    transition: border-color 0.3s ease;
+}
+
+.formulario input:focus {
+    border-bottom: 2px solid #703ea3;
+    outline: none;
+}
+
+/* Botón guardar */
+.formulario button[type="submit"] {
+    background-color: #4B0082;
+    color: white;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.formulario button[type="submit"]:hover {
+    background-color: #8750B2;
+}
+
+/* Centrar botón */
+.formulario .center {
+    display: flex;
+    justify-content: center;
+}
+
+.error-message {
+    font-size: 0.85rem;
+    color: #e53935;
+    margin-top: 0.2rem;
+}
+
+.input-icon-group {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.input-icon-group i {
+    color: #4B0082;
+    font-size: 1.2rem;
+}
