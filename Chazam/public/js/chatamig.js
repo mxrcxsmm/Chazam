@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
             chatMain.style.width = 'calc(100% - 350px)';
         }
     });
-
+ 
     // Función para actualizar mensajes cada 5 segundos
     function startMessagePolling() {
         setInterval(() => {
