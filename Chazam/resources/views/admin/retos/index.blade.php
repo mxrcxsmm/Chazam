@@ -38,6 +38,9 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ route('admin.productos.index') }}">Productos</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ route('admin.pagos.index') }}">Pagos</a>
+                    </li>
                 </ul>
                 <form action="{{ route('logout') }}" method="POST" class="ms-auto">
                     @csrf

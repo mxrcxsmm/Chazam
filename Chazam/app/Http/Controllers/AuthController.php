@@ -138,7 +138,6 @@ class AuthController extends Controller
                     ->withInput();
             }
         }
-
         try {
             // Crear usuario
             $user = User::create([
@@ -168,6 +167,7 @@ class AuthController extends Controller
                 ->withErrors(['error' => 'Error al crear el usuario: ' . $e->getMessage()])
                 ->withInput();
         }
+
     }
 
     // Método para cerrar sesión

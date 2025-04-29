@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'id_estado',
         'img',
         'descripcion',
+        'strikes',
         'inicio_ban',
         'fin_ban',
         'ultimo_login',
