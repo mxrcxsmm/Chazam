@@ -96,4 +96,7 @@ Route::middleware(['auth'])->group(function () {
     // Rutas para el chat
     Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
     Route::get('user/friendchat', [FriendChatController::class, 'index'])->name('user.friendchat');
+    Route::get('user/chats', [FriendChatController::class, 'getUserChats'])->name('user.chats');
+    Route::get('user/chat/{chatId}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
+    Route::post('user/chat/{chatId}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
 });

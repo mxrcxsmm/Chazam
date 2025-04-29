@@ -65,6 +65,12 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Nacionalidad::class, 'id_nacionalidad');
     }
 
+    // Relación con los chats del usuario
+    public function chatUsuarios()
+    {
+        return $this->hasMany(\App\Models\ChatUsuario::class, 'id_usuario');
+    }
+
     /* Extras */
     // nombre completo 
     public function getNombreCompletoAttribute(): string
