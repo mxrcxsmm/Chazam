@@ -9,6 +9,7 @@ use App\Models\Estado;
 use App\Models\Nacionalidad;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class AdminController extends Controller
 {
@@ -20,87 +21,13 @@ class AdminController extends Controller
         return view('admin.usuarios.index', compact('admins', 'nacionalidades')); // Pasa los administradores y nacionalidades a la vista
     }
 
-    // Guardar un nuevo administrador en la base de datos
-    public function store(Request $request)
-    {
-        $request->validate([
-            'username' => 'required|string|max:255|unique:users,username',
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'fecha_nacimiento' => 'required|date|before_or_equal:' . now()->format('Y-m-d'),
-            'genero' => 'required|in:Hombre,Mujer', // Validar género como Hombre o Mujer
-            'email' => 'required|email|unique:users,email',
-            'descripcion' => 'nullable|string',
-            'id_nacionalidad' => 'required|exists:nacionalidad,id_nacionalidad', // Validar que exista en la tabla nacionalidad
-        ]);
-
-        try {
-            User::create([
-                'username' => $request->username,
-                'nombre' => $request->nombre,
-                'apellido' => $request->apellido,
-                'fecha_nacimiento' => $request->fecha_nacimiento,
-                'genero' => $request->genero,
-                'email' => $request->email,
-                'descripcion' => $request->descripcion,
-                'password' => bcrypt('qweQWE123'), // Contraseña por defecto
-                'id_rol' => 3, // Rol por defecto
-                'id_estado' => 2, // Estado por defecto
-                'id_nacionalidad' => $request->id_nacionalidad,
-                'puntos' => 500, // Puntos iniciales
-            ]);
-
-            return redirect()->route('admin.usuarios.index')->with('success', 'Usuario creado correctamente.');
-        } catch (\Exception $e) {
-            return back()->withInput()->with('error', 'Error al crear usuario: ' . $e->getMessage());
-        }
-    }
-
-    // Mostrar el formulario para editar un administrador
-    public function edit($id_usuario)
-    {
-        $user = User::findOrFail($id_usuario); // Busca el usuario por ID
-        $nacionalidades = Nacionalidad::all(); // Obtiene todas las nacionalidades
-        return view('admin.usuarios.edit', compact('user','nacionalidades')); // Pasa el usuario a la vista
-    }
-
-    // Actualizar un administrador en la base de datos
-    public function update(Request $request, $id)
-    {
-        $user = User::findOrFail($id);
-
-        $request->validate([
-            'username' => 'required|string|max:255|unique:users,username,' . $user->id_usuario . ',id_usuario',
-            'nombre' => 'required|string|max:255',
-            'apellido' => 'required|string|max:255',
-            'fecha_nacimiento' => 'required|date|before_or_equal:' . now()->format('Y-m-d'),
-            'genero' => 'required|string|in:Hombre,Mujer', // Validar género como Hombre o Mujer
-            'email' => 'required|email|unique:users,email,' . $user->id_usuario . ',id_usuario',
-            'descripcion' => 'nullable|string',
-            'id_nacionalidad' => 'required|exists:nacionalidad,id_nacionalidad',
-        ]);
-
-        $user->update([
-            'username' => $request->username,
-            'nombre' => $request->nombre,
-            'apellido' => $request->apellido,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'genero' => $request->genero,
-            'email' => $request->email,
-            'descripcion' => $request->descripcion,
-            'id_nacionalidad' => $request->id_nacionalidad,
-        ]);
-
-        return redirect()->route('admin.usuarios.index')->with('update', 'Usuario actualizado correctamente.');
-    }
-
     // Eliminar un administrador de la base de datos
     public function destroy($id)
     {
         $user = User::findOrFail($id);
         $user->delete();
 
-        return redirect()->route('admin.usuarios.index')->with('success', 'Usuario eliminado correctamente.');
+        return redirect()->route('admin.usuarios.index')->with('eliminar', 'Usuario eliminado correctamente.');
     }
     
     // Filtrar usuarios mediante AJAX
@@ -137,5 +64,52 @@ class AdminController extends Controller
         $html = view('admin.usuarios.tabla-usuarios', compact('admins'))->render();
 
         return response()->json(['html' => $html]);
+    }
+
+    public function ban($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+
+            // Verificar si el usuario ya está permabaneado
+            $estadoPermaban = Estado::where('nom_estado', 'PermaBan')->first();
+            if ($user->id_estado == $estadoPermaban->id_estado) {
+                return redirect()->route('admin.usuarios.index')->with('error', 'El usuario ya está permabaneado y no se pueden realizar más acciones.');
+            }
+
+            // Incrementar el número de strikes hasta un máximo de 4
+            $user->strikes = min($user->strikes + 1, 4);
+
+            // Determinar la duración del ban y el estado
+            switch ($user->strikes) {
+                case 1:
+                    $banDuration = Carbon::now()->addHour(); // 1 hora
+                    $estado = Estado::where('nom_estado', 'Ban')->first();
+                    break;
+                case 2:
+                    $banDuration = Carbon::now()->addHours(12); // 12 horas
+                    $estado = Estado::where('nom_estado', 'Ban')->first();
+                    break;
+                case 3:
+                    $banDuration = Carbon::now()->addHours(24); // 24 horas
+                    $estado = Estado::where('nom_estado', 'Ban')->first();
+                    break;
+                case 4:
+                    $banDuration = null; // Permaban
+                    $estado = Estado::where('nom_estado', 'PermaBan')->first();
+                    break;
+            }
+
+            // Actualizar el estado del usuario
+            $user->id_estado = $estado->id_estado;
+            $user->inicio_ban = $user->strikes >= 4 ? null : Carbon::now();
+            $user->fin_ban = $user->strikes >= 4 ? null : $banDuration;
+
+            $user->save();
+
+            return redirect()->route('admin.usuarios.index')->with('success', 'El usuario ha sido baneado correctamente.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Error al banear el usuario: ' . $e->getMessage());
+        }
     }
 }

@@ -28,6 +28,7 @@ return new class extends Migration
             $table->bigInteger('id_estado')->unsigned();
             $table->string('img')->nullable();
             $table->text('descripcion')->nullable();
+            $table->integer('strikes')->nullable()->default('0');
             $table->dateTime('inicio_ban')->nullable();
             $table->dateTime('fin_ban')->nullable();
             $table->rememberToken();

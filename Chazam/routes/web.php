@@ -14,6 +14,7 @@ use App\Http\Controllers\ReporteAdminController;
 use App\Http\Controllers\ProductosAdminController;
 use App\Http\Controllers\TiendaController;
 use App\Http\Controllers\CompraController;
+use App\Http\Controllers\PagosAdminController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 
@@ -31,10 +32,9 @@ Route::middleware(['auth'])->group(function () {
     // Rutas para el administrador
     Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('usuarios.index');
-        Route::post('/', [AdminController::class, 'store'])->name('usuarios.store');
-        Route::put('/usuarios/{id}', [AdminController::class, 'update'])->name('usuarios.update');
         Route::delete('/{id}', [AdminController::class, 'destroy'])->name('usuarios.destroy');
         Route::post('/usuarios/filtrar', [AdminController::class, 'filtrar'])->name('usuarios.filtrar');
+        Route::post('/usuarios/{id}/ban', [AdminController::class, 'ban'])->name('usuarios.ban');
 
         // Rutas para retos (administrador)
         Route::get('retos', [RetoAdminController::class, 'index'])->name('retos.index');
@@ -51,6 +51,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('productos', [ProductosAdminController::class, 'store'])->name('productos.store');
         Route::put('productos/{id}', [ProductosAdminController::class, 'update'])->name('productos.update');
         Route::delete('productos/{id}', [ProductosAdminController::class, 'destroy'])->name('productos.destroy');
+
+        // Rutas para pagos (administrador)
+        Route::get('/pagos', [PagosAdminController::class, 'index'])->name('pagos.index');
+        Route::post('/pagos', [PagosAdminController::class, 'store'])->name('pagos.store');
+        Route::put('/pagos/{id}', [PagosAdminController::class, 'update'])->name('pagos.update');
     });
 
     // Rutas para usuarios normales
@@ -83,11 +88,6 @@ Route::middleware(['auth'])->group(function () {
             ]);
         })->name('guide');
     });
-
-    // Rutas para la tienda
-    Route::get('/tienda', [TiendaController::class, 'index'])->name('tienda.index');
-    Route::get('/producto/{id}/comprar', [CompraController::class, 'show'])->name('producto.comprar');
-    Route::post('/producto/{id}/checkout', [CompraController::class, 'checkout'])->name('producto.checkout');
 
     // Rutas para el estado de los usuarios
     Route::post('/estado/actualizar', [EstadoController::class, 'actualizarEstado'])->name('estado.actualizar');
