@@ -89,7 +89,6 @@ Route::middleware(['auth'])->group(function () {
         })->name('puntos');
     });     
 });
-
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {
         Route::get('reto', [RetoController::class, 'show'])->name('reto');
@@ -103,6 +102,12 @@ Route::middleware(['auth'])->group(function () {
                 'imagen_perfil' => $user->img ? 'img/profile_img/' . $user->img : null,
             ]);
         })->name('guide');
+
+        // Rutas para el chat aleatorio
+        Route::post('buscar-companero', [RetoController::class, 'buscarCompanero'])->name('buscar-companero');
+        Route::post('enviar-mensaje', [RetoController::class, 'enviarMensaje'])->name('enviar-mensaje');
+        Route::get('mensajes/{chatId}', [RetoController::class, 'obtenerMensajes'])->name('obtener-mensajes');
+        Route::post('verificar-estado-chats', [RetoController::class, 'verificarEstadoChats'])->name('verificar-estado-chats');
     });
 
     // Rutas para la tienda
@@ -118,3 +123,4 @@ Route::middleware(['auth'])->group(function () {
     Route::get('chat', [ChatLayoutController::class, 'show'])->name('chat.show');
     Route::get('user/friendchat', [FriendChatController::class, 'index'])->name('user.friendchat');
 });
+

@@ -423,32 +423,86 @@ margin-left: -4px;
 
 /* Estilos para los mensajes */
 .reto-message {
-    margin-bottom: 15px;
-    max-width: 80%;
+    margin-bottom: 1rem;
+    max-width: 70%;
+    display: flex;
+    flex-direction: column;
 }
 
 .reto-message.sent {
     margin-left: auto;
+    align-items: flex-end;
 }
 
 .reto-message.received {
     margin-right: auto;
+    align-items: flex-start;
+}
+
+.reto-message-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
+.reto-message-user-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.reto-message-user-image {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    object-fit: cover;
+    border: 2px solid #4b0082;
+}
+
+.reto-message-username {
+    font-size: 0.8rem;
+    font-weight: bold;
+    color: #4b0082;
+}
+
+.reto-message-content-wrapper {
+    position: relative;
+    padding: 0.5rem 1rem;
+    border-radius: 1rem;
+    max-width: 100%;
+}
+
+.reto-message.sent .reto-message-content-wrapper {
+    background-color: #4b0082;
+    color: white;
+    border-bottom-right-radius: 0.2rem;
+}
+
+.reto-message.received .reto-message-content-wrapper {
+    background-color: #f1dfff;
+    color: #4b0082;
+    border-bottom-left-radius: 0.2rem;
 }
 
 .reto-message-content {
-    padding: 10px 15px;
-    border-radius: 15px;
-    display: inline-block;
+    word-wrap: break-word;
+    margin: 0;
 }
 
-.reto-message.sent .reto-message-content {
-    background-color: #4b0082;
-    color: white;
+.reto-message-time {
+    font-size: 0.7rem;
+    text-align: right;
+    margin-top: 0.2rem;
+    padding-left: 0.5rem;
 }
 
-.reto-message.received .reto-message-content {
-    background-color: #e9ecef;
-    color: #212529;
+.reto-message.sent .reto-message-time {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.reto-message.received .reto-message-time {
+    color: #666;
 }
 
 /* Ajustes Responsive */

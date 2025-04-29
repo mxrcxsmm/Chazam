@@ -39,9 +39,9 @@
         <div class="full text-center">
             <label for="img">Imagen de perfil</label>
             
-            @if($user->img)
+            @if($imagen_perfil)
                 <div class="mb-3">
-                    <img src="{{ asset($user->img) }}" alt="Foto de perfil" class="rounded-circle shadow" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #8750B2;">
+                    <img src="{{ asset($imagen_perfil) }}" alt="Foto de perfil" class="rounded-circle shadow" style="width: 100px; height: 100px; object-fit: cover; border: 3px solid #8750B2;">
                 </div>
             @endif
         
