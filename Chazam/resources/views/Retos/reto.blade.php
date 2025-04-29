@@ -1,5 +1,7 @@
 @include('layout.chatsHeader')
 
+<meta name="user-id" content="{{ Auth::user()->id_usuario }}">
+
 <!-- Sidebar del reto-->
 <div id="sidebar2" class="bg-purple text-white p-4">
     <div class="reto-header mb-3">
@@ -22,12 +24,19 @@
         <div class="reto-chat-header bg-purple text-white p-3">
             <div class="d-flex align-items-center">
                 <div>
-                    <h5 class="mb-0">Chat del Reto</h5>
+                    <h5 class="mb-0" id="chatHeader">
+                        <div class="d-flex align-items-center">
+                            <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                            Buscando usuarios disponibles...
+                        </div>
+                    </h5>
                 </div>
             </div>
         </div>
 
-        <div class="reto-messages-container p-3">
+        <div class="reto-messages-container p-3" id="mensajesContainer">
             <!-- Los mensajes irán aquí -->
         </div>
 
@@ -36,8 +45,8 @@
                 <button class="btn btn-outline-secondary" type="button">
                     <i class="far fa-smile"></i>
                 </button>
-                <input type="text" class="form-control" placeholder="Escribe un mensaje aquí">
-                <button class="btn btn-primary" type="button">
+                <input type="text" class="form-control" id="mensajeInput" placeholder="Escribe un mensaje aquí">
+                <button class="btn btn-primary" type="button" id="enviarMensaje">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
@@ -48,7 +57,11 @@
 <!-- Añadir Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
-<!-- Incluir el archivo JavaScript para actualizar el tiempo en tiempo real -->
-@push('scripts')
-    <script src="{{ asset('js/Reto.js') }}"></script>
-@endpush
+<!-- Incluir los archivos JavaScript -->
+<script>
+    window.userId = {{ Auth::user()->id_usuario }};
+    console.log('=== INICIO DE LA VISTA RETO ===');
+    console.log('User ID:', window.userId);
+</script>
+<script src="{{ asset('js/estadoDisponible.js') }}"></script>
+<script src="{{ asset('js/chatrandom.js') }}"></script>
