@@ -147,5 +147,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
+    // Función para actualizar mensajes cada 5 segundos
+    function startMessagePolling() {
+        setInterval(() => {
+            if (currentChatId) {
+                loadMessages(currentChatId);
+            }
+        }, 5000); // Actualiza cada 5 segundos
+    }
+
     loadChats();
+    startMessagePolling();
 });
