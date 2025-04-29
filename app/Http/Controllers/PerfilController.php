@@ -88,5 +88,5 @@ class PerfilController extends Controller
         $user->save();
 
         return redirect()->route('perfil.personalizacion')->with('success', 'Tus datos se han actualizado correctamente.');
-    } //hola
+    }
 }
