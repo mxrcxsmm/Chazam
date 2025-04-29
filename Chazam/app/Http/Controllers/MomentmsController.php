@@ -35,12 +35,12 @@ class MomentmsController extends Controller
         // Obtener usuarios amigos
         $amigos = User::whereIn('id_usuario', $amigosIds)->get();
 
-        // Obtener momentms del usuario y sus amigos
+        // Obtener momentms del usuario y sus amigos que no hayan pasado 24h desde su última modificación
         $momentms = Historia::where(function($query) use ($user, $amigosIds) {
             $query->whereIn('id_usuario', $amigosIds)
                   ->orWhere('id_usuario', $user->id_usuario);
         })
-        ->where('created_at', '>=', now()->subDay())
+        ->where('updated_at', '>=', now()->subDay())
         ->with('usuario')
         ->get();
 
@@ -78,15 +78,18 @@ class MomentmsController extends Controller
             $image_parts = explode(",", $image_data);
             $image_base64 = base64_decode($image_parts[1]);
 
-            // Crear el directorio si no existe
-            $directory = public_path('img/momentms');
-            if (!file_exists($directory)) {
-                mkdir($directory, 0777, true);
+            // Obtener el usuario actual
+            $user = Auth::user();
+
+            // Crear el directorio específico para el usuario si no existe
+            $userDirectory = public_path('img/momentms/' . $user->username);
+            if (!file_exists($userDirectory)) {
+                mkdir($userDirectory, 0777, true);
             }
 
             // Generar nombre único para el archivo
             $fileName = time() . '_' . uniqid() . '.jpg';
-            $filePath = $directory . '/' . $fileName;
+            $filePath = $userDirectory . '/' . $fileName;
 
             // Guardar la imagen
             file_put_contents($filePath, $image_base64);
@@ -94,7 +97,7 @@ class MomentmsController extends Controller
             // Crear el registro en la base de datos
             $momentm = new Historia();
             $momentm->id_usuario = auth()->id();
-            $momentm->img = 'img/momentms/' . $fileName;
+            $momentm->img = 'img/momentms/' . $user->username . '/' . $fileName;
             $momentm->fecha_inicio = now();
             $momentm->fecha_fin = now()->addDay();
             $momentm->save();
@@ -111,5 +114,19 @@ class MomentmsController extends Controller
                 'message' => 'Error al guardar el Momentm: ' . $e->getMessage()
             ], 400);
         }
+    }
+
+    public function getData($id)
+    {
+        $momentm = Historia::with('usuario')->findOrFail($id);
+        return response()->json([
+            'id' => $momentm->id_historia,
+            'img' => $momentm->img,
+            'fecha_inicio_diff' => $momentm->fecha_inicio->diffForHumans(),
+            'usuario' => [
+                'username' => $momentm->usuario->username,
+                'img' => 'img/profile_img/' . $momentm->usuario->img
+            ]
+        ]);
     }
 } 

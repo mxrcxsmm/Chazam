@@ -55,7 +55,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('productos', [ProductosAdminController::class, 'store'])->name('productos.store');
         Route::put('productos/{id}', [ProductosAdminController::class, 'update'])->name('productos.update');
         Route::delete('productos/{id}', [ProductosAdminController::class, 'destroy'])->name('productos.destroy');
-    });
+});
 
 // Grupo de rutas para usuarios normales
 Route::middleware(['auth'])->group(function () {
@@ -76,6 +76,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('momentms/create', [MomentmsController::class, 'create'])->name('momentms.create');
     Route::post('/momentms', [MomentmsController::class, 'store'])->name('momentms.store');
     Route::get('momentms/{id}', [MomentmsController::class, 'show'])->name('momentms.show');
+    Route::get('momentms/{id}/data', [MomentmsController::class, 'getData'])->name('momentms.data');
 });
 
 Route::prefix('retos')->name('retos.')->group(function () {

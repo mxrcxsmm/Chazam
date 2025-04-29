@@ -5,7 +5,7 @@
         <!-- Header del sidebar -->
         <div class="sidebar-header">
             <div class="header-titles">
-                <h2>Chats</h2>
+            <h2>Chats</h2>
                 <a href="{{ route('user.momentms') }}" class="momentms-btn">Momentms</a>
             </div>
             <div class="header-icons">
