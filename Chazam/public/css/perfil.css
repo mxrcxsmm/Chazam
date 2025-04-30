@@ -190,6 +190,23 @@ canvas {
     background-color: #8750B2;
 }
 
+/* Estilo del botón Capturar */
+.btn-capture {
+    background-color: #4B0082;
+    color: white;
+    padding: 0.75rem 2rem;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 9999px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.btn-capture:hover {
+    background-color: #8750B2;
+}
+
 /* Centrar botón */
 .formulario .center {
     display: flex;
@@ -211,4 +228,41 @@ canvas {
 .input-icon-group i {
     color: #4B0082;
     font-size: 1.2rem;
+}
+
+.btn-group .btn {
+    background-color: #EBD2FF;
+    color: #4B0082;
+    border-color: #8750B2;
+    font-weight: 500;
+}
+
+.btn-group .btn:hover {
+    background-color: #d8bdf8;
+}
+
+.modal-content {
+    background-color: #f4ddff; /* tono lavanda suave */
+    border-radius: 1rem;
+    padding: 1.5rem;
+    border: 3px solid #8750B2;
+}
+
+.modal-header h5 {
+    color: #4B0082;
+    font-weight: bold;
+}
+
+.btn-outline-secondary {
+    background-color: transparent;
+    border: 2px solid #8750B2;
+    color: #4B0082;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #4B0082;
+    color: white;
+    border-color: #4B0082;
 }
