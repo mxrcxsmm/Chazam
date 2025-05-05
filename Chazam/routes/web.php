@@ -129,4 +129,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/producto/{id}/checkout', [StripeController::class, 'checkout'])->name('producto.comprar');
     Route::get('/stripe/success/{id}', [StripeController::class, 'success'])->name('stripe.success');
     Route::get('/stripe/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+    Route::get('user/chats', [FriendChatController::class, 'getUserChats'])->name('user.chats');
+    Route::get('user/chat/{chatId}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
+    Route::post('user/chat/{chatId}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
 });

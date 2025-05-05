@@ -192,8 +192,20 @@ body, html {
     white-space: nowrap;
 }
 
+.message-content {
+    color: rgb(241, 234, 234);
+}
+
+.message-user {
+    color: rgb(241, 234, 234);
+}
+
+.message-time {
+    color: rgb(241, 234, 234);
+}
+
 .last-message {
-    color: #888;
+    color: white;
     font-size: 0.9rem;
     margin: 0;
     white-space: nowrap;

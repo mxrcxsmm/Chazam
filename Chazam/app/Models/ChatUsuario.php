@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class ChatUsuario extends Model
 {
@@ -71,5 +72,13 @@ class ChatUsuario extends Model
     public function scopeForUser($query, $userId)
     {
         return $query->where('id_usuario', $userId);
+    }
+
+    /**
+     * Relación con los mensajes de este chat_usuario
+     */
+    public function mensajes(): HasMany
+    {
+        return $this->hasMany(Mensaje::class, 'id_chat_usuario');
     }
 }

@@ -57,10 +57,18 @@ class Chat extends Model
     }
 
     /**
-     * Get the chat usuarios associated with this chat.
+     * Relación con los usuarios del chat
      */
     public function chatUsuarios()
     {
         return $this->hasMany(ChatUsuario::class, 'id_chat', 'id_chat');
+    }
+
+    /**
+     * Relación con los mensajes del chat
+     */
+    public function mensajes()
+    {
+        return $this->hasManyThrough(Mensaje::class, ChatUsuario::class, 'id_chat', 'id_chat_usuario', 'id_chat', 'id_chat_usuario');
     }
 }

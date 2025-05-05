@@ -20,21 +20,8 @@
         </div>
 
         <!-- Lista de chats -->
-        <div class="chats-list">
-            <!-- Chat individual -->
-            <div class="chat-item active">
-                <div class="chat-avatar">
-                    <img src="{{ asset('images/avatar-default.png') }}" alt="Avatar">
-                </div>
-                <div class="chat-info">
-                    <div class="chat-header">
-                        <h3>Usuario 1</h3>
-                        <span class="time">17:22</span>
-                    </div>
-                    <p class="last-message">Último mensaje enviado...</p>
-                </div>
-            </div>
-            <!-- Más chats aquí -->
+        <div class="chats-list" id="chats-list">
+            <!-- Los chats se cargarán aquí dinámicamente -->
         </div>
     </div>
 
@@ -53,8 +40,8 @@
             </div>
         </div>
 
-        <div class="messages-container">
-            <!-- Los mensajes irán aquí -->
+        <div class="messages-container" id="messages-container">
+            <!-- Los mensajes se cargarán aquí dinámicamente -->
         </div>
 
         <div class="message-input-container">
@@ -100,3 +87,12 @@
 
 <!-- Añadir el JavaScript personalizado -->
 <script src="{{ asset('js/chatamig.js') }}"></script>
+
+<script>
+    window.userChatConfig = {
+        chatsUrl: '{{ route('user.chats') }}',
+        messagesUrl: function(chatId) { return `/user/chat/${chatId}/messages`; },
+        sendUrl: function(chatId) { return `/user/chat/${chatId}/send`; },
+        userId: {{ auth()->id() }}
+    };
+</script>
