@@ -29,6 +29,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'id_estado',
         'img',
         'descripcion',
+        'strikes',
         'inicio_ban',
         'fin_ban',
         'ultimo_login',
@@ -63,6 +64,14 @@ class User extends Authenticatable implements MustVerifyEmail
     public function nacionalidad(): BelongsTo
     {
         return $this->belongsTo(Nacionalidad::class, 'id_nacionalidad');
+    }
+
+    /**
+     * Get the chat usuarios associated with this user.
+     */
+    public function chatUsuarios()
+    {
+        return $this->hasMany(ChatUsuario::class, 'id_usuario', 'id_usuario');
     }
 
     // Relación con los chats del usuario

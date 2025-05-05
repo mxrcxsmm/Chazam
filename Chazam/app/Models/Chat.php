@@ -71,4 +71,12 @@ class Chat extends Model
     {
         return $this->hasManyThrough(Mensaje::class, ChatUsuario::class, 'id_chat', 'id_chat_usuario', 'id_chat', 'id_chat_usuario');
     }
+
+    /**
+     * Get the chat usuarios associated with this chat.
+     */
+    public function chatUsuarios()
+    {
+        return $this->hasMany(ChatUsuario::class, 'id_chat', 'id_chat');
+    }
 }

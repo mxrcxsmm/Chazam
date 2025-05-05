@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id_pago');
             $table->bigInteger('id_comprador')->unsigned();
             $table->datetime('fecha_pago');
-            $table->bigInteger('id_producto')->unsigned();
+            $table->bigInteger('id_producto')->unsigned()->nullable();
             $table->timestamps();
         
             $table->foreign('id_comprador')->references('id_usuario')->on('users');
