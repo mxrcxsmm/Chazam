@@ -9,8 +9,8 @@ use App\Models\Producto;
 use App\Models\Pago;
 use App\Models\Rol; // Modelo para la tabla roles
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
-use App\Http\Controllers\Log;
 
 class StripeController extends Controller
 {
@@ -73,7 +73,7 @@ class StripeController extends Controller
                 $user->puntos += $producto->puntos;
                 $user->save();
             } else {
-                \Log::error('El producto no tiene puntos válidos', ['producto_id' => $producto->id_producto]);
+                Log::error('El producto no tiene puntos válidos', ['producto_id' => $producto->id_producto]);
             }
         }
 
