@@ -43,11 +43,16 @@ document.addEventListener('DOMContentLoaded', function() {
         messagesContainer.innerHTML = '';
         messages.forEach(msg => {
             const msgDiv = document.createElement('div');
-            msgDiv.className = 'message' + (msg.es_mio ? ' my-message' : '');
+            msgDiv.className = 'message';
             msgDiv.innerHTML = `
-                <span class="message-user">${msg.usuario}</span>
-                <span class="message-content">${msg.contenido}</span>
-                <span class="message-time">${msg.fecha_envio}</span>
+                <div class="message-header">
+                    <img src="/images/avatar-default.png" alt="Avatar" class="message-avatar">
+                    <span class="message-username">${msg.usuario}</span>
+                    <span class="message-time">${msg.fecha_envio}</span>
+                </div>
+                <div class="message-content">
+                    ${msg.contenido}
+                </div>
             `;
             messagesContainer.appendChild(msgDiv);
         });
