@@ -34,6 +34,7 @@ class Producto extends Model
         'descripcion',
         'precio',
         'tipo_valor',
+        'puntos',
         'id_tipo_producto'
     ];
 

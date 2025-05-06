@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('descripcion');
             $table->decimal('precio', 10, 2);
             $table->enum('tipo_valor', ['euros', 'puntos']);
+            $table->integer('puntos')->nullable();
             $table->bigInteger('id_tipo_producto')->unsigned();
 
             $table->timestamps();

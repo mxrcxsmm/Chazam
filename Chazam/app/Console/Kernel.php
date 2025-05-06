@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
     {
         // Verificar usuarios inactivos cada minuto
         $schedule->command('users:check-inactive')->everyMinute();
+        $schedule->command('roles:revert-premium')->daily();
     }
 
     /**
@@ -32,4 +33,4 @@ class Kernel extends ConsoleKernel
 
         require base_path('routes/console.php');
     }
-} 
+}

@@ -7,7 +7,10 @@ use Stripe\Stripe;
 use Stripe\Checkout\Session as StripeSession;
 use App\Models\Producto;
 use App\Models\Pago;
+use App\Models\Rol; // Modelo para la tabla roles
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+use App\Http\Controllers\Log;
 
 class StripeController extends Controller
 {
@@ -42,7 +45,13 @@ class StripeController extends Controller
 
     public function success($id)
     {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para completar la compra.');
+        }
+
         $producto = Producto::findOrFail($id);
+        $user = Auth::user();
 
         // Registrar el pago en la base de datos
         Pago::create([
@@ -50,6 +59,23 @@ class StripeController extends Controller
             'id_producto' => $producto->id_producto,
             'fecha_pago' => now(),
         ]);
+
+        // Manejar lógica según el tipo de producto
+        if ($producto->id_tipo_producto == 1) { // Suscripción Premium
+            $premiumRole = Rol::where('nom_rol', 'Premium')->first(); // Buscar el rol Premium
+            if ($premiumRole) {
+                $user->id_rol = 3; // Asignar el rol Premium
+                $user->save();
+            }
+        } elseif ($producto->id_tipo_producto == 4) { // Compra de puntos
+            // Sumar los puntos del producto al perfil del usuario
+            if (is_numeric($producto->puntos)) {
+                $user->puntos += $producto->puntos;
+                $user->save();
+            } else {
+                \Log::error('El producto no tiene puntos válidos', ['producto_id' => $producto->id_producto]);
+            }
+        }
 
         return view('stripe.success', compact('producto'));
     }
