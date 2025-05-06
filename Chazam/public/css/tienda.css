@@ -123,6 +123,11 @@ body {
     margin-bottom: 10px;
 }
 
+.producto{
+    text-decoration: none;
+    color: white;
+}
+
 .producto-detalle p {
     font-size: 1em;
     margin-bottom: 15px;
