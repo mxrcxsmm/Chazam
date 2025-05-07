@@ -59,6 +59,15 @@ async function buscarCompaneroAutomatico() {
                 document.getElementById('chatHeader').innerHTML = `Chat con ${companero.username}`;
                 buscandoCompanero = false;
                 cargarMensajes();
+                // Iniciar el control de inactividad cuando se encuentra un compañero
+                if (window.iniciarControlInactividad) {
+                    console.log('Iniciando control de inactividad para nuevo chat');
+                    window.iniciarControlInactividad();
+                    // Actualizar el último mensaje para iniciar el contador
+                    if (window.actualizarUltimoMensaje) {
+                        window.actualizarUltimoMensaje();
+                    }
+                }
                 break;
             } else if (data.error === 'No hay usuarios disponibles') {
                 console.log('No hay usuarios disponibles, reintentando...');
@@ -96,6 +105,19 @@ function enviarMensaje() {
 
     if (!mensaje) return;
 
+    console.log('=== PROCESANDO MENSAJE ===');
+    console.log('Mensaje original:', mensaje);
+    
+    // Procesar el mensaje según el reto actual si existe la función
+    const mensajeProcesado = window.procesarMensaje ? window.procesarMensaje(mensaje) : mensaje;
+    console.log('Mensaje procesado:', mensajeProcesado);
+    
+    // Si el mensaje procesado es null, significa que no pasó la validación del reto
+    if (mensajeProcesado === null) {
+        console.log('Mensaje rechazado por la validación del reto');
+        return;
+    }
+
     fetch('/retos/enviar-mensaje', {
         method: 'POST',
         headers: {
@@ -104,7 +126,7 @@ function enviarMensaje() {
         },
         body: JSON.stringify({
             chat_id: chatId,
-            contenido: mensaje
+            contenido: mensajeProcesado
         })
     })
     .then(response => response.json())
@@ -112,6 +134,10 @@ function enviarMensaje() {
         if (data.mensaje) {
             mensajeInput.value = '';
             agregarMensaje(data.mensaje, data.usuario);
+            // Actualizar el tiempo de inactividad cuando se envía un mensaje
+            if (window.actualizarUltimoMensaje) {
+                window.actualizarUltimoMensaje();
+            }
         } else {
             alert(data.error);
         }
@@ -161,7 +187,7 @@ function agregarMensaje(mensaje, usuario) {
         
         // Imagen del usuario
         const userImage = document.createElement('img');
-        userImage.src = usuario.imagen || '/img/default-avatar.png';
+        userImage.src = usuario.imagen ? `/IMG/${usuario.imagen}` : '';
         userImage.alt = usuario.username;
         userImage.className = 'reto-message-user-image';
         
@@ -199,6 +225,71 @@ function agregarMensaje(mensaje, usuario) {
     container.scrollTop = container.scrollHeight;
 }
 
+// Función para verificar el estado del chat
+async function verificarEstadoChat() {
+    if (!chatId) return;
+
+    try {
+        // Verificar directamente si el chat sigue existiendo
+        const chatResponse = await fetch(`/retos/verificar-chat/${chatId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        if (!chatResponse.ok) {
+            console.log('Chat eliminado, reiniciando búsqueda...');
+            chatId = null;
+            companero = null;
+            buscandoCompanero = true;
+            
+            // Detener el control de inactividad cuando el chat termina
+            if (window.detenerControlInactividad) {
+                window.detenerControlInactividad();
+            }
+            
+            // Actualizar la interfaz inmediatamente
+            document.getElementById('chatHeader').innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    Buscando usuarios disponibles...
+                </div>
+            `;
+            
+            // Limpiar el contenedor de mensajes
+            document.getElementById('mensajesContainer').innerHTML = '';
+            
+            // Reiniciar la búsqueda
+            buscarCompaneroAutomatico();
+        }
+    } catch (error) {
+        console.error('Error al verificar estado del chat:', error);
+        // Si hay un error, asumimos que el chat se perdió
+        chatId = null;
+        companero = null;
+        buscandoCompanero = true;
+        
+        // Detener el control de inactividad cuando hay un error
+        if (window.detenerControlInactividad) {
+            window.detenerControlInactividad();
+        }
+        
+        document.getElementById('chatHeader').innerHTML = `
+            <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                Buscando usuarios disponibles...
+            </div>
+        `;
+        buscarCompaneroAutomatico();
+    }
+}
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
     console.log('=== DOM CARGADO - INICIANDO BÚSQUEDA ===');
@@ -216,12 +307,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Actualizar estado cada 2 minutos
     setInterval(mantenerEstado, 120000);
     
-    // Polling para actualizar mensajes cuando hay un chat activo
+    // Polling para actualizar mensajes y verificar estado del chat cada segundo
     setInterval(() => {
         if (chatId) {
             cargarMensajes();
+            verificarEstadoChat();
         }
-    }, 3000);
+    }, 1000); // Reducido a 1 segundo para mayor reactividad
 });
 
 // Actualizar estado cuando el usuario cierra la pestaña

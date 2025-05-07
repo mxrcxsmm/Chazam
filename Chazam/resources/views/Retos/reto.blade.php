@@ -57,11 +57,17 @@
 <!-- Añadir Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
+<!-- Añadir SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <!-- Incluir los archivos JavaScript -->
 <script>
     window.userId = {{ Auth::user()->id_usuario }};
+    window.retoId = {{ $reto->id_reto }};
     console.log('=== INICIO DE LA VISTA RETO ===');
     console.log('User ID:', window.userId);
+    console.log('Reto ID:', window.retoId);
 </script>
-<script src="{{ asset('js/estadoDisponible.js') }}"></script>
+<script src="{{ asset('js/estados.js') }}"></script>
 <script src="{{ asset('js/chatrandom.js') }}"></script>
+<script src="{{ asset('js/reto' . $reto->id_reto . '.js') }}"></script>

@@ -112,6 +112,7 @@ Route::middleware(['auth'])->group(function () {
         Route::post('enviar-mensaje', [RetoController::class, 'enviarMensaje'])->name('enviar-mensaje');
         Route::get('mensajes/{chatId}', [RetoController::class, 'obtenerMensajes'])->name('obtener-mensajes');
         Route::post('verificar-estado-chats', [RetoController::class, 'verificarEstadoChats'])->name('verificar-estado-chats');
+        Route::get('verificar-chat/{chatId}', [RetoController::class, 'verificarChat'])->name('verificar-chat');
     });
 
     // Rutas para el estado de los usuarios

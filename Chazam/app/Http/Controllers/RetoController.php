@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class RetoController extends Controller
 {
@@ -310,8 +311,29 @@ class RetoController extends Controller
                     if ($chatUsuario->usuario->id_estado != 5) {
                         Log::info('Usuario ' . $chatUsuario->usuario->id_usuario . ' cambió de estado. Eliminando chat ' . $chat->id_chat);
                         
-                        // Eliminar el chat y sus relaciones
-                        $chat->delete();
+                        // Iniciar transacción
+                        DB::beginTransaction();
+                        try {
+                            // Eliminar todos los mensajes relacionados con este chat
+                            Mensaje::whereHas('chatUsuario', function($query) use ($chat) {
+                                $query->where('id_chat', $chat->id_chat);
+                            })->delete();
+                            
+                            // Eliminar todos los registros de chat_usuario relacionados con este chat
+                            ChatUsuario::where('id_chat', $chat->id_chat)->delete();
+                            
+                            // Eliminar el chat
+                            $chat->delete();
+                            
+                            // Confirmar transacción
+                            DB::commit();
+                            Log::info('Transacción completada exitosamente para el chat ' . $chat->id_chat);
+                        } catch (\Exception $e) {
+                            // Revertir transacción en caso de error
+                            DB::rollBack();
+                            Log::error('Error en la transacción para el chat ' . $chat->id_chat . ': ' . $e->getMessage());
+                            throw $e;
+                        }
                         break;
                     }
                 }
@@ -321,6 +343,33 @@ class RetoController extends Controller
         } catch (\Exception $e) {
             Log::error('Error en verificarEstadoChats: ' . $e->getMessage());
             return response()->json(['error' => 'Error al verificar estados'], 500);
+        }
+    }
+
+    /**
+     * Verifica si un chat específico sigue activo
+     */
+    public function verificarChat($chatId)
+    {
+        try {
+            $chat = Chat::where('id_chat', $chatId)
+                ->where('fecha_creacion', '>=', now()->subMinutes(30))
+                ->first();
+
+            if (!$chat) {
+                return response()->json(['error' => 'Chat no encontrado'], 404);
+            }
+
+            // Verificar si ambos usuarios siguen en el chat
+            $usuariosEnChat = ChatUsuario::where('id_chat', $chatId)->count();
+            if ($usuariosEnChat < 2) {
+                return response()->json(['error' => 'Chat incompleto'], 404);
+            }
+
+            return response()->json(['status' => 'active']);
+        } catch (\Exception $e) {
+            Log::error('Error al verificar chat: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al verificar chat'], 500);
         }
     }
 }
