@@ -7,12 +7,99 @@ document.addEventListener('DOMContentLoaded', function() {
     const chatMain = document.querySelector('.chat-main');
     const mainContainer = document.querySelector('.main-container');
 
-    // Función para enviar mensaje
+    let chats = [];
+    let currentChatId = null;
+
+    function renderChats(chats) {
+        const chatsList = document.getElementById('chats-list');
+        chatsList.innerHTML = '';
+        chats.forEach(chat => {
+            const chatItem = document.createElement('div');
+            chatItem.className = 'chat-item';
+            chatItem.dataset.chatId = chat.id_chat;
+            chatItem.innerHTML = `
+                <div class="chat-avatar">
+                    <img src="${chat.img ? chat.img : '/images/avatar-default.png'}" alt="Avatar">
+                </div>
+                <div class="chat-info">
+                    <div class="chat-header">
+                        <h3>${chat.nombre}</h3>
+                        <span class="time">${chat.last_time ? chat.last_time : ''}</span>
+                    </div>
+                    <p class="last-message">${chat.last_message ? chat.last_message : ''}</p>
+                </div>
+            `;
+            chatItem.addEventListener('click', function() {
+                document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+                chatItem.classList.add('active');
+                loadMessages(chat.id_chat);
+            });
+            chatsList.appendChild(chatItem);
+        });
+    }
+
+    function renderMessages(messages) {
+        const messagesContainer = document.getElementById('messages-container');
+        messagesContainer.innerHTML = '';
+        messages.forEach(msg => {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message';
+            msgDiv.innerHTML = `
+                <div class="message-header">
+                    <img src="/images/avatar-default.png" alt="Avatar" class="message-avatar">
+                    <span class="message-username">${msg.usuario}</span>
+                    <span class="message-time">${msg.fecha_envio}</span>
+                </div>
+                <div class="message-content">
+                    ${msg.contenido}
+                </div>
+            `;
+            messagesContainer.appendChild(msgDiv);
+        });
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function loadChats() {
+        fetch(window.userChatConfig.chatsUrl)
+            .then(res => res.json())
+            .then(data => {
+                chats = data;
+                renderChats(chats);
+                if (chats.length > 0) {
+                    document.querySelector('.chat-item').classList.add('active');
+                    loadMessages(chats[0].id_chat);
+                }
+            });
+    }
+
+    function loadMessages(chatId) {
+        currentChatId = chatId;
+        fetch(window.userChatConfig.messagesUrl(chatId))
+            .then(res => res.json())
+            .then(data => {
+                renderMessages(data);
+            });
+    }
+
     function sendMessage() {
+        const messageInput = document.querySelector('.message-input-container input');
         const message = messageInput.value.trim();
-        if (message) {
-            // Aquí irá la lógica para enviar mensajes
+        if (message && currentChatId) {
+            fetch(window.userChatConfig.sendUrl(currentChatId), {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ contenido: message })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    loadMessages(currentChatId);
             messageInput.value = '';
+                }
+            });
         }
     }
 
@@ -64,4 +151,16 @@ document.addEventListener('DOMContentLoaded', function() {
             chatMain.style.width = 'calc(100% - 350px)';
         }
     });
+ 
+    // Función para actualizar mensajes cada 5 segundos
+    function startMessagePolling() {
+        setInterval(() => {
+            if (currentChatId) {
+                loadMessages(currentChatId);
+            }
+        }, 5000); // Actualiza cada 5 segundos
+    }
+
+    loadChats();
+    startMessagePolling();
 });

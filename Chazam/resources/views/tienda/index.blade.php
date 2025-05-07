@@ -29,13 +29,13 @@
                 <div class="productos-grid">
                     @foreach ($productos->where('id_tipo_producto', $categoria->id_tipo_producto) as $producto)
                         <div class="producto-card">
-                            <a href="{{ route('producto.comprar', ['id' => $producto->id_producto]) }}">
+                            <a class="producto" href="{{ route('producto.comprar', ['id' => $producto->id_producto]) }}">
                                 <img src="{{ asset('img/' . $producto->titulo . '.png') }}" alt="{{ $producto->titulo }}">
                                 <h3>{{ $producto->titulo }}</h3>
                                 <p>{{ $producto->descripcion }}</p>
                                 <div class="precio">
                                     <span>{{ $producto->precio }}</span>
-                                    <img src="{{ asset('images/coin.png') }}" alt="Moneda">
+                                    <span>€</span>
                                 </div>
                             </a>
                         </div>

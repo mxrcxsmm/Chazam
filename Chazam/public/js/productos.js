@@ -15,12 +15,12 @@ document.addEventListener('DOMContentLoaded', function () {
         Swal.fire({
             icon: 'success',
             title: '¡Actualizado!',
-            text: document.body.dataset.updateMessage,
+            text: document.body.dataset.updateMessage, 
             confirmButtonColor: '#3085d6',
             confirmButtonText: 'Aceptar'
         });
     }
-
+ 
     // Confirmación al eliminar un producto
     const deleteForms = document.querySelectorAll('form[action*="productos"][method="POST"].delete-form');
     deleteForms.forEach(form => {
