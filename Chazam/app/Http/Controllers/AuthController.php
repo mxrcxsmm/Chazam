@@ -138,27 +138,36 @@ class AuthController extends Controller
                     ->withInput();
             }
         }
+        try {
+            // Crear usuario
+            $user = User::create([
+                'username' => $request->username,
+                'nombre' => $request->nombre,
+                'apellido' => $request->apellido,
+                'fecha_nacimiento' => $request->fecha_nacimiento,
+                'email' => $request->email,
+                'password' => Hash::make($request->password),
+                'id_nacionalidad' => $request->id_nacionalidad,
+                'id_rol' => 2, // Rol de usuario normal
+                'id_estado' => 1, // Estado activo
+                'img' => $imagePath,
+                'descripcion' => $request->descripcion,
+                'genero' => $request->genero,
+                'puntos' => 500,
+                'racha' => 1,
+            ]);
 
-        // Crear usuario
-        $user = User::create([
-            'username' => $request->username,
-            'nombre' => $request->nombre,
-            'apellido' => $request->apellido,
-            'fecha_nacimiento' => $request->fecha_nacimiento,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'id_nacionalidad' => $request->id_nacionalidad,
-            'id_rol' => 2,
-            'id_estado' => 1,
-            'img' => $imagePath,
-            'descripcion' => $request->descripcion,
-            'genero' => $request->genero,
-        ]);
+            // Autenticar al usuario
+            Auth::login($user);
 
-        Auth::login($user);
+            // Redirigir al guide de retos
+            return redirect()->route('retos.guide')->with('success', '¡Registro exitoso!');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withErrors(['error' => 'Error al crear el usuario: ' . $e->getMessage()])
+                ->withInput();
+        }
 
-        return redirect()->route('login')->with('success', '¡Registro exitoso!');
-        // return redirect()->route('user.dashboard')->with('success', '¡Registro exitoso!');
     }
 
     // Método para cerrar sesión

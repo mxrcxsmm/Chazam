@@ -35,6 +35,9 @@
                     <li class="nav-item">
                         <a class="nav-link active" href="{{ route('admin.productos.index') }}">Productos</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ route('admin.pagos.index') }}">Pagos</a>
+                    </li>
                 </ul>
                 <form action="{{ route('logout') }}" method="POST" class="ms-auto">
                     @csrf
@@ -67,10 +70,12 @@
                         <td>{{ $reporte->descripcion }}</td>
                         <td>
                             <!-- Botón para eliminar -->
-                            <form action="{{ route('admin.reportes.destroy', $reporte->id_reporte) }}" method="POST" style="display:inline-block;">
+                            <form action="{{ route('admin.reportes.destroy', $reporte->id_reporte) }}" method="POST"
+                                style="display:inline-block;">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" style="border: none; background: none; cursor: pointer;" title="Eliminar">
+                                <button type="submit" style="border: none; background: none; cursor: pointer;"
+                                    title="Eliminar">
                                     <i class="fas fa-trash text-danger"></i>
                                 </button>
                             </form>
@@ -81,7 +86,7 @@
         </table>
     </div>
 
-    
+
     <script src="{{ asset('js/reportes.js') }}"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

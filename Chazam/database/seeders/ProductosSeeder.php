@@ -19,6 +19,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Acceso básico a las funciones premium durante un mes.',
                 'precio' => 9.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 1,
             ],
             [
@@ -26,6 +27,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Acceso completo a todas las funciones premium durante un mes.',
                 'precio' => 19.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 1,
             ],
 
@@ -35,6 +37,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Reduce el tiempo de espera para realizar skips.',
                 'precio' => 5.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 2,
             ],
             [
@@ -42,6 +45,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Disfruta de skips ilimitados durante un mes.',
                 'precio' => 9.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 2,
             ],
 
@@ -51,6 +55,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Incluye 1 mes de suscripción básica y 250 puntos.',
                 'precio' => 11.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 3,
             ],
             [
@@ -58,6 +63,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Incluye 1 mes de suscripción premium y 500 puntos.',
                 'precio' => 24.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 3,
             ],
 
@@ -67,6 +73,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Compra de 750 puntos en Chazam.',
                 'precio' => 9.99,
                 'tipo_valor' => 'euros',
+                'puntos' => 750,
                 'id_tipo_producto' => 4,
             ],
             [
@@ -74,6 +81,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Compra de 1000 puntos en Chazam.',
                 'precio' => 14.99,
                 'tipo_valor' => 'euros',
+                'puntos' => 1000,
                 'id_tipo_producto' => 4,
             ],
 
@@ -83,6 +91,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Obtén un descuento del 10% en tu próxima compra.',
                 'precio' => 0.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 5,
             ],
             [
@@ -90,6 +99,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Obtén un descuento del 20% en tu próxima compra.',
                 'precio' => 1.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 5,
             ],
 
@@ -99,6 +109,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Apoya el desarrollo de Chazam con una pequeña donación.',
                 'precio' => 2.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 6,
             ],
             [
@@ -106,6 +117,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Apoya el desarrollo de Chazam con una gran donación.',
                 'precio' => 9.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 6,
             ],
 
@@ -115,6 +127,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Compra de 100 créditos para usar en Chazam.',
                 'precio' => 4.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 7,
             ],
             [
@@ -122,6 +135,7 @@ class ProductosSeeder extends Seeder
                 'descripcion' => 'Compra de 500 créditos para usar en Chazam.',
                 'precio' => 19.99,
                 'tipo_valor' => 'euros',
+                'puntos' => null,
                 'id_tipo_producto' => 7,
             ],
         ]);

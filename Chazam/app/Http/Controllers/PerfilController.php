@@ -15,13 +15,13 @@ class PerfilController extends Controller
     /**
      * Muestra el formulario de personalización del usuario
      */
-    /*public function edit()
+    public function edit()
     {
         $user = Auth::user();
         return view('perfil.personalizacion', compact('user'));
-    }*/
+    }
 
-    public function edit()
+    /*public function edit()
 {
     // Usuario de prueba
     $user = (object)[
@@ -34,7 +34,7 @@ class PerfilController extends Controller
     ];
 
     return view('perfil.personalizacion', compact('user'));
-}
+}*/
 
 
     /**
@@ -48,7 +48,7 @@ class PerfilController extends Controller
             'email' => 'required|email|max:255',
             'fecha_nacimiento' => 'nullable|date',
             'descripcion' => 'nullable|string|max:1000',
-            'img' => 'nullable|string|max:255',
+            'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
         $user = Auth::user();
