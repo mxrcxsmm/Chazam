@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Producto;
 use App\Models\TipoProducto;
+use App\Models\Pago;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class ProductosAdminController extends Controller
 {
@@ -77,11 +80,28 @@ class ProductosAdminController extends Controller
     public function destroy($id)
     {
         try {
+            // Inicia una transacción
+            DB::beginTransaction();
+
+            // Encuentra el producto
             $producto = Producto::findOrFail($id);
+
+            // Actualiza los registros de pagos asociados para desvincular el producto
+            DB::table('pagos')
+                ->where('id_producto', $producto->id_producto)
+                ->update(['id_producto' => null]);
+
+            // Elimina el producto
             $producto->delete();
+
+            // Confirma la transacción
+            DB::commit();
 
             return redirect()->route('admin.productos.index')->with('success', 'Producto eliminado correctamente.');
         } catch (\Exception $e) {
+            // Revierte la transacción en caso de error
+            DB::rollBack();
+
             return back()->with('error', 'Error al eliminar el producto: ' . $e->getMessage());
         }
     }

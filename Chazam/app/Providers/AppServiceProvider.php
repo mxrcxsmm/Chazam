@@ -5,6 +5,7 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
+use Illuminate\Support\Facades\Schema; // <--- AÑADIDO
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +22,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // AÑADIDO PARA COMPATIBILIDAD CON utf8mb4
+        Schema::defaultStringLength(191);
+
         // Compartir variables de usuario con todas las vistas
         View::composer('*', function ($view) {
             if (Auth::check()) {

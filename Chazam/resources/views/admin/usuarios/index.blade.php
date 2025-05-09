@@ -14,8 +14,7 @@
 </head>
 
 <body 
-    @if(session('success')) data-success-message="{{ session('success') }}" @endif
-    @if(session('update')) data-update-message="{{ session('update') }}" @endif
+    @if(session('eliminar')) data-success-message="{{ session('eliminar') }}" @endif
 >
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -39,6 +38,9 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('admin.productos.index') }}">Productos</a>
                     </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{{ route('admin.pagos.index') }}">Pagos</a>
+                    </li>
                 </ul>
                 <form action="{{ route('logout') }}" method="POST" class="ms-auto">
                     @csrf
@@ -50,7 +52,6 @@
 
     <div class="container mt-4">
         <h1>Lista de Usuarios</h1>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createModal">Crear Usuario</button>
     </div>
 
     <!-- Sección de filtros -->
@@ -157,19 +158,6 @@
                             <td>{{ $user->estado->nom_estado ?? 'Sin estado' }}</td>
                             <td>{{ $user->rol->nom_rol ?? 'Sin rol' }}</td>
                             <td>
-                                <a href="javascript:void(0)" onclick="openEditModal({
-                                    id_usuario: {{ $user->id_usuario }},
-                                    username: '{{ addslashes($user->username) }}',
-                                    nombre: '{{ addslashes($user->nombre) }}',
-                                    apellido: '{{ addslashes($user->apellido) }}',
-                                    fecha_nacimiento: '{{ $user->fecha_nacimiento->format('Y-m-d') }}',
-                                    genero: '{{ addslashes($user->genero) }}',
-                                    email: '{{ addslashes($user->email) }}',
-                                    descripcion: '{{ addslashes($user->descripcion) }}',
-                                    id_nacionalidad: {{ $user->id_nacionalidad }}
-                                })" class="text-warning" title="Editar">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </a>
                                 <form action="{{ route('admin.usuarios.destroy', $user->id_usuario) }}" method="POST" class="delete-form" style="display:inline-block;">
                                     @csrf
                                     @method('DELETE')
@@ -177,132 +165,23 @@
                                         <i class="fas fa-trash text-danger"></i>
                                     </button>
                                 </form>
+                                @if ($user->strikes >= 4 || $user->estado->nom_estado === 'PermaBan')
+                                    <button disabled title="Usuario permabaneado">
+                                        <i class="fas fa-ban"></i>
+                                    </button>
+                                @else
+                                    <form action="{{ route('admin.usuarios.ban', $user->id_usuario) }}" method="POST" style="display:inline-block; margin-left: 5px;">
+                                        @csrf
+                                        <button type="submit" style="border: none; background: none; cursor: pointer;" title="Banear">
+                                            <i class="fas fa-ban text-warning"></i>
+                                        </button>
+                                    </form>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
-        </div>
-    </div>
-
-    <!-- Modal para Crear Usuario -->
-    <div id="createModal" class="modal fade" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ route('admin.usuarios.store') }}" method="POST" id="createForm">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="createModalLabel">Crear Usuario</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="username" class="form-label">Nombre de Usuario</label>
-                            <input type="text" name="username" id="username" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre</label>
-                            <input type="text" name="nombre" id="nombre" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="apellido" class="form-label">Apellido</label>
-                            <input type="text" name="apellido" id="apellido" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" name="fecha_nacimiento" id="fecha_nacimiento" class="form-control" max="{{ date('Y-m-d') }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="genero" class="form-label">Género</label>
-                            <select name="genero" id="genero" class="form-select">
-                                <option value="" disabled>Seleccione un género</option>
-                                <option value="Hombre">Hombre</option>
-                                <option value="Mujer">Mujer</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" name="email" id="email" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea name="descripcion" id="descripcion" class="form-control"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="id_nacionalidad" class="form-label">Nacionalidad</label>
-                            <select name="id_nacionalidad" id="id_nacionalidad" class="form-select">
-                                @foreach ($nacionalidades as $nacionalidad)
-                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal para Editar Usuario -->
-    <div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="editForm" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Editar Usuario</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="edit_username" class="form-label">Nombre de Usuario</label>
-                            <input type="text" name="username" id="edit_username" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_nombre" class="form-label">Nombre</label>
-                            <input type="text" name="nombre" id="edit_nombre" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_apellido" class="form-label">Apellido</label>
-                            <input type="text" name="apellido" id="edit_apellido" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_fecha_nacimiento" class="form-label">Fecha de Nacimiento</label>
-                            <input type="date" name="fecha_nacimiento" id="edit_fecha_nacimiento" class="form-control" max="{{ date('Y-m-d') }}">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_genero" class="form-label">Género</label>
-                            <select name="genero" id="edit_genero" class="form-select">
-                                <option value="" disabled>Seleccione un género</option>
-                                <option value="Hombre">Hombre</option>
-                                <option value="Mujer">Mujer</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_email" class="form-label">Email</label>
-                            <input type="email" name="email" id="edit_email" class="form-control">
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_descripcion" class="form-label">Descripción</label>
-                            <textarea name="descripcion" id="edit_descripcion" class="form-control"></textarea>
-                        </div>
-                        <div class="mb-3">
-                            <label for="edit_id_nacionalidad" class="form-label">Nacionalidad</label>
-                            <select name="id_nacionalidad" id="edit_id_nacionalidad" class="form-select">
-                                @foreach ($nacionalidades as $nacionalidad)
-                                    <option value="{{ $nacionalidad->id_nacionalidad }}">{{ $nacionalidad->nombre }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Actualizar</button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 

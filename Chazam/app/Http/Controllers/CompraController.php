@@ -24,8 +24,8 @@ class CompraController extends Controller
         $producto = Producto::findOrFail($id);
 
         // Configuración de PayPal Sandbox
-        $paypalUrl = "https://www.sandbox.paypal.com/cgi-bin/webscr";
-        $businessEmail = "sandbox-business-email@example.com"; // Cambia esto por tu correo de sandbox
+        $paypalUrl = "https://sandbox.paypal.com"; // URL de PayPal Sandbox
+        $businessEmail = "sb-tldxz40728150@business.example.com"; // Cambia esto por tu correo de sandbox
         $returnUrl = route('tienda.index'); // URL a la que redirige después del pago
         $cancelUrl = route('producto.comprar', ['id' => $producto->id_producto]); // URL si se cancela el pago
 
