@@ -76,4 +76,9 @@ class Historia extends Model
         $now = now();
         return $now->between($this->fecha_inicio, $this->fecha_fin);
     }
+
+    public function usuario(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'id_usuario');
+    }
 }

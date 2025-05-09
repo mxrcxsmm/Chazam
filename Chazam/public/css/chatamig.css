@@ -99,6 +99,25 @@ body, html {
     border-bottom: 1px solid #2d2d2d;
 }
 
+.header-titles {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.momentms-btn {
+    color: #FFD700;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.momentms-btn:hover {
+    color: #FFC000;
+    text-decoration: none;
+}
+
 .sidebar-header h2 {
     color: white;
     font-size: 1.2rem;

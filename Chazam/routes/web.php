@@ -12,13 +12,14 @@ use App\Http\Controllers\FriendChatController;
 use App\Http\Controllers\RetoAdminController;
 use App\Http\Controllers\ReporteAdminController;
 use App\Http\Controllers\ProductosAdminController;
+use App\Http\Controllers\MomentmsController;
 use App\Http\Controllers\TiendaController;
 use App\Http\Controllers\PagosAdminController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\StripeController;
 
-// Ruta de inicio de sesión
+
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 
 // Rutas de autenticación
@@ -92,6 +93,13 @@ Route::middleware(['auth'])->group(function () {
                 return view('perfil.puntos');
             })->name('puntos');
         });
+      Route::get('user/momentms', [FriendChatController::class, 'momentms'])->name('user.momentms');
+
+      Route::get('momentms', [MomentmsController::class, 'index'])->name('user.momentms');
+      Route::get('momentms/create', [MomentmsController::class, 'create'])->name('momentms.create');
+      Route::post('/momentms', [MomentmsController::class, 'store'])->name('momentms.store');
+      Route::get('momentms/{id}', [MomentmsController::class, 'show'])->name('momentms.show');
+      Route::get('momentms/{id}/data', [MomentmsController::class, 'getData'])->name('momentms.data');
     });
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {
