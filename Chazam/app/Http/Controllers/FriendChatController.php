@@ -15,6 +15,12 @@ class FriendChatController extends Controller
         return view('user.friendchat');
     }
 
+
+    public function momentms()
+    {
+        return view('user.momentms');
+    }
+  
     public function getUserChats()
     {
         $userId = Auth::id();

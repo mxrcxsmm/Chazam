@@ -66,6 +66,16 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Nacionalidad::class, 'id_nacionalidad');
     }
 
+
+    public function amigos()
+    {
+        return $this->belongsToMany(User::class, 'solicitudes', 'id_emisor', 'id_receptor')
+                    ->where('estado', '=', 'aceptada')
+                    ->union(
+                        $this->belongsToMany(User::class, 'solicitudes', 'id_receptor', 'id_emisor')
+                            ->where('estado', '=', 'aceptada')
+                    );
+    }
     /**
      * Get the chat usuarios associated with this user.
      */
