@@ -116,7 +116,10 @@
             </div>
         </div>
 
+        <!-- Capa flotante para overlays arrastrables -->
+        <div id="overlay-layer" style="position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none;"></div>
         <div class="editor-controls">
+            <button id="fixOverlaysBtn" class="control-btn">Fijar textos/emojis</button>
             <button id="saveBtn" class="control-btn primary">Guardar Momentm</button>
         </div>
     </div>
@@ -514,10 +517,13 @@ document.addEventListener('DOMContentLoaded', function() {
     let stream = null;
 
     // Estado global
-    let originalImage = null; // base64 de la imagen original
+    let originalImage = null;
     let currentFilter = 'none';
     let currentAdjust = { brightness: 0, contrast: 0, saturation: 0 };
-    let overlays = []; // {type: 'text'|'emoji', value, x, y, color, size, font}
+    let overlays = []; // {type, value, x, y, color, size, font, el}
+
+    const overlayLayer = document.getElementById('overlay-layer');
+    const fixOverlaysBtn = document.getElementById('fixOverlaysBtn');
 
     // Renderiza la imagen con filtros, ajustes y overlays
     function renderImage(callback) {
@@ -703,57 +709,108 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    // Añadir texto
+    // Redibuja los overlays flotantes
+    function drawOverlays() {
+        overlayLayer.innerHTML = '';
+        if (!originalImage) return;
+        const imgRect = image.getBoundingClientRect();
+        overlays.forEach((o, idx) => {
+            let el = document.createElement('div');
+            el.style.position = 'absolute';
+            el.style.left = ((o.x / image.naturalWidth) * imgRect.width + imgRect.left - imgRect.left) + 'px';
+            el.style.top = ((o.y / image.naturalHeight) * imgRect.height + imgRect.top - imgRect.top) + 'px';
+            el.style.cursor = 'move';
+            el.style.pointerEvents = 'auto';
+            el.setAttribute('data-idx', idx);
+            if (o.type === 'text') {
+                el.textContent = o.value;
+                el.style.fontFamily = o.font;
+                el.style.fontSize = o.size + 'px';
+                el.style.color = o.color;
+                el.style.background = 'rgba(255,255,255,0.0)';
+                el.style.textShadow = '0 0 2px #000';
+                el.style.userSelect = 'none';
+            } else if (o.type === 'emoji') {
+                el.textContent = o.value;
+                el.style.fontSize = '40px';
+                el.style.userSelect = 'none';
+            }
+            // Drag & drop
+            let offsetX, offsetY, dragging = false;
+            el.onmousedown = function(e) {
+                dragging = true;
+                offsetX = e.offsetX;
+                offsetY = e.offsetY;
+                document.body.style.userSelect = 'none';
+            };
+            document.onmousemove = function(e) {
+                if (!dragging) return;
+                let x = e.clientX - imgRect.left - offsetX;
+                let y = e.clientY - imgRect.top - offsetY;
+                el.style.left = x + 'px';
+                el.style.top = y + 'px';
+            };
+            document.onmouseup = function(e) {
+                if (!dragging) return;
+                dragging = false;
+                let x = parseFloat(el.style.left);
+                let y = parseFloat(el.style.top);
+                // Convertir a coordenadas relativas
+                overlays[idx].x = (x / imgRect.width) * image.naturalWidth;
+                overlays[idx].y = (y / imgRect.height) * image.naturalHeight;
+                document.body.style.userSelect = '';
+            };
+            overlayLayer.appendChild(el);
+        });
+        // Ajustar tamaño/capa
+        overlayLayer.style.width = image.offsetWidth + 'px';
+        overlayLayer.style.height = image.offsetHeight + 'px';
+        overlayLayer.style.left = image.offsetLeft + 'px';
+        overlayLayer.style.top = image.offsetTop + 'px';
+        overlayLayer.style.pointerEvents = 'auto';
+    }
+    // Llamar a drawOverlays cada vez que la imagen cambia de tamaño
+    window.addEventListener('resize', drawOverlays);
+    image.onload = drawOverlays;
+
+    // Añadir texto (flotante y arrastrable)
     document.querySelector('[data-action="add-text"]').addEventListener('click', () => {
-        if (!cropper) return;
+        if (!originalImage) return;
         const text = textInput.value;
         if (!text) return;
-        // Destruir Cropper temporalmente para permitir el click
-        cropper.destroy();
-        cropper = null;
-        image.style.cursor = 'crosshair';
-        const clickHandler = function(e) {
-            const rect = image.getBoundingClientRect();
-            const x = (e.clientX - rect.left) * (image.naturalWidth / rect.width);
-            const y = (e.clientY - rect.top) * (image.naturalHeight / rect.height);
-            overlays.push({
-                type: 'text',
-                value: text,
-                x, y,
-                color: textColor.value,
-                size: fontSize.value,
-                font: fontFamily.value
-            });
-            image.style.cursor = '';
-            image.removeEventListener('click', clickHandler);
-            textInput.value = '';
-            renderImage();
-        };
-        image.addEventListener('click', clickHandler);
+        // Añadir en el centro
+        overlays.push({
+            type: 'text',
+            value: text,
+            x: image.naturalWidth / 2,
+            y: image.naturalHeight / 2,
+            color: textColor.value,
+            size: fontSize.value,
+            font: fontFamily.value
+        });
+        textInput.value = '';
+        drawOverlays();
     });
-    // Añadir emoji
+    // Añadir emoji (flotante y arrastrable)
     emojiButtons.forEach(button => {
         button.addEventListener('click', (e) => {
-            if (!cropper) return;
+            if (!originalImage) return;
             const emoji = button.dataset.emoji;
-            cropper.destroy();
-            cropper = null;
-            image.style.cursor = 'crosshair';
-            const clickHandler = function(ev) {
-                const rect = image.getBoundingClientRect();
-                const x = (ev.clientX - rect.left) * (image.naturalWidth / rect.width);
-                const y = (ev.clientY - rect.top) * (image.naturalHeight / rect.height);
-                overlays.push({
-                    type: 'emoji',
-                    value: emoji,
-                    x, y
-                });
-                image.style.cursor = '';
-                image.removeEventListener('click', clickHandler);
-                renderImage();
-            };
-            image.addEventListener('click', clickHandler);
+            overlays.push({
+                type: 'emoji',
+                value: emoji,
+                x: image.naturalWidth / 2,
+                y: image.naturalHeight / 2
+            });
+            drawOverlays();
         });
+    });
+    // Fijar overlays
+    fixOverlaysBtn.addEventListener('click', function() {
+        // Renderizar todos los overlays sobre la imagen y reinicializar Cropper
+        renderImage();
+        overlays = [];
+        overlayLayer.innerHTML = '';
     });
     // Guardar Momentm
     saveBtn.addEventListener('click', function() {
