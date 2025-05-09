@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Reto;
 use App\Models\User;
+use App\Models\Reto;
 use App\Models\Chat;
 use App\Models\ChatUsuario;
 use App\Models\Mensaje;
@@ -200,9 +200,48 @@ class RetoController extends Controller
             return response()->json(['error' => 'No tienes acceso a este chat'], 403);
         }
 
+        // Obtener el reto actual del chat
+        $chat = Chat::find($request->chat_id);
+        $retoId = $chat->id_reto;
+        
+        // Verificar si es un nuevo día para resetear puntos diarios
+        if ($usuarioActual->ultimo_login && $usuarioActual->ultimo_login->format('Y-m-d') !== now()->format('Y-m-d')) {
+            DB::table('users')
+                ->where('id_usuario', $usuarioActual->id_usuario)
+                ->update(['puntos_diarios' => 0]);
+        }
+        
+        // Verificar si el usuario no ha alcanzado el límite diario
+        if ($usuarioActual->puntos_diarios < 300) {
+            // Para el reto 1, solo sumar puntos si tiene emojis
+            if ($retoId == 1) {
+                if (isset($request->tieneEmojis) && $request->tieneEmojis) {
+                    $puntosGanados = rand(1, 10);
+                }
+            } else {
+                // Para los demás retos, sumar puntos siempre
+                $puntosGanados = rand(1, 10);
+            }
+
+            // Si hay puntos para sumar
+            if (isset($puntosGanados)) {
+                // Asegurarse de no exceder el límite diario
+                $puntosDisponibles = 300 - ($usuarioActual->puntos_diarios ?? 0);
+                $puntosGanados = min($puntosGanados, $puntosDisponibles);
+                
+                // Actualizar puntos diarios y totales usando el Query Builder
+                DB::table('users')
+                    ->where('id_usuario', $usuarioActual->id_usuario)
+                    ->update([
+                        'puntos_diarios' => DB::raw('COALESCE(puntos_diarios, 0) + ' . $puntosGanados),
+                        'puntos' => DB::raw('puntos + ' . $puntosGanados)
+                    ]);
+            }
+        }
+
         $mensaje = Mensaje::create([
             'id_chat_usuario' => $chatUsuario->id_chat_usuario,
-            'contenido' => $request->contenido,
+            'contenido' => is_array($request->contenido) ? $request->contenido['texto'] : $request->contenido,
             'fecha_envio' => now()
         ]);
 
@@ -212,7 +251,8 @@ class RetoController extends Controller
                 'id' => $usuarioActual->id_usuario,
                 'username' => $usuarioActual->username,
                 'imagen' => $usuarioActual->imagen_perfil
-            ]
+            ],
+            'puntos_ganados' => $puntosGanados ?? 0
         ]);
     }
 
@@ -371,5 +411,38 @@ class RetoController extends Controller
             Log::error('Error al verificar chat: ' . $e->getMessage());
             return response()->json(['error' => 'Error al verificar chat'], 500);
         }
+    }
+
+    /**
+     * Limpia el estado del usuario cuando sale del reto
+     */
+    public function limpiarEstado()
+    {
+        try {
+            $user = Auth::user();
+            if ($user) {
+                User::where('id_usuario', $user->id_usuario)->update(['id_estado' => 1]);
+                Log::info('Estado limpiado para usuario: ' . $user->id_usuario);
+            }
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            Log::error('Error al limpiar estado: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al limpiar estado'], 500);
+        }
+    }
+
+    /**
+     * Obtiene los puntos diarios del usuario autenticado
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function obtenerPuntosDiarios()
+    {
+        $user = Auth::user();
+        $puntosDiarios = $user->puntos_diarios ?? 0;
+        
+        return response()->json([
+            'puntos_diarios' => $puntosDiarios
+        ]);
     }
 }

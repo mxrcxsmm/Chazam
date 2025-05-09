@@ -599,3 +599,31 @@ margin-left: -4px;
 .reto-content {
     margin: 0;
 }
+
+/* Animación de puntos ganados */
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.puntos-animacion {
+    position: absolute;
+    color: #28a745;
+    font-weight: bold;
+    font-size: 0.9rem;
+    animation: fadeOutUp 1.5s ease-out forwards;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.puntos-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+}

@@ -35,9 +35,10 @@
                 </div>
 
                 <!-- Puntos -->
-                <div class="d-flex align-items-center text-success fw-semibold">
+                <div class="d-flex align-items-center text-success fw-semibold puntos-container">
                     <i class="bi bi-star-fill me-1"></i>
-                    <span>{{ isset($puntos) ? $puntos : 0 }} pts</span>
+                    <span id="puntos-actuales">{{ isset($puntos) ? $puntos : 0 }}</span>
+                    <span>pts</span>
                 </div>
 
                 <!-- Botón para abrir el menú -->

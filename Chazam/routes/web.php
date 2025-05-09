@@ -113,6 +113,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('mensajes/{chatId}', [RetoController::class, 'obtenerMensajes'])->name('obtener-mensajes');
         Route::post('verificar-estado-chats', [RetoController::class, 'verificarEstadoChats'])->name('verificar-estado-chats');
         Route::get('verificar-chat/{chatId}', [RetoController::class, 'verificarChat'])->name('verificar-chat');
+        Route::post('limpiar-estado', [RetoController::class, 'limpiarEstado'])->name('limpiar-estado');
+        Route::get('puntos-diarios', [RetoController::class, 'obtenerPuntosDiarios'])->name('puntos-diarios');
     });
 
     // Rutas para el estado de los usuarios

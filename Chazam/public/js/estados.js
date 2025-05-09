@@ -40,6 +40,8 @@ function actualizarUsuariosEnLinea() {
 // Función para mantener el estado actualizado
 function mantenerEstado() {
     const rutaActual = window.location.pathname;
+    console.log('=== VERIFICANDO ESTADO ===');
+    console.log('Ruta actual:', rutaActual);
     
     // Verificar si estamos en la página de reto
     if (rutaActual.includes('/retos/reto')) {
@@ -55,10 +57,23 @@ function mantenerEstado() {
 function actualizarUltimoMensaje() {
     ultimoMensaje = Date.now();
     console.log('Último mensaje actualizado:', new Date(ultimoMensaje).toLocaleTimeString());
+    console.log('Tiempo de inactividad reseteado');
     if (alertaMostrada && miAlerta) {
         Swal.close();
         alertaMostrada = false;
         miAlerta = false;
+    }
+    // Reiniciar el contador de inactividad
+    if (contadorInactividad) {
+        clearInterval(contadorInactividad);
+        contadorInactividad = setInterval(() => {
+            const tiempoInactivo = Date.now() - ultimoMensaje;
+            console.log('Tiempo inactivo:', tiempoInactivo / 1000, 'segundos');
+            if (tiempoInactivo >= 60000 && !alertaMostrada) { // 1 minuto
+                console.log('Inactividad detectada, mostrando alerta...');
+                mostrarAlertaInactividad();
+            }
+        }, 1000);
     }
 }
 
@@ -125,9 +140,11 @@ function mostrarAlertaInactividad() {
         }
     }).then((result) => {
         if (result.isConfirmed) {
+            console.log('Usuario confirmó que sigue activo - Reseteando tiempo');
             actualizarUltimoMensaje();
             Swal.fire('¡Perfecto!', 'Sigues en el chat.', 'success');
         } else {
+            console.log('Usuario no respondió - Redirigiendo a guide');
             window.location.href = '/retos/guide';
         }
     });
@@ -140,6 +157,17 @@ setInterval(mantenerEstado, 30000);
 window.addEventListener('beforeunload', () => {
     console.log('Usuario cerrando página - Estado: 2 (Inactivo)');
     actualizarEstado(2);
+    
+    // Si estamos en la página de reto, limpiar el estado
+    if (window.location.pathname.includes('/retos/reto')) {
+        fetch('/retos/limpiar-estado', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        }).catch(error => console.error('Error al limpiar estado:', error));
+    }
 });
 
 // Actualizar lista de usuarios en línea cada 30 segundos
@@ -149,6 +177,17 @@ setInterval(actualizarUsuariosEnLinea, 30000);
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Página cargada - Verificando estado inicial');
     mantenerEstado();
+    
+    // Si no estamos en la página de reto, asegurarnos de que el estado no sea 5
+    if (!window.location.pathname.includes('/retos/reto')) {
+        fetch('/retos/limpiar-estado', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        }).catch(error => console.error('Error al limpiar estado:', error));
+    }
 });
 
 // Hacer las funciones disponibles globalmente

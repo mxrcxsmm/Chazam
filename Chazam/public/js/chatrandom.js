@@ -93,6 +93,24 @@ async function buscarCompaneroAutomatico() {
     }
 }
 
+// Función para mostrar la animación de puntos ganados
+function mostrarPuntosGanados(puntos) {
+    if (!puntos) return;
+    
+    const puntosContainer = document.querySelector('.puntos-container');
+    
+    // Crear elemento de animación
+    const animacion = document.createElement('span');
+    animacion.className = 'puntos-animacion';
+    animacion.textContent = `+${puntos}`;
+    puntosContainer.appendChild(animacion);
+    
+    // Eliminar la animación después de que termine
+    setTimeout(() => {
+        animacion.remove();
+    }, 1500);
+}
+
 // Función para enviar mensaje
 function enviarMensaje() {
     if (!chatId) {
@@ -109,13 +127,30 @@ function enviarMensaje() {
     console.log('Mensaje original:', mensaje);
     
     // Procesar el mensaje según el reto actual si existe la función
-    const mensajeProcesado = window.procesarMensaje ? window.procesarMensaje(mensaje) : mensaje;
-    console.log('Mensaje procesado:', mensajeProcesado);
+    let mensajeProcesado;
+    try {
+        mensajeProcesado = window.procesarMensaje ? window.procesarMensaje(mensaje) : mensaje;
+        console.log('Mensaje procesado:', mensajeProcesado);
+    } catch (error) {
+        console.error('Error al procesar mensaje:', error);
+        mensajeProcesado = mensaje;
+    }
     
     // Si el mensaje procesado es null, significa que no pasó la validación del reto
     if (mensajeProcesado === null) {
         console.log('Mensaje rechazado por la validación del reto');
         return;
+    }
+
+    // Manejar el caso donde el mensaje procesado es un objeto
+    let contenidoMensaje;
+    let tieneEmojis = false;
+    
+    if (typeof mensajeProcesado === 'object' && mensajeProcesado !== null) {
+        contenidoMensaje = mensajeProcesado.texto;
+        tieneEmojis = mensajeProcesado.tieneEmojis;
+    } else {
+        contenidoMensaje = mensajeProcesado;
     }
 
     fetch('/retos/enviar-mensaje', {
@@ -126,7 +161,8 @@ function enviarMensaje() {
         },
         body: JSON.stringify({
             chat_id: chatId,
-            contenido: mensajeProcesado
+            contenido: contenidoMensaje,
+            tieneEmojis: tieneEmojis
         })
     })
     .then(response => response.json())
@@ -134,6 +170,34 @@ function enviarMensaje() {
         if (data.mensaje) {
             mensajeInput.value = '';
             agregarMensaje(data.mensaje, data.usuario);
+            // Mostrar animación de puntos si se ganaron
+            if (data.puntos_ganados > 0) {
+                console.log('=== PUNTOS GANADOS ===');
+                console.log('Puntos ganados:', data.puntos_ganados);
+                
+                // Actualizar puntos diarios
+                const puntosDiariosActuales = document.getElementById('puntos-diarios-actuales');
+                const puntosDiariosNum = parseInt(puntosDiariosActuales.textContent);
+                const nuevosPuntosDiarios = puntosDiariosNum + data.puntos_ganados;
+                puntosDiariosActuales.textContent = nuevosPuntosDiarios;
+                console.log('Puntos diarios actuales:', nuevosPuntosDiarios);
+                
+                // Actualizar puntos totales
+                const puntosActuales = document.getElementById('puntos-actuales');
+                const puntosTotalNum = parseInt(puntosActuales.textContent);
+                puntosActuales.textContent = puntosTotalNum + data.puntos_ganados;
+                
+                // Mostrar animación
+                const puntosContainer = document.querySelector('.puntos-container');
+                const animacion = document.createElement('span');
+                animacion.className = 'puntos-animacion';
+                animacion.textContent = `+${data.puntos_ganados}`;
+                puntosContainer.appendChild(animacion);
+                setTimeout(() => animacion.remove(), 1500);
+            } else {
+                console.log('=== NO SE GANARON PUNTOS ===');
+                console.log('Puntos diarios actuales:', document.getElementById('puntos-diarios-actuales').textContent);
+            }
             // Actualizar el tiempo de inactividad cuando se envía un mensaje
             if (window.actualizarUltimoMensaje) {
                 window.actualizarUltimoMensaje();
@@ -222,6 +286,8 @@ function agregarMensaje(mensaje, usuario) {
     
     mensajeDiv.appendChild(mensajeWrapper);
     container.appendChild(mensajeDiv);
+    
+    // Asegurarse de que el contenedor se desplace al último mensaje
     container.scrollTop = container.scrollHeight;
 }
 
@@ -290,14 +356,46 @@ async function verificarEstadoChat() {
     }
 }
 
+// Función para actualizar el contador de puntos diarios
+async function actualizarPuntosDiarios() {
+    try {
+        const response = await fetch('/retos/puntos-diarios', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const puntosDiariosElement = document.getElementById('puntos-diarios-actuales');
+            if (puntosDiariosElement) {
+                // Solo actualizar si el valor es mayor que el actual
+                const puntosActuales = parseInt(puntosDiariosElement.textContent);
+                if (data.puntos_diarios > puntosActuales) {
+                    puntosDiariosElement.textContent = data.puntos_diarios;
+                    console.log('Puntos diarios actualizados desde el servidor:', data.puntos_diarios);
+                }
+            }
+        } else {
+            console.error('Error al obtener puntos diarios:', response.statusText);
+        }
+    } catch (error) {
+        console.error('Error al actualizar puntos diarios:', error);
+    }
+}
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== DOM CARGADO - INICIANDO BÚSQUEDA ===');
-    // Iniciar la búsqueda automática
+    console.log('=== PÁGINA CARGADA ===');
     buscarCompaneroAutomatico();
+    actualizarPuntosDiarios(); // Actualizar puntos diarios al cargar la página
     
     // Configurar el botón de enviar mensaje
     document.getElementById('enviarMensaje').addEventListener('click', enviarMensaje);
+    
+    // Configurar el input para enviar con Enter
     document.getElementById('mensajeInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             enviarMensaje();
@@ -312,6 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (chatId) {
             cargarMensajes();
             verificarEstadoChat();
+            actualizarPuntosDiarios(); // Actualizar puntos diarios periódicamente
         }
     }, 1000); // Reducido a 1 segundo para mayor reactividad
 });
