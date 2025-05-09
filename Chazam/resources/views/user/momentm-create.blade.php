@@ -15,24 +15,108 @@
         </div>
 
         <div class="editor-workspace">
-            <canvas id="canvas"></canvas>
-        </div>
+            <div class="img-container">
+                <img id="image" src="" alt="Imagen a editar">
+            </div>
+            <div class="editor-tools">
+                <div class="tool-group">
+                    <h3>Transformación</h3>
+                    <div class="buttons-container">
+                        <button class="tool-btn" data-action="rotate-left" title="Rotar izquierda">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button class="tool-btn" data-action="rotate-right" title="Rotar derecha">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <button class="tool-btn" data-action="flip-horizontal" title="Voltear horizontal">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </button>
+                        <button class="tool-btn" data-action="flip-vertical" title="Voltear vertical">
+                            <i class="fas fa-arrows-alt-v"></i>
+                        </button>
+                    </div>
+                </div>
 
-        <div class="text-controls">
-            <input type="text" id="textInput" placeholder="Añade texto...">
-            <select id="fontFamily">
-                <option value="Arial">Arial</option>
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Helvetica">Helvetica</option>
-                <option value="Comic Sans MS">Comic Sans MS</option>
-            </select>
-            <input type="number" id="fontSize" value="30" min="12" max="72">
-            <input type="color" id="textColor" value="#ffffff">
-            <button id="addTextBtn" class="control-btn">Añadir texto</button>
+                <div class="tool-group">
+                    <h3>Ajustes</h3>
+                    <div class="slider-container">
+                        <label>Brillo</label>
+                        <input type="range" class="slider" data-action="brightness" min="-100" max="100" value="0">
+                    </div>
+                    <div class="slider-container">
+                        <label>Contraste</label>
+                        <input type="range" class="slider" data-action="contrast" min="-100" max="100" value="0">
+                    </div>
+                    <div class="slider-container">
+                        <label>Saturación</label>
+                        <input type="range" class="slider" data-action="saturation" min="-100" max="100" value="0">
+                    </div>
+                </div>
+
+                <div class="tool-group">
+                    <h3>Filtros</h3>
+                    <div class="buttons-container">
+                        <button class="filter-btn" data-filter="none">Normal</button>
+                        <button class="filter-btn" data-filter="grayscale">B/N</button>
+                        <button class="filter-btn" data-filter="sepia">Sepia</button>
+                        <button class="filter-btn" data-filter="blur">Blur</button>
+                        <button class="filter-btn" data-filter="invert">Invert</button>
+                    </div>
+                </div>
+
+                <div class="tool-group">
+                    <h3>Texto</h3>
+                    <div class="text-controls">
+                        <input type="text" id="textInput" placeholder="Escribe algo..." class="text-input">
+                        <select id="fontFamily" class="font-select">
+                            <option value="Arial">Arial</option>
+                            <option value="Times New Roman">Times New Roman</option>
+                            <option value="Helvetica">Helvetica</option>
+                            <option value="Comic Sans MS">Comic Sans MS</option>
+                            <option value="Impact">Impact</option>
+                            <option value="Verdana">Verdana</option>
+                        </select>
+                        <input type="color" id="textColor" value="#ffffff" class="color-input">
+                        <select id="fontSize" class="font-size-select">
+                            <option value="20">Pequeño</option>
+                            <option value="30" selected>Mediano</option>
+                            <option value="40">Grande</option>
+                        </select>
+                        <button class="tool-btn" data-action="add-text">
+                            <i class="fas fa-plus"></i> Añadir
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tool-group">
+                    <h3>Emojis</h3>
+                    <div class="emoji-container">
+                        <button class="emoji-btn" data-emoji="😊">😊</button>
+                        <button class="emoji-btn" data-emoji="❤️">❤️</button>
+                        <button class="emoji-btn" data-emoji="👍">👍</button>
+                        <button class="emoji-btn" data-emoji="🎉">🎉</button>
+                        <button class="emoji-btn" data-emoji="🌟">🌟</button>
+                        <button class="emoji-btn" data-emoji="🔥">🔥</button>
+                        <button class="emoji-btn" data-emoji="💯">💯</button>
+                        <button class="emoji-btn" data-emoji="✨">✨</button>
+                    </div>
+                </div>
+
+                <div class="tool-group">
+                    <h3>Acciones</h3>
+                    <div class="buttons-container">
+                        <button class="tool-btn" data-action="reset" title="Restablecer">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                        <button class="tool-btn" data-action="download" title="Descargar">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div class="editor-controls">
-            <button id="deleteSelectedBtn" class="control-btn">Eliminar selección</button>
             <button id="saveBtn" class="control-btn primary">Guardar Momentm</button>
         </div>
     </div>
@@ -107,47 +191,133 @@ body {
     margin-bottom: 20px;
     border-radius: 5px;
     overflow: hidden;
-    height: 400px; /* Altura fija */
+    height: auto;
+    position: relative;
     display: flex;
-    justify-content: center;
-    align-items: center;
+    flex-direction: column;
 }
 
-#canvas {
+.img-container {
+    width: 100%;
+    height: 400px;
+    overflow: hidden;
+    background: #000;
+}
+
+.img-container img {
     max-width: 100%;
     max-height: 100%;
+    transition: filter 0.3s ease;
 }
 
-.text-controls {
-    display: flex;
+.editor-tools {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 10px;
-    margin-bottom: 15px;
-    flex-wrap: wrap;
-    align-items: center;
-    background: rgba(255,255,255,0.1);
     padding: 10px;
-    border-radius: 5px;
+    background: rgba(0,0,0,0.1);
 }
 
-.text-controls input,
-.text-controls select {
+.tool-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
     padding: 8px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 5px;
+    min-width: 200px;
+}
+
+.tool-group h3 {
+    color: #fff;
+    margin: 0;
+    font-size: 0.9rem;
+    text-align: center;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(255,255,255,0.2);
+}
+
+.tool-group .buttons-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    justify-content: center;
+}
+
+.slider-container {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin: 10px 0;
+}
+
+.slider-container label {
+    color: #fff;
+    font-size: 0.9rem;
+    margin-bottom: 5px;
+}
+
+.slider {
+    width: 100%;
+    height: 4px;
+    -webkit-appearance: none;
+    background: #ddd;
+    outline: none;
+    border-radius: 5px;
+    margin: 5px 0;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    background: #FFD700;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+}
+
+.filter-btn {
+    background: #fff;
     border: none;
-    border-radius: 4px;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    flex: 1;
+    min-width: 60px;
+    text-align: center;
 }
 
-#fontFamily {
-    min-width: 150px;
+.filter-btn:hover {
+    background: #FFD700;
+    transform: scale(1.05);
 }
 
-#fontSize {
-    width: 70px;
+.filter-btn.active {
+    background: #FFD700;
+    color: #000;
+    font-weight: bold;
 }
 
-#textColor {
-    width: 50px;
-    height: 38px;
-    padding: 0;
+.tool-btn {
+    background: #fff;
+    border: none;
+    padding: 5px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.8rem;
+}
+
+.tool-btn:hover {
+    background: #FFD700;
+    transform: scale(1.05);
 }
 
 .editor-controls {
@@ -155,12 +325,13 @@ body {
     gap: 10px;
     align-items: center;
     flex-wrap: wrap;
+    justify-content: center;
 }
 
 .control-btn {
-    padding: 8px 16px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 4px;
+    border-radius: 25px;
     cursor: pointer;
     background: #fff;
     font-weight: bold;
@@ -232,152 +403,373 @@ body {
     transform: scale(1.05);
 }
 
-.image-preview {
-    background: rgba(0,0,0,0.2);
-    padding: 10px;
-    margin: 10px 0;
+.font-select {
+    padding: 8px;
+    border: 1px solid #ddd;
     border-radius: 5px;
-    display: none;
+    font-size: 0.9rem;
+    width: 100%;
+    background: #fff;
 }
 
-.preview-scroll {
+.text-controls {
     display: flex;
+    flex-direction: column;
     gap: 10px;
-    overflow-x: auto;
-    padding: 5px;
+    margin: 10px 0;
 }
 
-.preview-image {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
+.text-input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.color-input {
+    width: 100%;
+    height: 40px;
+    padding: 0;
+    border: none;
     border-radius: 5px;
     cursor: pointer;
-    border: 2px solid transparent;
+}
+
+.font-size-select {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    width: 100%;
+    background: #fff;
+}
+
+.emoji-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 10px 0;
+}
+
+.emoji-btn {
+    background: #fff;
+    border: none;
+    padding: 8px;
+    border-radius: 5px;
+    cursor: pointer;
     transition: all 0.3s ease;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
 }
 
-.preview-image.active {
-    border-color: #FFD700;
-    transform: scale(1.05);
+.emoji-btn:hover {
+    background: #FFD700;
+    transform: scale(1.1);
 }
 
-.preview-image:hover {
-    transform: scale(1.05);
+/* Estilos para los filtros */
+.filter-grayscale {
+    filter: grayscale(100%) !important;
+}
+
+.filter-sepia {
+    filter: sepia(100%) !important;
+}
+
+.filter-blur {
+    filter: blur(5px) !important;
+}
+
+.filter-invert {
+    filter: invert(100%) !important;
 }
 </style>
 
-<!-- Fabric.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+<!-- Cropper.js -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    let canvas = new fabric.Canvas('canvas', {
-        width: 400,
-        height: 400,
-        backgroundColor: '#ffffff',
-        enableRetinaScaling: false,
-        selection: true
-    });
+    let cropper = null;
+    const image = document.getElementById('image');
+    const imageInput = document.getElementById('imageInput');
+    const uploadBtn = document.getElementById('uploadBtn');
+    const saveBtn = document.getElementById('saveBtn');
+    const toolButtons = document.querySelectorAll('.tool-btn');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    const sliders = document.querySelectorAll('.slider');
+    const textInput = document.getElementById('textInput');
+    const textColor = document.getElementById('textColor');
+    const fontSize = document.getElementById('fontSize');
+    const fontFamily = document.getElementById('fontFamily');
+    const emojiButtons = document.querySelectorAll('.emoji-btn');
+    // Cámara
+    let video = document.getElementById('video');
+    let cameraModal = document.getElementById('cameraModal');
+    let stream = null;
 
-    // Función para añadir imagen al canvas
-    function addImageToCanvas(imgSrc) {
-        fabric.Image.fromURL(imgSrc, function(fabricImage) {
-            const scale = Math.min(
-                canvas.width / fabricImage.width,
-                canvas.height / fabricImage.height
-            );
-            
-            fabricImage.scale(scale);
-            canvas.clear();
-            canvas.add(fabricImage);
-            canvas.centerObject(fabricImage);
-            canvas.renderAll();
-        });
+    // Estado global
+    let originalImage = null; // base64 de la imagen original
+    let currentFilter = 'none';
+    let currentAdjust = { brightness: 0, contrast: 0, saturation: 0 };
+    let overlays = []; // {type: 'text'|'emoji', value, x, y, color, size, font}
+
+    // Renderiza la imagen con filtros, ajustes y overlays
+    function renderImage(callback) {
+        if (!originalImage) return;
+        const img = new window.Image();
+        img.onload = function() {
+            // Crear canvas base
+            const canvas = document.createElement('canvas');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            const ctx = canvas.getContext('2d');
+            // Filtros CSS para el contexto
+            let filterStr = '';
+            filterStr += `brightness(${100 + parseInt(currentAdjust.brightness)}%) `;
+            filterStr += `contrast(${100 + parseInt(currentAdjust.contrast)}%) `;
+            filterStr += `saturate(${100 + parseInt(currentAdjust.saturation)}%)`;
+            if (currentFilter === 'grayscale') filterStr += ' grayscale(100%)';
+            if (currentFilter === 'sepia') filterStr += ' sepia(100%)';
+            if (currentFilter === 'blur') filterStr += ' blur(5px)';
+            if (currentFilter === 'invert') filterStr += ' invert(100%)';
+            ctx.filter = filterStr.trim();
+            ctx.drawImage(img, 0, 0);
+            ctx.filter = 'none';
+            // Dibujar overlays
+            overlays.forEach(o => {
+                if (o.type === 'text') {
+                    ctx.font = `${o.size}px ${o.font}`;
+                    ctx.fillStyle = o.color;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(o.value, o.x, o.y);
+                } else if (o.type === 'emoji') {
+                    ctx.font = '40px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(o.value, o.x, o.y);
+                }
+            });
+            image.src = canvas.toDataURL();
+            setTimeout(() => {
+                if (cropper) cropper.destroy();
+                cropper = new Cropper(image, {
+                    aspectRatio: 1,
+                    viewMode: 1,
+                    dragMode: 'move',
+                    autoCropArea: 1,
+                    restore: false,
+                    guides: true,
+                    center: true,
+                    highlight: false,
+                    cropBoxMovable: true,
+                    cropBoxResizable: true,
+                    toggleDragModeOnDblclick: false,
+                });
+                if (callback) callback();
+            }, 100);
+        };
+        img.src = originalImage;
     }
 
     // Subir imagen
-    document.getElementById('uploadBtn').addEventListener('click', function() {
-        document.getElementById('imageInput').click();
+    uploadBtn.addEventListener('click', () => {
+        imageInput.click();
     });
-
-    document.getElementById('imageInput').addEventListener('change', function(e) {
+    imageInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function(event) {
-                addImageToCanvas(event.target.result);
+            reader.onload = (event) => {
+                originalImage = event.target.result;
+                overlays = [];
+                currentFilter = 'none';
+                currentAdjust = { brightness: 0, contrast: 0, saturation: 0 };
+                sliders.forEach(slider => slider.value = 0);
+                filterButtons.forEach(btn => btn.classList.remove('active'));
+                renderImage();
             };
             reader.readAsDataURL(file);
         }
     });
-
     // Cámara
+    document.getElementById('cameraBtn').onclick = async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: 'user',
+                    width: { ideal: 1280 },
+                    height: { ideal: 720 }
+                }
+            });
+            video.srcObject = stream;
+            cameraModal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        } catch (err) {
+            alert('No se pudo acceder a la cámara');
+        }
+    };
     document.getElementById('captureBtn').addEventListener('click', function() {
-        const video = document.getElementById('video');
         const tempCanvas = document.createElement('canvas');
         tempCanvas.width = video.videoWidth;
         tempCanvas.height = video.videoHeight;
         const ctx = tempCanvas.getContext('2d');
         ctx.drawImage(video, 0, 0);
-        
-        const imgData = tempCanvas.toDataURL('image/jpeg');
-        addImageToCanvas(imgData);
-        
-        // Cerrar modal de la cámara
-        document.getElementById('cameraModal').style.display = 'none';
+        originalImage = tempCanvas.toDataURL('image/jpeg');
+        overlays = [];
+        currentFilter = 'none';
+        currentAdjust = { brightness: 0, contrast: 0, saturation: 0 };
+        sliders.forEach(slider => slider.value = 0);
+        filterButtons.forEach(btn => btn.classList.remove('active'));
+        renderImage();
+        cameraModal.style.display = 'none';
         stopCamera();
     });
-
+    document.getElementById('closeCamera').onclick = stopCamera;
+    function stopCamera() {
+        cameraModal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        if (stream) {
+            stream.getTracks().forEach(track => track.stop());
+            stream = null;
+        }
+        video.srcObject = null;
+    }
+    // Filtros visuales
+    filterButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            if (!originalImage) {
+                alert('Por favor, sube una imagen primero');
+                return;
+            }
+            const filter = button.dataset.filter;
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            currentFilter = filter;
+            if (filter !== 'none') button.classList.add('active');
+            renderImage();
+        });
+    });
+    // Sliders de ajustes
+    sliders.forEach(slider => {
+        slider.addEventListener('input', () => {
+            if (!originalImage) return;
+            const action = slider.dataset.action;
+            currentAdjust[action] = parseInt(slider.value);
+            renderImage();
+        });
+    });
+    // Herramientas de edición básicas
+    toolButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            if (!cropper) {
+                alert('Por favor, sube una imagen primero');
+                return;
+            }
+            const action = button.dataset.action;
+            switch (action) {
+                case 'rotate-left':
+                    cropper.rotate(-90);
+                    break;
+                case 'rotate-right':
+                    cropper.rotate(90);
+                    break;
+                case 'flip-horizontal':
+                    cropper.scaleX(cropper.getData().scaleX * -1);
+                    break;
+                case 'flip-vertical':
+                    cropper.scaleY(cropper.getData().scaleY * -1);
+                    break;
+                case 'reset':
+                    overlays = [];
+                    currentAdjust = { brightness: 0, contrast: 0, saturation: 0 };
+                    sliders.forEach(slider => slider.value = 0);
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    currentFilter = 'none';
+                    renderImage();
+                    break;
+                case 'download':
+                    const canvas = cropper.getCroppedCanvas();
+                    const link = document.createElement('a');
+                    link.download = 'momentm.jpg';
+                    link.href = canvas.toDataURL('image/jpeg');
+                    link.click();
+                    break;
+            }
+        });
+    });
     // Añadir texto
-    document.getElementById('addTextBtn').addEventListener('click', function() {
-        const text = document.getElementById('textInput').value;
-        if (text) {
-            const textObj = new fabric.Text(text, {
-                left: canvas.width / 2,
-                top: canvas.height / 2,
-                fontSize: parseInt(document.getElementById('fontSize').value),
-                fill: document.getElementById('textColor').value,
-                fontFamily: document.getElementById('fontFamily').value,
-                stroke: '#000000',
-                strokeWidth: 0.5,
-                textAlign: 'center',
-                originX: 'center',
-                originY: 'center'
+    document.querySelector('[data-action="add-text"]').addEventListener('click', () => {
+        if (!cropper) return;
+        const text = textInput.value;
+        if (!text) return;
+        // Destruir Cropper temporalmente para permitir el click
+        cropper.destroy();
+        cropper = null;
+        image.style.cursor = 'crosshair';
+        const clickHandler = function(e) {
+            const rect = image.getBoundingClientRect();
+            const x = (e.clientX - rect.left) * (image.naturalWidth / rect.width);
+            const y = (e.clientY - rect.top) * (image.naturalHeight / rect.height);
+            overlays.push({
+                type: 'text',
+                value: text,
+                x, y,
+                color: textColor.value,
+                size: fontSize.value,
+                font: fontFamily.value
             });
-            
-            canvas.add(textObj);
-            canvas.setActiveObject(textObj);
-            document.getElementById('textInput').value = '';
-            canvas.renderAll();
-        }
+            image.style.cursor = '';
+            image.removeEventListener('click', clickHandler);
+            textInput.value = '';
+            renderImage();
+        };
+        image.addEventListener('click', clickHandler);
     });
-
-    // Eliminar objeto seleccionado
-    document.getElementById('deleteSelectedBtn').addEventListener('click', function() {
-        const activeObject = canvas.getActiveObject();
-        if (activeObject) {
-            canvas.remove(activeObject);
-            canvas.renderAll();
-        }
+    // Añadir emoji
+    emojiButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            if (!cropper) return;
+            const emoji = button.dataset.emoji;
+            cropper.destroy();
+            cropper = null;
+            image.style.cursor = 'crosshair';
+            const clickHandler = function(ev) {
+                const rect = image.getBoundingClientRect();
+                const x = (ev.clientX - rect.left) * (image.naturalWidth / rect.width);
+                const y = (ev.clientY - rect.top) * (image.naturalHeight / rect.height);
+                overlays.push({
+                    type: 'emoji',
+                    value: emoji,
+                    x, y
+                });
+                image.style.cursor = '';
+                image.removeEventListener('click', clickHandler);
+                renderImage();
+            };
+            image.addEventListener('click', clickHandler);
+        });
     });
-
     // Guardar Momentm
-    document.getElementById('saveBtn').addEventListener('click', function() {
-        if (canvas.isEmpty()) {
+    saveBtn.addEventListener('click', function() {
+        if (!cropper) {
             alert('Por favor, añade una imagen primero');
             return;
         }
-
-        // Mostrar indicador de carga
         this.disabled = true;
         this.textContent = 'Guardando...';
-
-        const dataUrl = canvas.toDataURL({
-            format: 'jpeg',
-            quality: 0.8
-        });
-
+        const dataUrl = cropper.getCroppedCanvas({
+            maxWidth: 1000,
+            maxHeight: 1000,
+            fillColor: '#fff',
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high'
+        }).toDataURL('image/jpeg', 0.8);
         fetch('{{ route("momentms.store") }}', {
             method: 'POST',
             headers: {
@@ -403,61 +795,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
             alert(error.message || 'Error al guardar el Momentm');
             this.disabled = false;
             this.textContent = 'Guardar Momentm';
         });
-    });
-
-    // Variables para la cámara
-    let video = document.getElementById('video');
-    let cameraModal = document.getElementById('cameraModal');
-    let stream = null;
-
-    // Manejador para la cámara
-    document.getElementById('cameraBtn').onclick = async () => {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({
-                video: {
-                    facingMode: 'user',
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
-                }
-            });
-            video.srcObject = stream;
-            cameraModal.style.display = 'block';
-            document.body.style.overflow = 'hidden';
-        } catch (err) {
-            console.error('Error:', err);
-            alert('No se pudo acceder a la cámara');
-        }
-    };
-
-    // Cerrar cámara
-    document.getElementById('closeCamera').onclick = stopCamera;
-
-    // Detener la cámara
-    function stopCamera() {
-        cameraModal.style.display = 'none';
-        document.body.style.overflow = 'auto';
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-            stream = null;
-        }
-        video.srcObject = null;
-    }
-
-    // Añadir estas opciones para el manejo de eventos
-    canvas.on('mouse:wheel', function(opt) {
-        var delta = opt.e.deltaY;
-        var zoom = canvas.getZoom();
-        zoom *= 0.999 ** delta;
-        if (zoom > 20) zoom = 20;
-        if (zoom < 0.01) zoom = 0.01;
-        canvas.setZoom(zoom);
-        opt.e.preventDefault();
-        opt.e.stopPropagation();
     });
 });
 </script> 

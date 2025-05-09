@@ -7,66 +7,32 @@
     </div>
 
     <div class="momentms-grid">
-        <!-- Sección: Tus Momentms -->
-        <div class="section-header">
-            <h2 class="section-title">Tus Momentms</h2>
-        </div>
         <div class="momentms-section">
             @php
-                $tusMomentms = $momentms->where('id_usuario', Auth::id());
+                use Carbon\Carbon;
+                $ahora = Carbon::now();
+                $momentms24h = $momentms->filter(function($m) use ($ahora) {
+                    return $m->fecha_inicio && $ahora->diffInHours($m->fecha_inicio) < 24;
+                });
             @endphp
-            
-            @if($tusMomentms->isEmpty())
-                <div class="no-content-message">
-                    <p>No tienes Momentms. ¡Crea uno nuevo!</p>
-                </div>
-            @else
-                @foreach($tusMomentms as $momentm)
-                    <div class="momentm-card" data-momentm-id="{{ $momentm->id_historia }}" onclick="window.location.href='{{ route('momentms.show', $momentm->id_historia) }}'">
-                        <div class="momentm-preview">
-                            <img src="{{ asset($momentm->img) }}" alt="Tu Momentm">
-                        </div>
-                        <div class="momentm-info">
-                            <div class="momentm-avatar">
-                                <img src="{{ asset('img/profile_img/' . Auth::user()->img) }}" alt="Tu avatar">
-                            </div>
-                            <p class="momentm-username">Tú</p>
-                            <p class="momentm-time">{{ $momentm->fecha_inicio->diffForHumans() }}</p>
-                        </div>
+            @forelse($momentms24h as $momentm)
+                <div class="momentm-card" data-momentm-id="{{ $momentm->id_historia }}">
+                    <div class="momentm-preview">
+                        <img src="{{ asset($momentm->img) }}" alt="Momentm de {{ $momentm->usuario->username ?? 'Usuario' }}">
                     </div>
-                @endforeach
-            @endif
-        </div>
-
-        <!-- Sección: Momentms de Amigos -->
-        <div class="section-header">
-            <h2 class="section-title">Momentms de Amigos</h2>
-        </div>
-        <div class="momentms-section">
-            @php
-                $momentmsAmigos = $momentms->where('id_usuario', '!=', Auth::id());
-            @endphp
-            
-            @if($momentmsAmigos->isEmpty())
-                <div class="no-content-message">
-                    <p>No hay Momentms de amigos para mostrar.</p>
-                </div>
-            @else
-                @foreach($momentmsAmigos as $momentm)
-                    <div class="momentm-card" data-momentm-id="{{ $momentm->id_historia }}" onclick="window.location.href='{{ route('momentms.show', $momentm->id_historia) }}'">
-                        <div class="momentm-preview">
-                            <img src="{{ asset($momentm->img) }}" alt="Momentm de {{ $momentm->usuario->username }}">
+                    <div class="momentm-info">
+                        <div class="momentm-avatar">
+                            <img src="{{ asset('img/profile_img/' . ($momentm->usuario->img ?? 'default.png')) }}" alt="Avatar de {{ $momentm->usuario->username ?? 'Usuario' }}">
                         </div>
-                        <div class="momentm-info">
-                            <div class="momentm-avatar">
-                                <img src="{{ asset('img/profile_img/' . $momentm->usuario->img) }}" alt="Avatar de {{ $momentm->usuario->username }}">
-                            </div>
-                            <p class="momentm-username">{{ $momentm->usuario->username }}</p>
-                            <p class="momentm-time">{{ $momentm->fecha_inicio->diffForHumans() }}</p>
-                        </div>
+                        <p class="momentm-username">{{ $momentm->usuario->id == Auth::id() ? 'Tú' : ($momentm->usuario->username ?? 'Usuario') }}</p>
+                        <p class="momentm-time">{{ $momentm->fecha_inicio->diffForHumans() }}</p>
                     </div>
-                @endforeach
-            @endif
+                </div>
+            @empty
+                <div class="no-content-message">
+                    <p>No hay Momentms recientes. ¡Crea uno nuevo!</p>
+                </div>
+            @endforelse
         </div>
     </div>
 </div>
@@ -116,100 +82,96 @@ html, body {
 
 .momentms-container {
     background-color: #9400D3;
-    min-height: 100%;
-    padding: 20px;
-    padding-top: 160px; /* Espacio para el header fijo */
-    position: relative;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch; /* Para mejor scroll en iOS */
+    min-height: 100vh;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
 }
 
 .momentms-header {
     display: flex;
     flex-direction: column;
     align-items: center;
+    margin-top: 40px;
+    margin-bottom: 30px;
     gap: 20px;
-    text-align: center;
-    position: fixed;
-    top: 60px;
-    left: 0;
-    right: 0;
-    z-index: 100;
-    background-color: #9400D3;
-    padding: 20px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Añadir sombra para separación visual */
 }
 
 .gradient-text {
-    background: linear-gradient(to right, rgba(255, 128, 0, 1), rgba(255, 0, 111, 1));
+    background: linear-gradient(to right, #FF8000, #FF006F);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
     font-size: 2.5rem;
     font-weight: bold;
     margin: 0;
-    padding: 10px 0;
+    text-align: center;
 }
 
 .create-momentm-btn {
     background-color: #FFD700;
     color: #000;
-    padding: 12px 24px;
-    border-radius: 25px;
+    padding: 12px 32px;
+    border-radius: 10px;
     text-decoration: none;
     font-weight: bold;
+    font-size: 1.1rem;
+    border: none;
     transition: all 0.3s ease;
+    margin-top: 10px;
 }
-
 .create-momentm-btn:hover {
     background-color: #FFC000;
     transform: scale(1.05);
 }
 
-.section-header {
-    margin: 0 0 20px 0;
-    padding: 0 20px;
-    background-color: #9400D3;
-}
-
-.section-title {
-    color: #FFD700;
-    font-size: 1.5rem;
-    margin: 0;
-    padding: 10px 0;
-    border-bottom: 2px solid #FFD700;
-}
-
 .momentms-grid {
-    position: relative;
-    z-index: 1;
+    width: 100%;
     display: flex;
     flex-direction: column;
-    gap: 40px;
+    align-items: center;
 }
 
 .momentms-section {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 20px;
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    width: 90vw;
+    max-width: 1100px;
 }
 
 .momentm-card {
-    background-color: #8B008B;
-    border-radius: 10px;
-    overflow: hidden;
+    background-color: #A259D9;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 280px;
+    width: 200px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 2px solid #FFD700;
+    transition: transform 0.2s;
     cursor: pointer;
-    transition: transform 0.3s ease;
+    overflow: hidden;
 }
-
 .momentm-card:hover {
-    transform: scale(1.05);
+    transform: scale(1.04);
 }
 
 .momentm-preview {
     width: 100%;
-    height: 200px;
+    height: 140px;
     overflow: hidden;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .momentm-preview img {
@@ -219,36 +181,43 @@ html, body {
 }
 
 .momentm-info {
-    padding: 15px;
+    padding: 15px 10px 10px 10px;
     display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
+    width: 100%;
 }
 
 .momentm-avatar {
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #fff;
+    margin-bottom: 5px;
 }
 
 .momentm-avatar img {
     width: 100%;
     height: 100%;
-    border-radius: 50%;
     object-fit: cover;
+    border-radius: 50%;
 }
 
 .momentm-username {
-    color: white;
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: center;
     margin: 0;
-    font-weight: bold;
 }
 
 .momentm-time {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.8rem;
+    color: #FFD700;
+    font-size: 0.95rem;
     margin: 0;
-    margin-left: auto;
+    text-align: center;
 }
 
 .no-content-message {
@@ -265,8 +234,8 @@ html, body {
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background-color: rgba(0, 0, 0, 0.9);
     z-index: 1000;
     overflow: hidden;
@@ -318,7 +287,7 @@ html, body {
 
 .momentm-view {
     position: relative;
-    max-width: 90%;
+    max-width: 90vw;
     max-height: 90vh;
     background: #8B008B;
     border-radius: 10px;
@@ -329,6 +298,10 @@ html, body {
 
 .momentm-view-header {
     margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
 }
 
 .momentm-user-info {
@@ -350,14 +323,18 @@ html, body {
 }
 
 .momentm-time {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.8rem;
+    color: #FFD700;
+    font-size: 0.95rem;
 }
 
 .momentm-image-container {
     position: relative;
     width: 100%;
-    height: calc(90vh - 70px);
+    height: 60vh;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .momentm-full-image {
