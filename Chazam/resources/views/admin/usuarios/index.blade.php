@@ -102,8 +102,6 @@
                             </select>
                         </div>
                     </div>
-                </div>
-                <div class="row">
                     <div class="col-md-3 mb-3">
                         <div class="filtro-campo">
                             <label for="filtro_rol">Rol</label>
@@ -115,10 +113,13 @@
                             </select>
                         </div>
                     </div>
-                    <div class="col-md-9 mb-3 d-flex align-items-end">
+                    <div class="col-md-3 mb-3 d-flex align-items-end">
+                        <div class="filtro-campo">
                         <button type="button" id="limpiarFiltros" class="btn btn-secondary">
                             <i class="fas fa-eraser"></i> Limpiar Filtros
                         </button>
+                        </div>
+                        
                     </div>
                 </div>
             </form>
