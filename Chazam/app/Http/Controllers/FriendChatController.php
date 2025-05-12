@@ -7,6 +7,7 @@ use App\Models\ChatUsuario;
 use App\Models\Mensaje;
 use App\Models\Chat;
 use Illuminate\Support\Facades\Auth;
+use App\Models\Comunidad;
 
 class FriendChatController extends Controller
 {
@@ -24,14 +25,18 @@ class FriendChatController extends Controller
     public function getUserChats()
     {
         $userId = Auth::id();
-        $chats = ChatUsuario::with(['chat'])
+        $chats = ChatUsuario::with(['chat', 'usuario'])
             ->where('id_usuario', $userId)
+            ->whereHas('chat', function($query) {
+                $query->whereNull('id_reto');
+            })
             ->get()
             ->map(function($chatUsuario) {
                 $chat = $chatUsuario->chat;
                 return [
                     'id_chat' => $chat->id_chat,
                     'nombre' => $chat->nombre,
+                    'username' => $chatUsuario->usuario->username,
                     'img' => $chat->img,
                     'last_message' => optional($chat->mensajes()->latest('fecha_envio')->first())->contenido,
                     'last_time' => optional($chat->mensajes()->latest('fecha_envio')->first())->fecha_envio?->format('H:i'),
@@ -85,5 +90,11 @@ class FriendChatController extends Controller
             'fecha_envio' => now(),
         ]);
         return response()->json(['success' => true, 'mensaje' => $mensaje]);
+    }
+
+    public function comunidades()
+    {
+        $comunidades = Comunidad::all();
+        return view('user.comunidades', compact('comunidades'));
     }
 } 

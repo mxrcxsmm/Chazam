@@ -25,6 +25,13 @@
         <!-- Lista de chats -->
         <div class="chats-list" id="chats-list">
             <!-- Los chats se cargarán aquí dinámicamente -->
+            <div class="chat-info">
+                <div class="chat-header">
+                    <h3>${chat.username ? chat.username : chat.nombre}</h3>
+                    <span class="time">${chat.last_time ? chat.last_time : ''}</span>
+                </div>
+                <p class="last-message">${chat.last_message ? chat.last_message : ''}</p>
+            </div>
         </div>
     </div>
 
@@ -94,5 +101,3 @@
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
 <emoji-picker style="position: absolute; bottom: 60px; left: 20px; display: none;"></emoji-picker>
-
-<!-- El JavaScript ahora está en chatamig.js -->
