@@ -27,6 +27,9 @@ class FriendChatController extends Controller
         $userId = Auth::id();
         $chats = ChatUsuario::with(['chat', 'usuario'])
             ->where('id_usuario', $userId)
+            ->whereHas('chat', function($query) {
+                $query->whereNull('id_reto');
+            })
             ->get()
             ->map(function($chatUsuario) {
                 $chat = $chatUsuario->chat;

@@ -1,6 +1,6 @@
 <div class="main-container">
     <div class="comunidades-list" id="comunidades-list">
-        @foreach($comunidades as $comunidad)
+         @foreach($comunidades as $comunidad)
             <div class="comunidad-item">
                 <div class="comunidad-info">
                     <h3>{{ $comunidad->nombre }}</h3>

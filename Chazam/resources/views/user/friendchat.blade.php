@@ -101,5 +101,3 @@
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
 <emoji-picker style="position: absolute; bottom: 60px; left: 20px; display: none;"></emoji-picker>
-
-<!-- El JavaScript ahora está en chatamig.js -->
