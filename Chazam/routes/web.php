@@ -141,4 +141,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('user/chats', [FriendChatController::class, 'getUserChats'])->name('user.chats');
     Route::get('user/chat/{chatId}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
     Route::post('user/chat/{chatId}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
+
+    Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
 });
