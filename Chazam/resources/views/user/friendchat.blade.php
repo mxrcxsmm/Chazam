@@ -45,16 +45,6 @@
 
         <div class="messages-container" id="messages-container">
             <!-- Los mensajes se cargarán aquí dinámicamente -->
-            <div class="message">
-                <div class="message-header">
-                    <img src="{{ asset('images/avatar-default.png') }}" alt="Avatar" class="message-avatar">
-                    <span class="message-username">Usuario 1</span>
-                    <span class="message-time">18:03</span>
-                </div>
-                <div class="message-content">
-                    Este es un mensaje de ejemplo.
-                </div>
-            </div>
         </div>
 
         <div class="message-input-container">
@@ -105,26 +95,4 @@
 
 <emoji-picker style="position: absolute; bottom: 60px; left: 20px; display: none;"></emoji-picker>
 
-<script>
-    window.userChatConfig = {
-        chatsUrl: '{{ route('user.chats') }}',
-        messagesUrl: function(chatId) { return `/user/chat/${chatId}/messages`; },
-        sendUrl: function(chatId) { return `/user/chat/${chatId}/send`; },
-        userId: {{ auth()->id() }}
-    };
-
-    const emojiButton = document.querySelector('.far.fa-smile');
-    const emojiPicker = document.querySelector('emoji-picker');
-
-    emojiButton.addEventListener('click', () => {
-        emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
-    });
-
-    document.querySelector('emoji-picker')
-      .addEventListener('emoji-click', event => {
-        const emoji = event.detail.unicode;
-        // Inserta el emoji en el campo de texto
-        const input = document.querySelector('.message-input-container input');
-        input.value += emoji;
-      });
-</script>
+<!-- El JavaScript ahora está en chatamig.js -->

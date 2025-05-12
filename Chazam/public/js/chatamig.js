@@ -6,9 +6,18 @@ document.addEventListener('DOMContentLoaded', function() {
     const optionsSidebar = document.querySelector('.options-sidebar');
     const chatMain = document.querySelector('.chat-main');
     const mainContainer = document.querySelector('.main-container');
+    const emojiButton = document.querySelector('.far.fa-smile');
+    const emojiPicker = document.querySelector('emoji-picker');
 
     let chats = [];
     let currentChatId = null;
+
+    window.userChatConfig = {
+        chatsUrl: '/user/chats', // Asegúrate de que esta ruta sea correcta
+        messagesUrl: function(chatId) { return `/user/chat/${chatId}/messages`; },
+        sendUrl: function(chatId) { return `/user/chat/${chatId}/send`; },
+        userId: 1 // Reemplaza con el ID del usuario autenticado
+    };
 
     function renderChats(chats) {
         const chatsList = document.getElementById('chats-list');
@@ -23,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="chat-info">
                     <div class="chat-header">
-                        <h3>${chat.nombre}</h3>
+                        <h3>${chat.username ? chat.username : chat.nombre}</h3>
                         <span class="time">${chat.last_time ? chat.last_time : ''}</span>
                     </div>
                     <p class="last-message">${chat.last_message ? chat.last_message : ''}</p>
@@ -33,6 +42,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
                 chatItem.classList.add('active');
                 loadMessages(chat.id_chat);
+                updateChatHeader(chat);
             });
             chatsList.appendChild(chatItem);
         });
@@ -159,6 +169,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadMessages(currentChatId);
             }
         }, 5000); // Actualiza cada 5 segundos
+    }
+
+    emojiButton.addEventListener('click', () => {
+        emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
+    });
+
+    document.querySelector('emoji-picker')
+      .addEventListener('emoji-click', event => {
+        const emoji = event.detail.unicode;
+        // Inserta el emoji en el campo de texto
+        const input = document.querySelector('.message-input-container input');
+        input.value += emoji;
+      });
+
+    function updateChatHeader(companero) {
+        const chatHeader = document.querySelector('.chat-contact h3');
+        chatHeader.textContent = companero.nombre_completo;
     }
 
     loadChats();
