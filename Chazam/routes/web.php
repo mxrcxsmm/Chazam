@@ -55,6 +55,7 @@ Route::middleware(['auth'])->group(function () {
         // Rutas para pagos (administrador)
         Route::get('/pagos', [PagosAdminController::class, 'index'])->name('pagos.index');
         Route::post('/pagos', [PagosAdminController::class, 'store'])->name('pagos.store');
+        Route::post('/pagos/filtrar', [PagosAdminController::class, 'filtrar'])->name('pagos.filtrar');        
         Route::put('/pagos/{id}', [PagosAdminController::class, 'update'])->name('pagos.update');
     });
 
