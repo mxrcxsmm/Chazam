@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use Carbon\Carbon;
 
 class PerfilController extends Controller
 {
@@ -47,7 +48,7 @@ class PerfilController extends Controller
             'username' => 'required|string|max:30|unique:users,username,' . Auth::id() . ',id_usuario',
             'nombre' => 'required|string|max:255',
             'apellido' => 'nullable|string|max:255',
-            'fecha_nacimiento' => 'nullable|date',
+            'fecha_nacimiento' => 'nullable|date|before_or_equal:' . Carbon::now()->subYears(13)->format('Y-m-d'),
             'descripcion' => 'nullable|string|max:1000',
             'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
@@ -86,6 +87,20 @@ class PerfilController extends Controller
         }
 
         $user->save();
+
+        // Si es una petición AJAX, devolvemos JSON
+        if ($request->ajax()) {
+            return response()->json([
+                'message' => 'Tus datos se han actualizado correctamente.',
+                'img' => $user->img,
+                'username' => $user->username,
+                'nombre' => $user->nombre,
+                'apellido' => $user->apellido,
+                'nombre_completo' => $user->nombre . ' ' . $user->apellido,
+                'fecha_nacimiento' => $user->fecha_nacimiento,
+                'descripcion' => $user->descripcion,
+            ]);
+        }
 
         return redirect()->route('perfil.personalizacion')->with('success', 'Tus datos se han actualizado correctamente.');
     }

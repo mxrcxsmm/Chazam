@@ -29,7 +29,7 @@
             <input type="text" id="descripcion" name="descripcion" value="{{ old('descripcion', $user->descripcion) }}">
         </div>
 
-                {{-- <div class="full text-center">
+        {{-- <div class="full text-center">
             <label for="img">Imagen de perfil</label>
 
             <div id="previewContainer" class="mb-3">
@@ -62,25 +62,40 @@
         {{-- Imagen de perfil --}}
         <div class="full text-center">
             <label class="form-label fw-bold fs-5">Imagen de perfil</label>
+        
             <div id="previewContainer" class="position-relative mb-3">
                 <img src="{{ asset($user->img ?? '') }}" id="profilePreview" alt="Foto de perfil"
-                     class="rounded-circle shadow" style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #8750B2;">
-                <a id="downloadBtn" class="position-absolute top-0 end-0 btn btn-sm btn-light shadow d-none" download="foto_webcam.jpg" title="Descargar" style="margin-top: -10px; margin-right: -10px;">
-                    💾
+                     class="rounded-circle shadow"
+                     style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #8750B2;">
+        
+                <!-- Botón Descargar -->
+                <a id="downloadBtn"
+                   class="position-absolute btn btn-sm btn-light shadow d-none"
+                   download="foto_webcam.jpg"
+                   title="Descargar"
+                   style="top: 5px; right: -15px;">
+                    <i class="bi bi-download"></i>
                 </a>
-                <button id="discardBtn" type="button" class="position-absolute top-0 start-0 btn btn-sm btn-danger shadow d-none" title="Descartar" style="margin-top: -10px; margin-left: -10px;">
-                    ❌
+        
+                <!-- Botón Descartar -->
+                <button id="discardBtn"
+                        type="button"
+                        class="position-absolute btn btn-sm btn-light text-danger border-0 shadow d-none"
+                        title="Descartar"
+                        style="top: 5px; left: -15px;">
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
-
+        
             <div class="d-flex justify-content-center gap-3">
                 <button type="button" class="btn btn-outline-secondary" id="uploadBtn">Subir archivo</button>
                 <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cameraModal">
                     Tomar foto
                 </button>
             </div>
+        
             <input type="file" id="img" name="img" accept="image/*" class="d-none">
-        </div>
+        </div>        
 
         {{-- Modal cámara --}}
         <div class="modal fade" id="cameraModal" tabindex="-1" aria-labelledby="cameraModalLabel" aria-hidden="true">
@@ -108,78 +123,6 @@
 @endsection
 
 @push('scripts')
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-    const video = document.getElementById('camera');
-    const canvas = document.getElementById('snapshot');
-    const captureBtn = document.getElementById('captureBtn');
-    const fileInput = document.getElementById('img');
-    const previewImg = document.getElementById('profilePreview');
-    const uploadBtn = document.getElementById('uploadBtn');
-    const modal = document.getElementById('cameraModal');
-    const discardBtn = document.getElementById('discardBtn');
-    const downloadBtn = document.getElementById('downloadBtn');
-
-    let stream;
-    let originalImage = previewImg.src;
-
-    modal.addEventListener('shown.bs.modal', async () => {
-        stream = await navigator.mediaDevices.getUserMedia({ video: true });
-        video.srcObject = stream;
-    });
-
-    modal.addEventListener('hidden.bs.modal', () => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
-    });
-
-    captureBtn.addEventListener('click', () => {
-        const ctx = canvas.getContext('2d');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        const dataURL = canvas.toDataURL('image/jpeg');
-        previewImg.src = dataURL;
-
-        // Mostrar botones de acción
-        discardBtn.classList.remove('d-none');
-        downloadBtn.classList.remove('d-none');
-        downloadBtn.href = dataURL;
-
-        canvas.toBlob(blob => {
-            const file = new File([blob], "foto_webcam.jpg", { type: "image/jpeg" });
-            const dataTransfer = new DataTransfer();
-            dataTransfer.items.add(file);
-            fileInput.files = dataTransfer.files;
-        }, "image/jpeg");
-
-        bootstrap.Modal.getInstance(modal).hide();
-    });
-
-    uploadBtn.addEventListener('click', () => {
-        fileInput.click();
-    });
-
-    fileInput.addEventListener('change', function () {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = e => {
-                previewImg.src = e.target.result;
-                downloadBtn.classList.add('d-none');
-                discardBtn.classList.add('d-none');
-            };
-            reader.readAsDataURL(this.files[0]);
-        }
-    });
-
-    discardBtn.addEventListener('click', () => {
-        previewImg.src = originalImage;
-        discardBtn.classList.add('d-none');
-        downloadBtn.classList.add('d-none');
-        fileInput.value = ''; // limpia el archivo del input
-    });
-});
-</script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="{{ asset('js/datosusuario.js') }}"></script>
 @endpush

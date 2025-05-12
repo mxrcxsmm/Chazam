@@ -266,3 +266,29 @@ canvas {
     color: white;
     border-color: #4B0082;
 }
+
+#previewContainer {
+    position: relative;
+    display: inline-block;
+}
+
+#discardBtn, #downloadBtn {
+    position: absolute;
+    top: 5px;
+    background-color: white;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+}
+
+#discardBtn {
+    left: -15px;
+    color: #e53935;
+}
+
+#downloadBtn {
+    right: -15px;
+    color: #4B0082;
+}
