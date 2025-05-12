@@ -24,7 +24,7 @@ class FriendChatController extends Controller
     public function getUserChats()
     {
         $userId = Auth::id();
-        $chats = ChatUsuario::with(['chat'])
+        $chats = ChatUsuario::with(['chat', 'usuario'])
             ->where('id_usuario', $userId)
             ->get()
             ->map(function($chatUsuario) {
@@ -32,6 +32,7 @@ class FriendChatController extends Controller
                 return [
                     'id_chat' => $chat->id_chat,
                     'nombre' => $chat->nombre,
+                    'username' => $chatUsuario->usuario->username,
                     'img' => $chat->img,
                     'last_message' => optional($chat->mensajes()->latest('fecha_envio')->first())->contenido,
                     'last_time' => optional($chat->mensajes()->latest('fecha_envio')->first())->fecha_envio?->format('H:i'),
