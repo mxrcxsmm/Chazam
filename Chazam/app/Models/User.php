@@ -133,4 +133,10 @@ class User extends Authenticatable implements MustVerifyEmail
         return $query->whereNotNull('fin_ban')
                     ->where('fin_ban', '>', now());
     }
+
+    // relacion con historias de usuario
+    public function historias()
+    {
+        return $this->hasMany(Historia::class, 'id_usuario');
+    }
 }
