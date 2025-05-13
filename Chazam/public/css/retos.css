@@ -423,26 +423,33 @@ margin-left: -4px;
 
 /* Estilos para los mensajes */
 .reto-message {
-    margin-bottom: 1rem;
-    max-width: 70%;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    align-items: flex-start !important;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 1rem;
 }
 
-.reto-message.sent {
-    margin-left: auto;
-    align-items: flex-end;
-}
-
+.reto-message.sent,
 .reto-message.received {
-    margin-right: auto;
-    align-items: flex-start;
+    width: 100% !important;
+    max-width: 100% !important;
+    align-items: flex-start !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 .reto-message-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    align-items: flex-start !important;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    margin: 0 !important;
 }
 
 .reto-message-user-info {
@@ -467,10 +474,12 @@ margin-left: -4px;
 }
 
 .reto-message-content-wrapper {
-    position: relative;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
     padding: 0.5rem 1rem;
     border-radius: 1rem;
-    max-width: 100%;
+    background: none;
 }
 
 .reto-message.sent .reto-message-content-wrapper {

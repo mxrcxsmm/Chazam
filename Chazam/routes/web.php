@@ -18,6 +18,8 @@ use App\Http\Controllers\PagosAdminController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\SolicitudUserController;
+use App\Http\Controllers\ReporteController;
 
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -143,4 +145,13 @@ Route::middleware(['auth'])->group(function () {
     Route::get('user/chats', [FriendChatController::class, 'getUserChats'])->name('user.chats');
     Route::get('user/chat/{chatId}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
     Route::post('user/chat/{chatId}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
+
+    // Rutas para solicitudes y bloqueos
+    Route::post('/solicitudes/enviar', [SolicitudUserController::class, 'enviarSolicitud'])->name('solicitudes.enviar');
+    Route::post('/solicitudes/bloquear', [SolicitudUserController::class, 'bloquearUsuario'])->name('solicitudes.bloquear');
+    Route::get('/solicitudes/verificar-bloqueo/{id_usuario}', [SolicitudUserController::class, 'verificarBloqueo'])->name('solicitudes.verificar-bloqueo');
+    Route::get('/solicitudes/verificar/{id_usuario}', [SolicitudUserController::class, 'verificarSolicitud'])->name('solicitudes.verificar');
+    
+    // Ruta para reportes
+    Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
 });

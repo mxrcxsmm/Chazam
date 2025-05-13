@@ -96,7 +96,7 @@ class User extends Authenticatable implements MustVerifyEmail
     // recuperar foto
     public function getImagenPerfilAttribute(): string
     {
-        return $this->img ? asset('img/profile_img/'.$this->img) : asset('img/profile_img/avatar-default.png');
+        return $this->img ? asset('IMG/profile_img/'.$this->img) : asset('IMG/profile_img/avatar-default.png');
     }
 
     // edad en años

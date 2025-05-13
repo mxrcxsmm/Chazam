@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('solicitudes', function (Blueprint $table) {
             $table->bigIncrements('id_solicitud');
-            $table->enum('estado', ['pendiente', 'aceptada', 'rechazada','solicitando','blockeada']);
+            $table->enum('estado', ['pendiente', 'aceptada', 'rechazada','blockeada']);
             $table->bigInteger('id_emisor')->unsigned();
             $table->bigInteger('id_receptor')->unsigned();
             $table->timestamps();

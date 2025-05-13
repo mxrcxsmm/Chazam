@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use App\Models\Solicitud;
 
 class RetoController extends Controller
 {
@@ -115,8 +116,32 @@ class RetoController extends Controller
 
             // Buscar compañero
             try {
+                // Obtener IDs de usuarios bloqueados usando el modelo Solicitud
+                $usuariosBloqueados = Solicitud::where(function($query) use ($usuarioActual) {
+                    $query->where(function($q) use ($usuarioActual) {
+                        $q->where('id_emisor', $usuarioActual->id_usuario)
+                          ->where('estado', 'blockeada');
+                    })->orWhere(function($q) use ($usuarioActual) {
+                        $q->where('id_receptor', $usuarioActual->id_usuario)
+                          ->where('estado', 'blockeada');
+                    });
+                })
+                ->get()
+                ->map(function($solicitud) use ($usuarioActual) {
+                    // Si el usuario actual es el emisor, devolver el receptor y viceversa
+                    return $solicitud->id_emisor == $usuarioActual->id_usuario 
+                        ? $solicitud->id_receptor 
+                        : $solicitud->id_emisor;
+                })
+                ->unique()
+                ->push($usuarioActual->id_usuario)
+                ->toArray();
+
+                Log::info('Usuarios bloqueados: ' . implode(', ', $usuariosBloqueados));
+
                 $companero = User::where('id_estado', 5)
                     ->where('id_usuario', '!=', $usuarioActual->id_usuario)
+                    ->whereNotIn('id_usuario', $usuariosBloqueados)
                     ->whereDoesntHave('chatUsuarios', function($query) use ($reto) {
                         $query->whereHas('chat', function($q) use ($reto) {
                             $q->where('id_reto', $reto->id_reto)
@@ -132,6 +157,7 @@ class RetoController extends Controller
                     Log::info('1. No hay usuarios con estado 5');
                     Log::info('2. Todos los usuarios están en chats activos');
                     Log::info('3. El usuario actual es el único disponible');
+                    Log::info('4. Todos los usuarios disponibles están bloqueados');
                     return response()->json(['error' => 'No hay usuarios disponibles'], 404);
                 }
 
@@ -275,7 +301,23 @@ class RetoController extends Controller
                 $query->where('id_chat', $chatId);
             })
             ->orderBy('fecha_envio', 'asc')
-            ->get();
+            ->get()
+            ->map(function($mensaje) {
+                return [
+                    'id_chat_usuario' => $mensaje->id_chat_usuario,
+                    'contenido' => $mensaje->contenido,
+                    'fecha_envio' => $mensaje->fecha_envio,
+                    'updated_at' => $mensaje->updated_at,
+                    'created_at' => $mensaje->created_at,
+                    'chat_usuario' => [
+                        'usuario' => [
+                            'id' => $mensaje->chatUsuario->usuario->id_usuario,
+                            'username' => $mensaje->chatUsuario->usuario->username,
+                            'imagen' => $mensaje->chatUsuario->usuario->imagen_perfil
+                        ]
+                    ]
+                ];
+            });
 
         return response()->json($mensajes);
     }

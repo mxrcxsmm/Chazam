@@ -31,7 +31,7 @@
 <div class="reto-chat-container">
     <div class="reto-chat-main h-100">
         <div class="reto-chat-header bg-purple text-white p-3">
-            <div class="d-flex align-items-center">
+            <div class="d-flex align-items-center justify-content-between w-100">
                 <div>
                     <h5 class="mb-0" id="chatHeader">
                         <div class="d-flex align-items-center">
@@ -41,6 +41,22 @@
                             Buscando usuarios disponibles...
                         </div>
                     </h5>
+                </div>
+                <div class="dropdown ms-auto" id="chatOptions" style="display: none;">
+                    <button class="btn btn-link text-white p-0" type="button" id="chatOptionsButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="chatOptionsButton">
+                        <li><a class="dropdown-item" href="#" id="sendFriendRequest">
+                            <i class="fas fa-user-plus me-2"></i>Enviar solicitud de amistad
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" id="reportUser">
+                            <i class="fas fa-flag me-2"></i>Reportar usuario
+                        </a></li>
+                        <li><a class="dropdown-item" href="#" id="blockUser">
+                            <i class="fas fa-ban me-2"></i>Bloquear usuario
+                        </a></li>
+                    </ul>
                 </div>
             </div>
         </div>

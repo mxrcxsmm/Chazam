@@ -118,7 +118,7 @@ function mostrarAlertaInactividad() {
     alertaMostrada = true;
     miAlerta = true;
     
-    Swal.fire({
+    const swalInstance = Swal.fire({
         title: '¿Sigues ahí?',
         html: `Tienes <b>${tiempoRestante}</b> segundos para confirmar que sigues activo.`,
         icon: 'warning',
@@ -128,10 +128,13 @@ function mostrarAlertaInactividad() {
         timerProgressBar: true,
         allowOutsideClick: false,
         allowEscapeKey: false,
-        didOpen: () => {
+        didOpen: (popup) => {
             contadorRegresivo = setInterval(() => {
                 tiempoRestante--;
-                Swal.getHtmlContainer().innerHTML = `Tienes <b>${tiempoRestante}</b> segundos para confirmar que sigues activo.`;
+                const htmlContainer = popup.querySelector('.swal2-html-container');
+                if (htmlContainer) {
+                    htmlContainer.innerHTML = `Tienes <b>${tiempoRestante}</b> segundos para confirmar que sigues activo.`;
+                }
             }, 1000);
         },
         willClose: () => {
