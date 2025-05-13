@@ -2,86 +2,77 @@
 let chatId = null;
 let companero = null;
 let buscandoCompanero = true;
-
-console.log('=== CHATRANDOM.JS CARGADO ===');
-console.log('User ID:', window.userId);
-console.log('CSRF Token:', document.querySelector('meta[name="csrf-token"]')?.content);
+let usuarioReportadoId = null; // Nueva variable para mantener el ID del usuario a reportar
 
 // Función para buscar un compañero automáticamente
 async function buscarCompaneroAutomatico() {
-    console.log('=== FUNCIÓN buscarCompaneroAutomatico INICIADA ===');
-    console.log('=== INICIO DE BÚSQUEDA DE COMPAÑERO ===');
-    console.log('Estado inicial:', {
-        chatId,
-        companero,
-        buscandoCompanero,
-        userId: window.userId
-    });
-    
-    // Si ya tenemos un chat activo, no buscamos más
     if (chatId) {
-        console.log('Ya hay un chat activo, no se busca más');
         return;
     }
     
     while (buscandoCompanero) {
         try {
-            console.log('=== INTENTO DE BÚSQUEDA ===');
             const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
             
-            console.log('Enviando petición a /retos/buscar-companero');
             const response = await fetch('/retos/buscar-companero', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': csrfToken
                 }
-            });
-
-            console.log('=== RESPUESTA DEL SERVIDOR ===');
-            console.log('Status:', response.status);
-            console.log('Status Text:', response.statusText);
+            }).catch(() => null);
             
-            const data = await response.json();
-            console.log('Datos recibidos:', JSON.stringify(data, null, 2));
-            
-            if (response.ok) {
-                console.log('=== COMPAÑERO ENCONTRADO ===');
-                console.log('Chat ID:', data.chat_id);
-                console.log('Compañero:', data.companero);
-                console.log('Detalles del chat:', {
-                    chatId: data.chat_id,
-                    companeroId: data.companero.id,
-                    companeroUsername: data.companero.username
-                });
+            if (response && response.ok) {
+                const data = await response.json();
                 chatId = data.chat_id;
                 companero = data.companero;
-                document.getElementById('chatHeader').innerHTML = `Chat con ${companero.username}`;
+                usuarioReportadoId = companero.id;
+                
+                const chatHeader = document.getElementById('chatHeader');
+                const chatOptions = document.getElementById('chatOptions');
+                
+                if (chatHeader && chatOptions) {
+                    chatHeader.innerHTML = `Chat con ${companero.username}`;
+                    chatOptions.style.display = 'block';
+                    verificarEstadoSolicitud();
+                }
+                
                 buscandoCompanero = false;
                 cargarMensajes();
+                
+                if (window.iniciarControlInactividad) {
+                    window.iniciarControlInactividad();
+                    if (window.actualizarUltimoMensaje) {
+                        window.actualizarUltimoMensaje();
+                    }
+                }
                 break;
-            } else if (data.error === 'No hay usuarios disponibles') {
-                console.log('No hay usuarios disponibles, reintentando...');
-                document.getElementById('chatHeader').innerHTML = `
-                    <div class="d-flex align-items-center">
-                        <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
-                            <span class="visually-hidden">Cargando...</span>
-                        </div>
-                        Buscando usuarios disponibles...
-                    </div>
-                `;
             }
             
-            // Esperar 3 segundos antes de intentar de nuevo
-            console.log('Esperando 3 segundos antes del siguiente intento...');
             await new Promise(resolve => setTimeout(resolve, 3000));
+            
         } catch (error) {
-            console.error('=== ERROR EN LA PETICIÓN ===');
-            console.error('Error:', error);
-            console.error('Stack:', error.stack);
             await new Promise(resolve => setTimeout(resolve, 3000));
         }
     }
+}
+
+// Función para mostrar la animación de puntos ganados
+function mostrarPuntosGanados(puntos) {
+    if (!puntos) return;
+    
+    const puntosContainer = document.querySelector('.puntos-container');
+    
+    // Crear elemento de animación
+    const animacion = document.createElement('span');
+    animacion.className = 'puntos-animacion';
+    animacion.textContent = `+${puntos}`;
+    puntosContainer.appendChild(animacion);
+    
+    // Eliminar la animación después de que termine
+    setTimeout(() => {
+        animacion.remove();
+    }, 1500);
 }
 
 // Función para enviar mensaje
@@ -95,6 +86,30 @@ function enviarMensaje() {
     const mensaje = mensajeInput.value.trim();
 
     if (!mensaje) return;
+    
+    // Procesar el mensaje según el reto actual si existe la función
+    let mensajeProcesado;
+    try {
+        mensajeProcesado = window.procesarMensaje ? window.procesarMensaje(mensaje) : mensaje;
+    } catch (error) {
+        mensajeProcesado = mensaje;
+    }
+    
+    // Si el mensaje procesado es null, significa que no pasó la validación del reto
+    if (mensajeProcesado === null) {
+        return;
+    }
+
+    // Manejar el caso donde el mensaje procesado es un objeto
+    let contenidoMensaje;
+    let tieneEmojis = false;
+    
+    if (typeof mensajeProcesado === 'object' && mensajeProcesado !== null) {
+        contenidoMensaje = mensajeProcesado.texto;
+        tieneEmojis = mensajeProcesado.tieneEmojis;
+    } else {
+        contenidoMensaje = mensajeProcesado;
+    }
 
     fetch('/retos/enviar-mensaje', {
         method: 'POST',
@@ -104,7 +119,8 @@ function enviarMensaje() {
         },
         body: JSON.stringify({
             chat_id: chatId,
-            contenido: mensaje
+            contenido: contenidoMensaje,
+            tieneEmojis: tieneEmojis
         })
     })
     .then(response => response.json())
@@ -112,12 +128,36 @@ function enviarMensaje() {
         if (data.mensaje) {
             mensajeInput.value = '';
             agregarMensaje(data.mensaje, data.usuario);
+            // Mostrar animación de puntos si se ganaron
+            if (data.puntos_ganados > 0) {
+                // Actualizar puntos diarios
+                const puntosDiariosActuales = document.getElementById('puntos-diarios-actuales');
+                const puntosDiariosNum = parseInt(puntosDiariosActuales.textContent);
+                const nuevosPuntosDiarios = puntosDiariosNum + data.puntos_ganados;
+                puntosDiariosActuales.textContent = nuevosPuntosDiarios;
+                
+                // Actualizar puntos totales
+                const puntosActuales = document.getElementById('puntos-actuales');
+                const puntosTotalNum = parseInt(puntosActuales.textContent);
+                puntosActuales.textContent = puntosTotalNum + data.puntos_ganados;
+                
+                // Mostrar animación
+                const puntosContainer = document.querySelector('.puntos-container');
+                const animacion = document.createElement('span');
+                animacion.className = 'puntos-animacion';
+                animacion.textContent = `+${data.puntos_ganados}`;
+                puntosContainer.appendChild(animacion);
+                setTimeout(() => animacion.remove(), 1500);
+            }
+            // Actualizar el tiempo de inactividad cuando se envía un mensaje
+            if (window.actualizarUltimoMensaje) {
+                window.actualizarUltimoMensaje();
+            }
         } else {
             alert(data.error);
         }
     })
     .catch(error => {
-        console.error('Error:', error);
         alert('Error al enviar mensaje');
     });
 }
@@ -137,7 +177,7 @@ async function cargarMensajes() {
             agregarMensaje(mensaje, mensaje.chat_usuario.usuario);
         });
     } catch (error) {
-        console.error('Error:', error);
+        // Error silencioso
     }
 }
 
@@ -149,64 +189,208 @@ function agregarMensaje(mensaje, usuario) {
     
     const mensajeDiv = document.createElement('div');
     mensajeDiv.className = `reto-message ${esMio ? 'sent' : 'received'}`;
+    mensajeDiv.style.display = 'flex';
+    mensajeDiv.style.alignItems = 'flex-start';
+    mensajeDiv.style.gap = '10px';
+    mensajeDiv.style.marginBottom = '8px';
     
-    // Contenedor principal del mensaje
+    // Imagen del usuario
+    const userImage = document.createElement('img');
+    userImage.src = usuario.imagen || '';
+    userImage.alt = usuario.username;
+    userImage.className = 'reto-message-user-image';
+    userImage.style.width = '40px';
+    userImage.style.height = '40px';
+    userImage.style.objectFit = 'cover';
+    userImage.style.borderRadius = '50%';
+    userImage.onerror = function() {
+        this.src = '/IMG/profile_img/avatar-default.png';
+    };
+    
+    // Contenedor principal del mensaje (nombre, mensaje, hora)
     const mensajeWrapper = document.createElement('div');
     mensajeWrapper.className = 'reto-message-wrapper';
+    mensajeWrapper.style.display = 'flex';
+    mensajeWrapper.style.flexDirection = 'column';
+    mensajeWrapper.style.alignItems = 'flex-start';
     
-    // Información del usuario (solo para mensajes recibidos)
-    if (!esMio) {
-        const userInfo = document.createElement('div');
-        userInfo.className = 'reto-message-user-info';
-        
-        // Imagen del usuario
-        const userImage = document.createElement('img');
-        userImage.src = usuario.imagen || '/img/default-avatar.png';
-        userImage.alt = usuario.username;
-        userImage.className = 'reto-message-user-image';
-        
-        // Nombre del usuario
-        const userName = document.createElement('span');
-        userName.className = 'reto-message-username';
-        userName.textContent = usuario.username;
-        
-        userInfo.appendChild(userImage);
-        userInfo.appendChild(userName);
-        mensajeWrapper.appendChild(userInfo);
-    }
-    
-    // Contenedor del mensaje
-    const messageContent = document.createElement('div');
-    messageContent.className = 'reto-message-content-wrapper';
+    // Nombre del usuario
+    const userName = document.createElement('span');
+    userName.className = 'reto-message-username';
+    userName.textContent = usuario.username;
+    userName.style.fontWeight = 'bold';
+    userName.style.color = esMio ? '#4B0082' : '#6c757d';
+    userName.style.fontSize = '15px';
+    userName.style.marginBottom = '2px';
     
     // Contenido del mensaje
     const contenido = document.createElement('div');
     contenido.className = 'reto-message-content';
     contenido.textContent = mensaje.contenido;
+    contenido.style.background = esMio ? '#4B0082' : '#f3e6ff';
+    contenido.style.color = esMio ? 'white' : '#222';
+    contenido.style.padding = '10px 18px';
+    contenido.style.borderRadius = '14px';
+    contenido.style.marginBottom = '2px';
+    contenido.style.maxWidth = '600px';
+    contenido.style.fontSize = '16px';
+    contenido.style.wordBreak = 'break-word';
     
     // Fecha del mensaje
     const fecha = document.createElement('div');
     fecha.className = 'reto-message-time';
     const fechaMensaje = new Date(mensaje.fecha_envio);
     fecha.textContent = fechaMensaje.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    fecha.style.fontSize = '12px';
+    fecha.style.color = '#888';
+    fecha.style.marginLeft = '2px';
     
-    messageContent.appendChild(contenido);
-    messageContent.appendChild(fecha);
-    mensajeWrapper.appendChild(messageContent);
+    // Añadir elementos al wrapper
+    mensajeWrapper.appendChild(userName);
+    mensajeWrapper.appendChild(contenido);
+    mensajeWrapper.appendChild(fecha);
     
+    // Añadir imagen y wrapper al mensajeDiv
+    mensajeDiv.appendChild(userImage);
     mensajeDiv.appendChild(mensajeWrapper);
     container.appendChild(mensajeDiv);
+    
+    // Asegurarse de que el contenedor se desplace al último mensaje
     container.scrollTop = container.scrollHeight;
+}
+
+// Función para verificar el estado del chat
+async function verificarEstadoChat() {
+    if (!chatId) return;
+
+    try {
+        // Verificar directamente si el chat sigue existiendo
+        const chatResponse = await fetch(`/retos/verificar-chat/${chatId}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        if (!chatResponse.ok) {
+            chatId = null;
+            companero = null;
+            buscandoCompanero = true;
+            
+            // Detener el control de inactividad cuando el chat termina
+            if (window.detenerControlInactividad) {
+                window.detenerControlInactividad();
+            }
+            
+            // Actualizar la interfaz inmediatamente
+            document.getElementById('chatHeader').innerHTML = `
+                <div class="d-flex align-items-center">
+                    <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                        <span class="visually-hidden">Cargando...</span>
+                    </div>
+                    Buscando usuarios disponibles...
+                </div>
+            `;
+            
+            // Ocultar el menú de opciones
+            document.getElementById('chatOptions').style.display = 'none';
+            
+            // Limpiar el contenedor de mensajes
+            document.getElementById('mensajesContainer').innerHTML = '';
+            
+            // Reiniciar la búsqueda
+            buscarCompaneroAutomatico();
+        }
+    } catch (error) {
+        chatId = null;
+        companero = null;
+        buscandoCompanero = true;
+        
+        // Detener el control de inactividad cuando hay un error
+        if (window.detenerControlInactividad) {
+            window.detenerControlInactividad();
+        }
+        
+        document.getElementById('chatHeader').innerHTML = `
+            <div class="d-flex align-items-center">
+                <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                Buscando usuarios disponibles...
+            </div>
+        `;
+        buscarCompaneroAutomatico();
+    }
+}
+
+// Función para actualizar el contador de puntos diarios
+async function actualizarPuntosDiarios() {
+    try {
+        const response = await fetch('/retos/puntos-diarios', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const puntosDiariosElement = document.getElementById('puntos-diarios-actuales');
+            if (puntosDiariosElement) {
+                // Solo actualizar si el valor es mayor que el actual
+                const puntosActuales = parseInt(puntosDiariosElement.textContent);
+                if (data.puntos_diarios > puntosActuales) {
+                    puntosDiariosElement.textContent = data.puntos_diarios;
+                }
+            }
+        }
+    } catch (error) {
+        // Error silencioso
+    }
+}
+
+// Función para verificar el estado de la solicitud
+async function verificarEstadoSolicitud() {
+    if (!companero) return;
+    
+    try {
+        const response = await fetch(`/solicitudes/verificar/${companero.id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const sendFriendRequestBtn = document.getElementById('sendFriendRequest');
+            
+            if (data.estado === 'pendiente') {
+                sendFriendRequestBtn.innerHTML = '<i class="fas fa-clock me-2"></i>Solicitud pendiente';
+                sendFriendRequestBtn.classList.add('disabled');
+                sendFriendRequestBtn.style.pointerEvents = 'none';
+                sendFriendRequestBtn.style.opacity = '0.7';
+            } else if (data.estado === 'aceptada') {
+                sendFriendRequestBtn.parentElement.style.display = 'none';
+            }
+        }
+    } catch (error) {
+        console.error('Error al verificar estado de solicitud:', error);
+    }
 }
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('=== DOM CARGADO - INICIANDO BÚSQUEDA ===');
-    // Iniciar la búsqueda automática
     buscarCompaneroAutomatico();
+    actualizarPuntosDiarios(); // Actualizar puntos diarios al cargar la página
     
     // Configurar el botón de enviar mensaje
     document.getElementById('enviarMensaje').addEventListener('click', enviarMensaje);
+    
+    // Configurar el input para enviar con Enter
     document.getElementById('mensajeInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
             enviarMensaje();
@@ -216,12 +400,194 @@ document.addEventListener('DOMContentLoaded', function() {
     // Actualizar estado cada 2 minutos
     setInterval(mantenerEstado, 120000);
     
-    // Polling para actualizar mensajes cuando hay un chat activo
+    // Polling para actualizar mensajes y verificar estado del chat cada segundo
     setInterval(() => {
         if (chatId) {
             cargarMensajes();
+            verificarEstadoChat();
+            actualizarPuntosDiarios(); // Actualizar puntos diarios periódicamente
         }
-    }, 3000);
+    }, 1000); // Reducido a 1 segundo para mayor reactividad
+
+    // Enviar solicitud de amistad
+    document.getElementById('sendFriendRequest').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (!companero) return;
+        
+        fetch('/solicitudes/enviar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                id_receptor: companero.id
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const sendFriendRequestBtn = document.getElementById('sendFriendRequest');
+                sendFriendRequestBtn.innerHTML = '<i class="fas fa-clock me-2"></i>Solicitud pendiente';
+                sendFriendRequestBtn.classList.add('disabled');
+                sendFriendRequestBtn.style.pointerEvents = 'none';
+                sendFriendRequestBtn.style.opacity = '0.7';
+                
+                Swal.fire({
+                    title: '¡Solicitud enviada!',
+                    text: 'La solicitud de amistad ha sido enviada correctamente.',
+                    icon: 'success'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message || 'No se pudo enviar la solicitud de amistad.',
+                    icon: 'error'
+                });
+            }
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error',
+                text: 'Ocurrió un error al enviar la solicitud.',
+                icon: 'error'
+            });
+        });
+    });
+
+    // Reportar usuario
+    document.getElementById('reportUser').addEventListener('click', function(e) {
+        e.preventDefault();
+        
+        // Verificar que tenemos un ID de usuario válido para reportar
+        if (!usuarioReportadoId) {
+            Swal.fire({
+                title: 'Error',
+                text: 'No hay un usuario seleccionado para reportar',
+                icon: 'error'
+            });
+            return;
+        }
+
+        Swal.fire({
+            title: 'Reportar usuario',
+            html: `
+                <div class="mb-3">
+                    <label for="reportTitle" class="form-label">Título del reporte</label>
+                    <input type="text" class="form-control" id="reportTitle" placeholder="Ingrese un título">
+                </div>
+                <div class="mb-3">
+                    <label for="reportDescription" class="form-label">Descripción</label>
+                    <textarea class="form-control" id="reportDescription" rows="3" placeholder="Describa el motivo del reporte"></textarea>
+                </div>
+            `,
+            showCancelButton: true,
+            confirmButtonText: 'Enviar reporte',
+            cancelButtonText: 'Cancelar',
+            preConfirm: () => {
+                const title = document.getElementById('reportTitle').value;
+                const description = document.getElementById('reportDescription').value;
+                if (!title || !description) {
+                    Swal.showValidationMessage('Por favor complete todos los campos');
+                    return false;
+                }
+                return { title, description };
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Usar el ID guardado en lugar del compañero actual
+                fetch('/reportes/crear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        id_reportado: usuarioReportadoId,
+                        titulo: result.value.title,
+                        descripcion: result.value.description
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: '¡Reporte enviado!',
+                            text: 'El reporte ha sido enviado correctamente.',
+                            icon: 'success'
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.message || 'No se pudo enviar el reporte.',
+                            icon: 'error'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Ocurrió un error al enviar el reporte.',
+                        icon: 'error'
+                    });
+                });
+            }
+        });
+    });
+
+    // Bloquear usuario
+    document.getElementById('blockUser').addEventListener('click', function(e) {
+        e.preventDefault();
+        if (!companero) return;
+
+        Swal.fire({
+            title: '¿Bloquear usuario?',
+            text: '¿Estás seguro de que deseas bloquear a este usuario? No podrás ver sus mensajes ni interactuar con él.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, bloquear',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('/solicitudes/bloquear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        id_usuario: companero.id
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        Swal.fire({
+                            title: '¡Usuario bloqueado!',
+                            text: 'El usuario ha sido bloqueado correctamente.',
+                            icon: 'success'
+                        }).then(() => {
+                            // Recargar la página para aplicar el bloqueo
+                            window.location.reload();
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Error',
+                            text: data.message || 'No se pudo bloquear al usuario.',
+                            icon: 'error'
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Ocurrió un error al bloquear al usuario.',
+                        icon: 'error'
+                    });
+                });
+            }
+        });
+    });
 });
 
 // Actualizar estado cuando el usuario cierra la pestaña

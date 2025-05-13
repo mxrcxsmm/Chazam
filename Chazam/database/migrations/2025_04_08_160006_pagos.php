@@ -13,13 +13,13 @@ return new class extends Migration
     {
         Schema::create('pagos', function (Blueprint $table) {
             $table->bigIncrements('id_pago');
-            $table->bigInteger('id_comprador')->unsigned();
+            $table->bigInteger('id_comprador')->unsigned()->nullable();
             $table->datetime('fecha_pago');
             $table->bigInteger('id_producto')->unsigned()->nullable();
             $table->timestamps();
         
-            $table->foreign('id_comprador')->references('id_usuario')->on('users');
-            $table->foreign('id_producto')->references('id_producto')->on('productos');
+            $table->foreign('id_comprador')->references('id_usuario')->on('users')->onDelete('set null');
+            $table->foreign('id_producto')->references('id_producto')->on('productos')->onDelete('set null');
         });
     }
 

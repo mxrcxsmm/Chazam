@@ -11,6 +11,9 @@
     <!-- Bootstrap Icons (opcional) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <link rel="stylesheet" href="{{ asset('css/retos.css') }}">
     @yield('head')
 </head>
@@ -32,9 +35,10 @@
                 </div>
 
                 <!-- Puntos -->
-                <div class="d-flex align-items-center text-success fw-semibold">
+                <div class="d-flex align-items-center text-success fw-semibold puntos-container">
                     <i class="bi bi-star-fill me-1"></i>
-                    <span>{{ isset($puntos) ? $puntos : 0 }} pts</span>
+                    <span id="puntos-actuales">{{ isset($puntos) ? $puntos : 0 }}</span>
+                    <span>pts</span>
                 </div>
 
                 <!-- Botón para abrir el menú -->
