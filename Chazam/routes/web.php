@@ -46,6 +46,7 @@ Route::middleware(['auth'])->group(function () {
         // Rutas para reportes (administrador)
         Route::get('reportes', [ReporteAdminController::class, 'index'])->name('reportes.index');
         Route::delete('reportes/{id}', [ReporteAdminController::class, 'destroy'])->name('reportes.destroy');
+        Route::get('/reportes/nuevos', [ReporteAdminController::class, 'contarNuevos'])->name('admin.reportes.nuevos');
 
         // Rutas para productos (administrador)
         Route::get('productos', [ProductosAdminController::class, 'index'])->name('productos.index');
