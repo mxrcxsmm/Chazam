@@ -21,4 +21,23 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
+
+    const contador = document.getElementById('contador-reportes');
+
+    if (contador) {
+        function actualizarContador() {
+            fetch('/admin/reportes/nuevos')
+                .then(response => response.json())
+                .then(data => {
+                    contador.textContent = data.nuevos; // Actualizar el contador con el número de reportes no leídos
+                })
+                .catch(error => console.error('Error al obtener el contador de reportes:', error));
+        }
+
+        // Actualizar el contador cada 10 segundos
+        setInterval(actualizarContador, 10000);
+
+        // Actualizar el contador al cargar la página
+        actualizarContador();
+    }
 });

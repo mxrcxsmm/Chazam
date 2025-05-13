@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Reto;
 use App\Models\User;
+use App\Models\Reto;
 use App\Models\Chat;
 use App\Models\ChatUsuario;
 use App\Models\Mensaje;
@@ -12,6 +12,8 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use App\Models\Solicitud;
 
 class RetoController extends Controller
 {
@@ -114,8 +116,32 @@ class RetoController extends Controller
 
             // Buscar compañero
             try {
+                // Obtener IDs de usuarios bloqueados usando el modelo Solicitud
+                $usuariosBloqueados = Solicitud::where(function($query) use ($usuarioActual) {
+                    $query->where(function($q) use ($usuarioActual) {
+                        $q->where('id_emisor', $usuarioActual->id_usuario)
+                          ->where('estado', 'blockeada');
+                    })->orWhere(function($q) use ($usuarioActual) {
+                        $q->where('id_receptor', $usuarioActual->id_usuario)
+                          ->where('estado', 'blockeada');
+                    });
+                })
+                ->get()
+                ->map(function($solicitud) use ($usuarioActual) {
+                    // Si el usuario actual es el emisor, devolver el receptor y viceversa
+                    return $solicitud->id_emisor == $usuarioActual->id_usuario 
+                        ? $solicitud->id_receptor 
+                        : $solicitud->id_emisor;
+                })
+                ->unique()
+                ->push($usuarioActual->id_usuario)
+                ->toArray();
+
+                Log::info('Usuarios bloqueados: ' . implode(', ', $usuariosBloqueados));
+
                 $companero = User::where('id_estado', 5)
                     ->where('id_usuario', '!=', $usuarioActual->id_usuario)
+                    ->whereNotIn('id_usuario', $usuariosBloqueados)
                     ->whereDoesntHave('chatUsuarios', function($query) use ($reto) {
                         $query->whereHas('chat', function($q) use ($reto) {
                             $q->where('id_reto', $reto->id_reto)
@@ -131,6 +157,7 @@ class RetoController extends Controller
                     Log::info('1. No hay usuarios con estado 5');
                     Log::info('2. Todos los usuarios están en chats activos');
                     Log::info('3. El usuario actual es el único disponible');
+                    Log::info('4. Todos los usuarios disponibles están bloqueados');
                     return response()->json(['error' => 'No hay usuarios disponibles'], 404);
                 }
 
@@ -199,9 +226,48 @@ class RetoController extends Controller
             return response()->json(['error' => 'No tienes acceso a este chat'], 403);
         }
 
+        // Obtener el reto actual del chat
+        $chat = Chat::find($request->chat_id);
+        $retoId = $chat->id_reto;
+        
+        // Verificar si es un nuevo día para resetear puntos diarios
+        if ($usuarioActual->ultimo_login && $usuarioActual->ultimo_login->format('Y-m-d') !== now()->format('Y-m-d')) {
+            DB::table('users')
+                ->where('id_usuario', $usuarioActual->id_usuario)
+                ->update(['puntos_diarios' => 0]);
+        }
+        
+        // Verificar si el usuario no ha alcanzado el límite diario
+        if ($usuarioActual->puntos_diarios < 300) {
+            // Para el reto 1, solo sumar puntos si tiene emojis
+            if ($retoId == 1) {
+                if (isset($request->tieneEmojis) && $request->tieneEmojis) {
+                    $puntosGanados = rand(1, 10);
+                }
+            } else {
+                // Para los demás retos, sumar puntos siempre
+                $puntosGanados = rand(1, 10);
+            }
+
+            // Si hay puntos para sumar
+            if (isset($puntosGanados)) {
+                // Asegurarse de no exceder el límite diario
+                $puntosDisponibles = 300 - ($usuarioActual->puntos_diarios ?? 0);
+                $puntosGanados = min($puntosGanados, $puntosDisponibles);
+                
+                // Actualizar puntos diarios y totales usando el Query Builder
+                DB::table('users')
+                    ->where('id_usuario', $usuarioActual->id_usuario)
+                    ->update([
+                        'puntos_diarios' => DB::raw('COALESCE(puntos_diarios, 0) + ' . $puntosGanados),
+                        'puntos' => DB::raw('puntos + ' . $puntosGanados)
+                    ]);
+            }
+        }
+
         $mensaje = Mensaje::create([
             'id_chat_usuario' => $chatUsuario->id_chat_usuario,
-            'contenido' => $request->contenido,
+            'contenido' => is_array($request->contenido) ? $request->contenido['texto'] : $request->contenido,
             'fecha_envio' => now()
         ]);
 
@@ -211,7 +277,8 @@ class RetoController extends Controller
                 'id' => $usuarioActual->id_usuario,
                 'username' => $usuarioActual->username,
                 'imagen' => $usuarioActual->imagen_perfil
-            ]
+            ],
+            'puntos_ganados' => $puntosGanados ?? 0
         ]);
     }
 
@@ -234,7 +301,23 @@ class RetoController extends Controller
                 $query->where('id_chat', $chatId);
             })
             ->orderBy('fecha_envio', 'asc')
-            ->get();
+            ->get()
+            ->map(function($mensaje) {
+                return [
+                    'id_chat_usuario' => $mensaje->id_chat_usuario,
+                    'contenido' => $mensaje->contenido,
+                    'fecha_envio' => $mensaje->fecha_envio,
+                    'updated_at' => $mensaje->updated_at,
+                    'created_at' => $mensaje->created_at,
+                    'chat_usuario' => [
+                        'usuario' => [
+                            'id' => $mensaje->chatUsuario->usuario->id_usuario,
+                            'username' => $mensaje->chatUsuario->usuario->username,
+                            'imagen' => $mensaje->chatUsuario->usuario->imagen_perfil
+                        ]
+                    ]
+                ];
+            });
 
         return response()->json($mensajes);
     }
@@ -310,8 +393,29 @@ class RetoController extends Controller
                     if ($chatUsuario->usuario->id_estado != 5) {
                         Log::info('Usuario ' . $chatUsuario->usuario->id_usuario . ' cambió de estado. Eliminando chat ' . $chat->id_chat);
                         
-                        // Eliminar el chat y sus relaciones
-                        $chat->delete();
+                        // Iniciar transacción
+                        DB::beginTransaction();
+                        try {
+                            // Eliminar todos los mensajes relacionados con este chat
+                            Mensaje::whereHas('chatUsuario', function($query) use ($chat) {
+                                $query->where('id_chat', $chat->id_chat);
+                            })->delete();
+                            
+                            // Eliminar todos los registros de chat_usuario relacionados con este chat
+                            ChatUsuario::where('id_chat', $chat->id_chat)->delete();
+                            
+                            // Eliminar el chat
+                            $chat->delete();
+                            
+                            // Confirmar transacción
+                            DB::commit();
+                            Log::info('Transacción completada exitosamente para el chat ' . $chat->id_chat);
+                        } catch (\Exception $e) {
+                            // Revertir transacción en caso de error
+                            DB::rollBack();
+                            Log::error('Error en la transacción para el chat ' . $chat->id_chat . ': ' . $e->getMessage());
+                            throw $e;
+                        }
                         break;
                     }
                 }
@@ -322,5 +426,65 @@ class RetoController extends Controller
             Log::error('Error en verificarEstadoChats: ' . $e->getMessage());
             return response()->json(['error' => 'Error al verificar estados'], 500);
         }
+    }
+
+    /**
+     * Verifica si un chat específico sigue activo
+     */
+    public function verificarChat($chatId)
+    {
+        try {
+            $chat = Chat::where('id_chat', $chatId)
+                ->where('fecha_creacion', '>=', now()->subMinutes(30))
+                ->first();
+
+            if (!$chat) {
+                return response()->json(['error' => 'Chat no encontrado'], 404);
+            }
+
+            // Verificar si ambos usuarios siguen en el chat
+            $usuariosEnChat = ChatUsuario::where('id_chat', $chatId)->count();
+            if ($usuariosEnChat < 2) {
+                return response()->json(['error' => 'Chat incompleto'], 404);
+            }
+
+            return response()->json(['status' => 'active']);
+        } catch (\Exception $e) {
+            Log::error('Error al verificar chat: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al verificar chat'], 500);
+        }
+    }
+
+    /**
+     * Limpia el estado del usuario cuando sale del reto
+     */
+    public function limpiarEstado()
+    {
+        try {
+            $user = Auth::user();
+            if ($user) {
+                User::where('id_usuario', $user->id_usuario)->update(['id_estado' => 1]);
+                Log::info('Estado limpiado para usuario: ' . $user->id_usuario);
+            }
+            return response()->json(['success' => true]);
+        } catch (\Exception $e) {
+            Log::error('Error al limpiar estado: ' . $e->getMessage());
+            return response()->json(['error' => 'Error al limpiar estado'], 500);
+        }
+    }
+
+    /**
+     * Obtiene los puntos diarios del usuario autenticado
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function obtenerPuntosDiarios()
+    {
+        $user = Auth::user();
+        $puntosDiarios = $user->puntos_diarios ?? 0;
+        
+        return response()->json([
+            'puntos_diarios' => $puntosDiarios
+        ]);
     }
 }

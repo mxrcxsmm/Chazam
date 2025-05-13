@@ -17,6 +17,7 @@ return new class extends Migration
             $table->text('descripcion');
             $table->bigInteger('id_reportador')->unsigned();
             $table->bigInteger('id_reportado')->unsigned();
+            $table->boolean('leido')->default(false);
             $table->timestamps();
         
             $table->foreign('id_reportador')->references('id_usuario')->on('users');

@@ -33,7 +33,8 @@ class Reporte extends Model
         'titulo',
         'descripcion',
         'id_reportador',
-        'id_reportado'
+        'id_reportado',
+        'leido'
     ];
 
     /**
