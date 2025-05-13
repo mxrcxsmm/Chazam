@@ -24,8 +24,13 @@
                         <div class="momentm-avatar">
                             <img src="{{ asset('img/profile_img/' . ($momentm->usuario->img ?? 'default.png')) }}" alt="Avatar de {{ $momentm->usuario->username ?? 'Usuario' }}">
                         </div>
-                        <p class="momentm-username">{{ $momentm->usuario->id == Auth::id() ? 'Tú' : ($momentm->usuario->username ?? 'Usuario') }}</p>
+                        <p class="momentm-username">{{ $momentm->usuario->id_usuario == Auth::user()->id_usuario ? 'Tú' : ($momentm->usuario->username ?? 'Usuario') }}</p>
                         <p class="momentm-time">{{ $momentm->fecha_inicio->diffForHumans() }}</p>
+                        @if($momentm->usuario->id_usuario == Auth::user()->id_usuario)
+                            <button class="delete-momentm-btn" data-id="{{ $momentm->id_historia }}">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        @endif
                     </div>
                 </div>
             @empty
@@ -382,10 +387,32 @@ html, body {
 .nav-btn:hover {
     background: rgba(0, 0, 0, 0.8);
 }
+
+.delete-momentm-btn {
+    background: #ff4d4d;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    margin-top: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+}
+.delete-momentm-btn:hover {
+    background: #d90000;
+}
+
+.swal2-border-radius {
+    border-radius: 16px !important;
+}
 </style>
 
 <!-- Añadir Font Awesome -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+<!-- SweetAlert2 -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -531,5 +558,80 @@ html, body {
 
     // Inicializar los momentms
     getAllMomentms();
+
+    document.querySelectorAll('.delete-momentm-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const id = this.dataset.id;
+            const card = this.closest('.momentm-card');
+            Swal.fire({
+                title: '¿Eliminar Momentm?',
+                text: 'Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#FFD700',
+                cancelButtonColor: '#8B008B',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar',
+                background: '#8B008B',
+                color: '#fff',
+                customClass: {
+                    popup: 'swal2-border-radius'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/momentms/${id}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            card.remove();
+                            Swal.fire({
+                                title: '¡Eliminado!',
+                                text: 'Tu Momentm ha sido eliminado.',
+                                icon: 'success',
+                                confirmButtonColor: '#FFD700',
+                                background: '#8B008B',
+                                color: '#fff',
+                                customClass: {
+                                    popup: 'swal2-border-radius'
+                                }
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: 'No se pudo eliminar el Momentm.',
+                                icon: 'error',
+                                confirmButtonColor: '#FFD700',
+                                background: '#8B008B',
+                                color: '#fff',
+                                customClass: {
+                                    popup: 'swal2-border-radius'
+                                }
+                            });
+                        }
+                    })
+                    .catch(() => Swal.fire({
+                        title: 'Error',
+                        text: 'Error al eliminar el Momentm.',
+                        icon: 'error',
+                        confirmButtonColor: '#FFD700',
+                        background: '#8B008B',
+                        color: '#fff',
+                        customClass: {
+                            popup: 'swal2-border-radius'
+                        }
+                    }));
+                }
+            });
+        });
+    });
 });
 </script>
+
+<meta name="csrf-token" content="{{ csrf_token() }}">

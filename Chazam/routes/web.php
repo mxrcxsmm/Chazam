@@ -100,6 +100,7 @@ Route::middleware(['auth'])->group(function () {
       Route::post('/momentms', [MomentmsController::class, 'store'])->name('momentms.store');
       Route::get('momentms/{id}', [MomentmsController::class, 'show'])->name('momentms.show');
       Route::get('momentms/{id}/data', [MomentmsController::class, 'getData'])->name('momentms.data');
+      Route::delete('/momentms/{id}', [MomentmsController::class, 'destroy'])->name('momentms.destroy');
     });
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {

@@ -96,7 +96,7 @@ class MomentmsController extends Controller
 
             // Crear el registro en la base de datos
             $momentm = new Historia();
-            $momentm->id_usuario = auth()->id();
+            $momentm->id_usuario = Auth::user()->id_usuario;
             $momentm->img = 'img/momentms/' . $user->username . '/' . $fileName;
             $momentm->fecha_inicio = now();
             $momentm->fecha_fin = now()->addDay();
@@ -128,5 +128,24 @@ class MomentmsController extends Controller
                 'img' => 'img/profile_img/' . $momentm->usuario->img
             ]
         ]);
+    }
+
+    public function destroy($id)
+    {
+        $momentm = Historia::findOrFail($id);
+
+        // Solo permitir borrar si es el dueño
+        if ($momentm->id_usuario != Auth::user()->id_usuario) {
+            abort(403, 'No tienes permiso para eliminar este Momentm.');
+        }
+
+        // Elimina la imagen del disco si lo deseas
+        if ($momentm->img && file_exists(public_path($momentm->img))) {
+            unlink(public_path($momentm->img));
+        }
+
+        $momentm->delete();
+
+        return response()->json(['success' => true]);
     }
 } 
