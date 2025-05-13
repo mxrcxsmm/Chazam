@@ -1,6 +1,9 @@
 @include('layout.chatsHeader')
 
 <div class="create-momentm-container">
+    <a href="{{ url()->previous() }}" class="back-btn">
+        <i class="fas fa-arrow-left"></i> Volver atrás
+    </a>
     <h1 class="gradient-text">Crear nuevo Momentm</h1>
 
     <div class="editor-container">
@@ -17,6 +20,7 @@
         <div class="editor-workspace">
             <div class="img-container">
                 <img id="image" src="" alt="Imagen a editar">
+                <div id="overlay-layer"></div>
             </div>
             <div class="editor-tools">
                 <div class="tool-group">
@@ -61,6 +65,10 @@
                         <button class="filter-btn" data-filter="sepia">Sepia</button>
                         <button class="filter-btn" data-filter="blur">Blur</button>
                         <button class="filter-btn" data-filter="invert">Invert</button>
+                        <button class="filter-btn" data-filter="vintage">Vintage</button>
+                        <button class="filter-btn" data-filter="warm">Cálido</button>
+                        <button class="filter-btn" data-filter="cool">Frío</button>
+                        <button class="filter-btn" data-filter="dramatic">Dramático</button>
                     </div>
                 </div>
 
@@ -116,10 +124,8 @@
             </div>
         </div>
 
-        <!-- Capa flotante para overlays arrastrables -->
-        <div id="overlay-layer" style="position:absolute; left:0; top:0; width:100%; height:100%; pointer-events:none;"></div>
         <div class="editor-controls">
-            <button id="fixOverlaysBtn" class="control-btn">Fijar textos/emojis</button>
+            <button id="resetOverlaysBtn" class="control-btn">Resetear emojis</button>
             <button id="saveBtn" class="control-btn primary">Guardar Momentm</button>
         </div>
     </div>
@@ -201,6 +207,7 @@ body {
 }
 
 .img-container {
+    position: relative;
     width: 100%;
     height: 400px;
     overflow: hidden;
@@ -490,6 +497,70 @@ body {
 .filter-invert {
     filter: invert(100%) !important;
 }
+
+/* Estilos para los filtros adicionales */
+.filter-vintage {
+    filter: sepia(50%) contrast(120%) brightness(90%) !important;
+}
+
+.filter-warm {
+    filter: sepia(30%) saturate(150%) brightness(110%) !important;
+}
+
+.filter-cool {
+    filter: saturate(80%) hue-rotate(30deg) brightness(110%) !important;
+}
+
+.filter-dramatic {
+    filter: contrast(150%) brightness(90%) saturate(120%) !important;
+}
+
+/* Mejoras para elementos arrastrables */
+.draggable {
+    position: absolute;
+    cursor: move;
+    user-select: none;
+    pointer-events: auto;
+    z-index: 1000;
+    padding: 5px;
+    border-radius: 3px;
+    transform: translate(-50%, -50%);
+}
+
+.draggable.dragging {
+    opacity: 0.8;
+    z-index: 1001;
+}
+
+#overlay-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+.back-btn {
+    display: inline-block;
+    background: #FFD700;
+    color: #000;
+    padding: 10px 22px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1rem;
+    margin-bottom: 18px;
+    margin-right: 20px;
+    transition: background 0.2s, transform 0.2s;
+}
+.back-btn i {
+    margin-right: 8px;
+}
+.back-btn:hover {
+    background: #FFC000;
+    transform: scale(1.05);
+}
 </style>
 
 <!-- Cropper.js -->
@@ -523,45 +594,35 @@ document.addEventListener('DOMContentLoaded', function() {
     let overlays = []; // {type, value, x, y, color, size, font, el}
 
     const overlayLayer = document.getElementById('overlay-layer');
-    const fixOverlaysBtn = document.getElementById('fixOverlaysBtn');
+    const resetOverlaysBtn = document.getElementById('resetOverlaysBtn');
 
     // Renderiza la imagen con filtros, ajustes y overlays
     function renderImage(callback) {
         if (!originalImage) return;
         const img = new window.Image();
         img.onload = function() {
-            // Crear canvas base
             const canvas = document.createElement('canvas');
             canvas.width = img.width;
             canvas.height = img.height;
             const ctx = canvas.getContext('2d');
-            // Filtros CSS para el contexto
             let filterStr = '';
             filterStr += `brightness(${100 + parseInt(currentAdjust.brightness)}%) `;
             filterStr += `contrast(${100 + parseInt(currentAdjust.contrast)}%) `;
             filterStr += `saturate(${100 + parseInt(currentAdjust.saturation)}%)`;
-            if (currentFilter === 'grayscale') filterStr += ' grayscale(100%)';
-            if (currentFilter === 'sepia') filterStr += ' sepia(100%)';
-            if (currentFilter === 'blur') filterStr += ' blur(5px)';
-            if (currentFilter === 'invert') filterStr += ' invert(100%)';
+            switch(currentFilter) {
+                case 'grayscale': filterStr += ' grayscale(100%)'; break;
+                case 'sepia': filterStr += ' sepia(100%)'; break;
+                case 'blur': filterStr += ' blur(5px)'; break;
+                case 'invert': filterStr += ' invert(100%)'; break;
+                case 'vintage': filterStr += ' sepia(50%) contrast(120%) brightness(90%)'; break;
+                case 'warm': filterStr += ' sepia(30%) saturate(150%) brightness(110%)'; break;
+                case 'cool': filterStr += ' saturate(80%) hue-rotate(30deg) brightness(110%)'; break;
+                case 'dramatic': filterStr += ' contrast(150%) brightness(90%) saturate(120%)'; break;
+            }
             ctx.filter = filterStr.trim();
             ctx.drawImage(img, 0, 0);
             ctx.filter = 'none';
-            // Dibujar overlays
-            overlays.forEach(o => {
-                if (o.type === 'text') {
-                    ctx.font = `${o.size}px ${o.font}`;
-                    ctx.fillStyle = o.color;
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(o.value, o.x, o.y);
-                } else if (o.type === 'emoji') {
-                    ctx.font = '40px Arial';
-                    ctx.textAlign = 'center';
-                    ctx.textBaseline = 'middle';
-                    ctx.fillText(o.value, o.x, o.y);
-                }
-            });
+            // NO dibujar overlays aquí
             image.src = canvas.toDataURL();
             setTimeout(() => {
                 if (cropper) cropper.destroy();
@@ -584,7 +645,29 @@ document.addEventListener('DOMContentLoaded', function() {
         img.src = originalImage;
     }
 
-    // Subir imagen
+    // --- FUNCIÓN PARA REDIMENSIONAR LA IMAGEN AL CARGAR ---
+    function resizeImageIfNeeded(dataUrl, maxWidth = 1000, maxHeight = 1000, callback) {
+        const img = new window.Image();
+        img.onload = function() {
+            let { width, height } = img;
+            if (width > maxWidth || height > maxHeight) {
+                const scale = Math.min(maxWidth / width, maxHeight / height);
+                width = Math.round(width * scale);
+                height = Math.round(height * scale);
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+                callback(canvas.toDataURL('image/jpeg', 0.9));
+            } else {
+                callback(dataUrl);
+            }
+        };
+        img.src = dataUrl;
+    }
+
+    // --- MODIFICAR CARGA DE IMAGEN DESDE ARCHIVO ---
     uploadBtn.addEventListener('click', () => {
         imageInput.click();
     });
@@ -593,13 +676,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (file) {
             const reader = new FileReader();
             reader.onload = (event) => {
-                originalImage = event.target.result;
-                overlays = [];
-                currentFilter = 'none';
-                currentAdjust = { brightness: 0, contrast: 0, saturation: 0 };
-                sliders.forEach(slider => slider.value = 0);
-                filterButtons.forEach(btn => btn.classList.remove('active'));
-                renderImage();
+                resizeImageIfNeeded(event.target.result, 1000, 1000, (resizedDataUrl) => {
+                    originalImage = resizedDataUrl;
+                    overlays = [];
+                    currentFilter = 'none';
+                    currentAdjust = { brightness: 0, contrast: 0, saturation: 0 };
+                    sliders.forEach(slider => slider.value = 0);
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    renderImage();
+                });
             };
             reader.readAsDataURL(file);
         }
@@ -627,13 +712,15 @@ document.addEventListener('DOMContentLoaded', function() {
         tempCanvas.height = video.videoHeight;
         const ctx = tempCanvas.getContext('2d');
         ctx.drawImage(video, 0, 0);
-        originalImage = tempCanvas.toDataURL('image/jpeg');
-        overlays = [];
-        currentFilter = 'none';
-        currentAdjust = { brightness: 0, contrast: 0, saturation: 0 };
-        sliders.forEach(slider => slider.value = 0);
-        filterButtons.forEach(btn => btn.classList.remove('active'));
-        renderImage();
+        resizeImageIfNeeded(tempCanvas.toDataURL('image/jpeg'), 1000, 1000, (resizedDataUrl) => {
+            originalImage = resizedDataUrl;
+            overlays = [];
+            currentFilter = 'none';
+            currentAdjust = { brightness: 0, contrast: 0, saturation: 0 };
+            sliders.forEach(slider => slider.value = 0);
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            renderImage();
+        });
         cameraModal.style.display = 'none';
         stopCamera();
     });
@@ -709,110 +796,155 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
-    // Redibuja los overlays flotantes
-    function drawOverlays() {
-        overlayLayer.innerHTML = '';
-        if (!originalImage) return;
-        const imgRect = image.getBoundingClientRect();
-        overlays.forEach((o, idx) => {
-            let el = document.createElement('div');
-            el.style.position = 'absolute';
-            el.style.left = ((o.x / image.naturalWidth) * imgRect.width + imgRect.left - imgRect.left) + 'px';
-            el.style.top = ((o.y / image.naturalHeight) * imgRect.height + imgRect.top - imgRect.top) + 'px';
-            el.style.cursor = 'move';
-            el.style.pointerEvents = 'auto';
-            el.setAttribute('data-idx', idx);
-            if (o.type === 'text') {
-                el.textContent = o.value;
-                el.style.fontFamily = o.font;
-                el.style.fontSize = o.size + 'px';
-                el.style.color = o.color;
-                el.style.background = 'rgba(255,255,255,0.0)';
-                el.style.textShadow = '0 0 2px #000';
-                el.style.userSelect = 'none';
-            } else if (o.type === 'emoji') {
-                el.textContent = o.value;
-                el.style.fontSize = '40px';
-                el.style.userSelect = 'none';
-            }
-            // Drag & drop
-            let offsetX, offsetY, dragging = false;
-            el.onmousedown = function(e) {
-                dragging = true;
-                offsetX = e.offsetX;
-                offsetY = e.offsetY;
-                document.body.style.userSelect = 'none';
-            };
-            document.onmousemove = function(e) {
-                if (!dragging) return;
-                let x = e.clientX - imgRect.left - offsetX;
-                let y = e.clientY - imgRect.top - offsetY;
-                el.style.left = x + 'px';
-                el.style.top = y + 'px';
-            };
-            document.onmouseup = function(e) {
-                if (!dragging) return;
-                dragging = false;
-                let x = parseFloat(el.style.left);
-                let y = parseFloat(el.style.top);
-                // Convertir a coordenadas relativas
-                overlays[idx].x = (x / imgRect.width) * image.naturalWidth;
-                overlays[idx].y = (y / imgRect.height) * image.naturalHeight;
-                document.body.style.userSelect = '';
-            };
-            overlayLayer.appendChild(el);
-        });
-        // Ajustar tamaño/capa
-        overlayLayer.style.width = image.offsetWidth + 'px';
-        overlayLayer.style.height = image.offsetHeight + 'px';
-        overlayLayer.style.left = image.offsetLeft + 'px';
-        overlayLayer.style.top = image.offsetTop + 'px';
-        overlayLayer.style.pointerEvents = 'auto';
-    }
-    // Llamar a drawOverlays cada vez que la imagen cambia de tamaño
-    window.addEventListener('resize', drawOverlays);
-    image.onload = drawOverlays;
+    // Función para añadir texto
+    function addText(text, options = {}) {
+        const textEl = document.createElement('div');
+        textEl.className = 'draggable text-overlay';
+        textEl.textContent = text;
+        textEl.style.color = options.color || '#ffffff';
+        textEl.style.fontSize = (options.size || 30) + 'px';
+        textEl.style.fontFamily = options.font || 'Arial';
+        
+        // Posicionar en el centro
+        const rect = overlayLayer.getBoundingClientRect();
+        textEl.style.left = (rect.width / 2) + 'px';
+        textEl.style.top = (rect.height / 2) + 'px';
 
-    // Añadir texto (flotante y arrastrable)
-    document.querySelector('[data-action="add-text"]').addEventListener('click', () => {
-        if (!originalImage) return;
-        const text = textInput.value;
-        if (!text) return;
-        // Añadir en el centro
+        overlayLayer.appendChild(textEl);
         overlays.push({
             type: 'text',
             value: text,
-            x: image.naturalWidth / 2,
-            y: image.naturalHeight / 2,
+            x: rect.width / 2,
+            y: rect.height / 2,
+            color: options.color,
+            size: options.size,
+            font: options.font,
+            el: textEl
+        });
+
+        makeDraggable(textEl);
+        renderImage();
+    }
+
+    // Función para añadir emoji
+    function addEmoji(emoji) {
+        const emojiEl = document.createElement('div');
+        emojiEl.className = 'draggable emoji-overlay';
+        emojiEl.textContent = emoji;
+        emojiEl.style.fontSize = '40px';
+        
+        // Posicionar en el centro
+        const rect = overlayLayer.getBoundingClientRect();
+        emojiEl.style.left = (rect.width / 2) + 'px';
+        emojiEl.style.top = (rect.height / 2) + 'px';
+
+        overlayLayer.appendChild(emojiEl);
+        overlays.push({
+            type: 'emoji',
+            value: emoji,
+            x: rect.width / 2,
+            y: rect.height / 2,
+            el: emojiEl
+        });
+
+        makeDraggable(emojiEl);
+        renderImage();
+    }
+
+    // Función para hacer elementos arrastrables
+    function makeDraggable(element) {
+        let isDragging = false;
+        let offsetX, offsetY;
+
+        element.addEventListener('mousedown', dragStart);
+        document.addEventListener('mousemove', drag);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) {
+            e.preventDefault();
+            isDragging = true;
+            element.classList.add('dragging');
+            // Calcula el offset entre el cursor y la esquina del overlay
+            const rect = element.getBoundingClientRect();
+            offsetX = e.clientX - rect.left;
+            offsetY = e.clientY - rect.top;
+        }
+
+        function drag(e) {
+            if (!isDragging) return;
+            e.preventDefault();
+
+            const rect = overlayLayer.getBoundingClientRect();
+            const elementRect = element.getBoundingClientRect();
+
+            // Nueva posición basada en el offset
+            let newX = e.clientX - rect.left - offsetX;
+            let newY = e.clientY - rect.top - offsetY;
+
+            // Limitar al contenedor
+            newX = Math.max(0, Math.min(newX, rect.width - elementRect.width));
+            newY = Math.max(0, Math.min(newY, rect.height - elementRect.height));
+
+            element.style.left = newX + 'px';
+            element.style.top = newY + 'px';
+
+            // Actualizar posición en el array de overlays
+            const overlay = overlays.find(o => o.el === element);
+            if (overlay) {
+                overlay.x = newX;
+                overlay.y = newY;
+            }
+        }
+
+        function dragEnd() {
+            isDragging = false;
+            element.classList.remove('dragging');
+        }
+    }
+
+    // Event Listeners para texto y emojis
+    document.querySelector('[data-action="add-text"]').addEventListener('click', () => {
+        if (!cropper) {
+            alert('Por favor, sube una imagen primero');
+            return;
+        }
+        
+        const text = textInput.value.trim();
+        if (!text) {
+            alert('Por favor, escribe algún texto');
+            return;
+        }
+        
+        addText(text, {
             color: textColor.value,
-            size: fontSize.value,
+            size: parseInt(fontSize.value),
             font: fontFamily.value
         });
+        
         textInput.value = '';
-        drawOverlays();
     });
-    // Añadir emoji (flotante y arrastrable)
+
     emojiButtons.forEach(button => {
-        button.addEventListener('click', (e) => {
-            if (!originalImage) return;
+        button.addEventListener('click', () => {
+            if (!cropper) {
+                alert('Por favor, sube una imagen primero');
+                return;
+            }
+            
             const emoji = button.dataset.emoji;
-            overlays.push({
-                type: 'emoji',
-                value: emoji,
-                x: image.naturalWidth / 2,
-                y: image.naturalHeight / 2
-            });
-            drawOverlays();
+            addEmoji(emoji);
         });
     });
-    // Fijar overlays
-    fixOverlaysBtn.addEventListener('click', function() {
-        // Renderizar todos los overlays sobre la imagen y reinicializar Cropper
-        renderImage();
-        overlays = [];
+
+    // Reemplazar el botón de fijar por el de resetear
+    document.getElementById('resetOverlaysBtn').addEventListener('click', function() {
+        // Limpiar overlays
         overlayLayer.innerHTML = '';
+        overlays = [];
+        renderImage();
     });
-    // Guardar Momentm
+
+    // --- MODIFICAR FUNCIÓN DE GUARDADO ---
     saveBtn.addEventListener('click', function() {
         if (!cropper) {
             alert('Por favor, añade una imagen primero');
@@ -820,42 +952,105 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         this.disabled = true;
         this.textContent = 'Guardando...';
-        const dataUrl = cropper.getCroppedCanvas({
-            maxWidth: 1000,
-            maxHeight: 1000,
-            fillColor: '#fff',
-            imageSmoothingEnabled: true,
-            imageSmoothingQuality: 'high'
-        }).toDataURL('image/jpeg', 0.8);
-        fetch('{{ route("momentms.store") }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                contenido: dataUrl
+
+        // 1. Obtén los datos de recorte de Cropper
+        const cropData = cropper.getData(true); // datos reales
+        const cropBoxData = cropper.getCropBoxData();
+        const overlayRect = overlayLayer.getBoundingClientRect();
+
+        // 2. Crea un canvas del tamaño del recorte
+        const canvas = document.createElement('canvas');
+        canvas.width = cropData.width;
+        canvas.height = cropData.height;
+        const ctx = canvas.getContext('2d');
+
+        // 3. Carga la imagen original
+        const img = new window.Image();
+        img.onload = function() {
+            // 4. Aplica los mismos filtros y ajustes que en el editor
+            let filterStr = '';
+            filterStr += `brightness(${100 + parseInt(currentAdjust.brightness)}%) `;
+            filterStr += `contrast(${100 + parseInt(currentAdjust.contrast)}%) `;
+            filterStr += `saturate(${100 + parseInt(currentAdjust.saturation)}%)`;
+            switch(currentFilter) {
+                case 'grayscale': filterStr += ' grayscale(100%)'; break;
+                case 'sepia': filterStr += ' sepia(100%)'; break;
+                case 'blur': filterStr += ' blur(5px)'; break;
+                case 'invert': filterStr += ' invert(100%)'; break;
+                case 'vintage': filterStr += ' sepia(50%) contrast(120%) brightness(90%)'; break;
+                case 'warm': filterStr += ' sepia(30%) saturate(150%) brightness(110%)'; break;
+                case 'cool': filterStr += ' saturate(80%) hue-rotate(30deg) brightness(110%)'; break;
+                case 'dramatic': filterStr += ' contrast(150%) brightness(90%) saturate(120%)'; break;
+            }
+            ctx.filter = filterStr.trim();
+
+            // 5. Dibuja la imagen original recortada
+            ctx.drawImage(
+                img,
+                cropData.x, cropData.y, cropData.width, cropData.height,
+                0, 0, canvas.width, canvas.height
+            );
+            ctx.filter = 'none';
+
+            // 6. Dibuja los overlays HTML en la posición y tamaño relativa al recorte
+            overlays.forEach(overlay => {
+                // overlay.x, overlay.y son en px relativos al overlayLayer
+                // Calcula la posición relativa al área recortada dentro del overlayLayer
+                const relX = ((overlay.x - cropBoxData.left) / cropBoxData.width) * canvas.width;
+                const relY = ((overlay.y - cropBoxData.top) / cropBoxData.height) * canvas.height;
+
+                // Calcula el tamaño proporcional
+                let fontSize = overlay.size || 30;
+                if (overlay.type === 'emoji') fontSize = 40;
+                // El tamaño base es respecto al cropBox, no al overlayLayer completo
+                const scale = canvas.width / cropBoxData.width;
+                const scaledFontSize = fontSize * scale;
+
+                if (overlay.type === 'text') {
+                    ctx.font = `${scaledFontSize}px ${overlay.font}`;
+                    ctx.fillStyle = overlay.color;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(overlay.value, relX, relY);
+                } else if (overlay.type === 'emoji') {
+                    ctx.font = `${scaledFontSize}px Arial`;
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(overlay.value, relX, relY);
+                }
+            });
+
+            // 7. Envía la imagen final
+            const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
+            fetch('{{ route("momentms.store") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({ contenido: dataUrl })
             })
-        })
-        .then(response => {
-            if (!response.ok) {
-                return response.json().then(err => Promise.reject(err));
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                window.location.href = '{{ route("user.momentms") }}';
-            } else {
-                throw new Error(data.message || 'Error al guardar el Momentm');
-            }
-        })
-        .catch(error => {
-            alert(error.message || 'Error al guardar el Momentm');
-            this.disabled = false;
-            this.textContent = 'Guardar Momentm';
-        });
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => Promise.reject(err));
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '{{ route("user.momentms") }}';
+                } else {
+                    throw new Error(data.message || 'Error al guardar el Momentm');
+                }
+            })
+            .catch(error => {
+                alert(error.message || 'Error al guardar el Momentm');
+                this.disabled = false;
+                this.textContent = 'Guardar Momentm';
+            });
+        };
+        img.src = originalImage;
     });
 });
 </script> 
