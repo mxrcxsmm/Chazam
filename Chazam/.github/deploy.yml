@@ -3,7 +3,7 @@ name: Deploy por FTP al servidor
 on:
   push:
     branches:
-      - production
+      - Server
 
 jobs:
   ftp-deploy:
