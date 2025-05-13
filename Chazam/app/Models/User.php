@@ -24,6 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'puntos',
+        'puntos_diarios',
         'id_nacionalidad',
         'id_rol',
         'id_estado',
@@ -45,6 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'fecha_nacimiento' => 'date',
         'puntos' => 'integer',
+        'puntos_diarios' => 'integer',
         'inicio_ban' => 'datetime',
         'fin_ban' => 'datetime',
         'ultimo_login' => 'datetime',
@@ -94,7 +96,7 @@ class User extends Authenticatable implements MustVerifyEmail
     // recuperar foto
     public function getImagenPerfilAttribute(): string
     {
-        return $this->img ? asset('img/profile_img/'.$this->img) : asset('img/profile_img/avatar-default.png');
+        return $this->img ? asset('IMG/profile_img/'.$this->img) : asset('IMG/profile_img/avatar-default.png');
     }
 
     // edad en años

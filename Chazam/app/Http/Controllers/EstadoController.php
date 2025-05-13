@@ -27,6 +27,12 @@ class EstadoController extends Controller
         // Actualizar el estado del usuario
         User::where('id_usuario', $user->id_usuario)->update(['id_estado' => $estadoId]);
 
+        // Si el usuario cambia de estado 5 a otro, verificar y eliminar chats
+        if ($estadoId != 5) {
+            $retoController = new RetoController();
+            $retoController->verificarEstadoChats();
+        }
+
         // Actualizar el caché de usuarios en línea
         $this->actualizarUsuariosEnLinea($user->id_usuario, $estadoId);
 
