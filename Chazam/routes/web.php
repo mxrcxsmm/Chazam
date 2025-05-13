@@ -48,6 +48,7 @@ Route::middleware(['auth'])->group(function () {
         // Rutas para reportes (administrador)
         Route::get('reportes', [ReporteAdminController::class, 'index'])->name('reportes.index');
         Route::delete('reportes/{id}', [ReporteAdminController::class, 'destroy'])->name('reportes.destroy');
+        Route::get('/reportes/nuevos', [ReporteAdminController::class, 'contarNuevos'])->name('admin.reportes.nuevos');
 
         // Rutas para productos (administrador)
         Route::get('productos', [ProductosAdminController::class, 'index'])->name('productos.index');
@@ -58,6 +59,7 @@ Route::middleware(['auth'])->group(function () {
         // Rutas para pagos (administrador)
         Route::get('/pagos', [PagosAdminController::class, 'index'])->name('pagos.index');
         Route::post('/pagos', [PagosAdminController::class, 'store'])->name('pagos.store');
+        Route::post('/pagos/filtrar', [PagosAdminController::class, 'filtrar'])->name('pagos.filtrar');        
         Route::put('/pagos/{id}', [PagosAdminController::class, 'update'])->name('pagos.update');
     });
 
@@ -146,6 +148,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('user/chat/{chatId}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
     Route::post('user/chat/{chatId}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
 
+
     // Rutas para solicitudes y bloqueos
     Route::post('/solicitudes/enviar', [SolicitudUserController::class, 'enviarSolicitud'])->name('solicitudes.enviar');
     Route::post('/solicitudes/bloquear', [SolicitudUserController::class, 'bloquearUsuario'])->name('solicitudes.bloquear');
@@ -154,4 +157,6 @@ Route::middleware(['auth'])->group(function () {
     
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
+
+    Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
 });
