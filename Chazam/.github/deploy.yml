@@ -20,3 +20,4 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /Chazam/
           local-dir: ./
+          
