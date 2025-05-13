@@ -1,0 +1,22 @@
+name: Deploy por FTP al servidor
+
+on:
+  push:
+    branches:
+      - production
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
+
+      - name: Subir archivos vía FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ftp.daw2j23.es
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /Chazam/
+          local-dir: ./
