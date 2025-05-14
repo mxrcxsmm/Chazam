@@ -70,15 +70,28 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadChats() {
+        const chatsList = document.getElementById('chats-list');
+        const loader = document.getElementById('chats-loader');
+        // Mostrar el loader y ocultar la lista de chats
+        loader.style.display = 'block';
+        chatsList.style.display = 'none';
+
         fetch(window.userChatConfig.chatsUrl)
             .then(res => res.json())
             .then(data => {
                 chats = data;
                 renderChats(chats);
+                // Ocultar el loader y mostrar la lista de chats
+                loader.style.display = 'none';
+                chatsList.style.display = 'block';
                 if (chats.length > 0) {
                     document.querySelector('.chat-item').classList.add('active');
                     loadMessages(chats[0].id_chat);
                 }
+            })
+            .catch(error => {
+                loader.innerHTML = 'Error al cargar los chats';
+                console.error('Error al cargar los chats:', error);
             });
     }
 
