@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     let chats = [];
     let currentChatId = null;
+    let lastImageUpdate = 0;
 
     window.userChatConfig = {
         chatsUrl: '/user/chats', // Asegúrate de que esta ruta sea correcta
@@ -70,15 +71,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function loadChats() {
+        const chatsList = document.getElementById('chats-list');
+        const loader = document.getElementById('chats-loader');
+        loader.style.display = 'block';
+        chatsList.style.display = 'none';
+
         fetch(window.userChatConfig.chatsUrl)
             .then(res => res.json())
             .then(data => {
                 chats = data;
                 renderChats(chats);
+                loader.style.display = 'none';
+                chatsList.style.display = 'block';
                 if (chats.length > 0) {
                     document.querySelector('.chat-item').classList.add('active');
+                    updateChatHeader(chats[0]);
                     loadMessages(chats[0].id_chat);
                 }
+            })
+            .catch(error => {
+                loader.innerHTML = 'Error al cargar los chats';
+                console.error('Error al cargar los chats:', error);
             });
     }
 
@@ -164,11 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
  
     // Función para actualizar mensajes cada 5 segundos
     function startMessagePolling() {
-        setInterval(() => {
-            if (currentChatId) {
-                loadMessages(currentChatId);
-            }
-        }, 5000); // Actualiza cada 5 segundos
+        // setInterval(refreshCurrentChatHeader, 5000);
     }
 
     emojiButton.addEventListener('click', () => {
@@ -184,9 +193,55 @@ document.addEventListener('DOMContentLoaded', function() {
       });
 
     function updateChatHeader(companero) {
-        const chatHeader = document.querySelector('.chat-contact h3');
-        chatHeader.textContent = companero.nombre_completo;
+        // Actualiza el nombre
+        const chatHeader = document.getElementById('chat-contact-name');
+        chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
+
+        // Actualiza el estado según id_estado
+        const chatStatus = document.getElementById('chat-contact-status');
+        if (companero.id_estado == 1 || companero.id_estado == 5) {
+            chatStatus.textContent = 'en línea';
+            chatStatus.style.color = '#9147ff';
+        } else {
+            chatStatus.textContent = 'desconectado';
+            chatStatus.style.color = '#b9bbbe';
+        }
+
+        // Actualiza la imagen de perfil
+        const chatImg = document.getElementById('chat-contact-img');
+        chatImg.src = companero.img ? companero.img : '/images/avatar-default.png';
     }
+
+    function refreshCurrentChatHeader() {
+        if (!currentChatId) return;
+        fetch(window.userChatConfig.chatsUrl)
+            .then(res => res.json())
+            .then(data => {
+                const currentChat = data.find(chat => chat.id_chat == currentChatId);
+                if (currentChat) {
+                    // Actualiza el estado
+                    const chatStatus = document.getElementById('chat-contact-status');
+                    if (currentChat.id_estado == 1 || currentChat.id_estado == 5) {
+                        chatStatus.textContent = 'en línea';
+                        chatStatus.style.color = '#9147ff';
+                    } else {
+                        chatStatus.textContent = 'desconectado';
+                        chatStatus.style.color = '#b9bbbe';
+                    }
+
+                    // Actualiza la imagen de perfil cada 2 minutos
+                    const now = Date.now();
+                    if (now - lastImageUpdate > 120000) { // 120000 ms = 2 minutos
+                        const chatImg = document.getElementById('chat-contact-img');
+                        chatImg.src = currentChat.img ? currentChat.img : '/images/avatar-default.png';
+                        lastImageUpdate = now;
+                    }
+                }
+            });
+    }
+
+    // Llama a esta función cada 15 segundos
+    setInterval(refreshCurrentChatHeader, 15000);
 
     loadChats();
     startMessagePolling();

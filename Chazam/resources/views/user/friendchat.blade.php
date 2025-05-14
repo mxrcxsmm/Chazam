@@ -25,23 +25,16 @@
         <!-- Lista de chats -->
         <div class="chats-list" id="chats-list">
             <!-- Los chats se cargarán aquí dinámicamente -->
-            <div class="chat-info">
-                <div class="chat-header">
-                    <h3>${chat.username ? chat.username : chat.nombre}</h3>
-                    <span class="time">${chat.last_time ? chat.last_time : ''}</span>
-                </div>
-                <p class="last-message">${chat.last_message ? chat.last_message : ''}</p>
-            </div>
         </div>
     </div>
 
     <div class="chat-main">
         <div class="chat-header">
             <div class="chat-contact">
-                <img src="{{ asset('images/avatar-default.png') }}" alt="Contact Avatar">
+                <img id="chat-contact-img" src="{{ asset('images/avatar-default.png') }}" alt="Contact Avatar">
                 <div class="contact-info">
-                    <h3>Usuario 1</h3>
-                    <p>en línea</p>
+                    <h3 id="chat-contact-name">Usuario</h3>
+                    <p id="chat-contact-status">Estado</p>
                 </div>
             </div>
             <div class="chat-actions">
@@ -101,3 +94,7 @@
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
 <emoji-picker style="position: absolute; bottom: 60px; left: 20px; display: none;"></emoji-picker>
+
+<div id="chats-loader" style="text-align:center; padding: 20px;">
+    <i class="fas fa-spinner fa-spin"></i> Cargando chats...
+</div>
