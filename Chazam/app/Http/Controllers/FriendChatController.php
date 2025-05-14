@@ -31,15 +31,22 @@ class FriendChatController extends Controller
                 $query->whereNull('id_reto');
             })
             ->get()
-            ->map(function($chatUsuario) {
+            ->map(function($chatUsuario) use ($userId) {
                 $chat = $chatUsuario->chat;
+                // Buscar el otro usuario del chat
+                $compa = ChatUsuario::where('id_chat', $chat->id_chat)
+                    ->where('id_usuario', '!=', $userId)
+                    ->with('usuario')
+                    ->first();
+                $compaUser = $compa ? $compa->usuario : null;
                 return [
                     'id_chat' => $chat->id_chat,
-                    'nombre' => $chat->nombre,
-                    'username' => $chatUsuario->usuario->username,
-                    'img' => $chat->img,
+                    'nombre' => $compaUser ? $compaUser->nombre : 'Desconocido',
+                    'username' => $compaUser ? $compaUser->username : 'Desconocido',
+                    'img' => $compaUser && $compaUser->img ? $compaUser->img : $chat->img,
                     'last_message' => optional($chat->mensajes()->latest('fecha_envio')->first())->contenido,
                     'last_time' => optional($chat->mensajes()->latest('fecha_envio')->first())->fecha_envio?->format('H:i'),
+                    'id_estado' => $compaUser ? $compaUser->id_estado : 2, // 2 = desconectado por defecto
                 ];
             });
         return response()->json($chats);
