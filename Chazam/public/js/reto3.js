@@ -19,7 +19,20 @@ function desordenarMensaje(texto) {
 
 // Función para procesar el mensaje antes de enviarlo
 function procesarMensaje(mensaje) {
-    return desordenarMensaje(mensaje);
+    // Verificar que el mensaje tenga al menos 60 caracteres para sumar puntos
+    if (mensaje.length < 60) {
+        // Devolver un objeto indicando que no debe sumar puntos
+        return {
+            texto: desordenarMensaje(mensaje),
+            sumarPuntos: false
+        };
+    }
+    
+    // Si tiene 60 o más caracteres, devolver con la indicación para sumar puntos
+    return {
+        texto: desordenarMensaje(mensaje),
+        sumarPuntos: true
+    };
 }
 
 // Exportar las funciones
