@@ -19,9 +19,11 @@ jobs:
           extensions: mbstring, zip, bcmath, curl, dom, fileinfo, json, pdo, tokenizer, xml
           coverage: none
 
-      - name: Instalar dependencias con Composer
-        working-directory: ./Chazam
-        run: composer install --no-dev --prefer-dist --optimize-autoloader
+      - name: Instalar y cachear dependencias con Composer
+        uses: ramsey/composer-install@v2
+        with:
+          working-directory: ./Chazam
+          composer-options: --no-dev --prefer-dist --optimize-autoloader
 
       - name: Subir archivos vía FTP
         uses: SamKirkland/FTP-Deploy-Action@v4.3.4
