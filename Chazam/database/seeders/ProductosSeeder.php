@@ -97,16 +97,6 @@ class ProductosSeeder extends Seeder
                 'puntos' => 10000,
                 'id_tipo_producto' => 3,
             ],
-
-            // Donaciones (id_tipo_producto = 4)
-            [
-                'titulo' => 'Donaciones',
-                'descripcion' => 'Apoya el desarrollo de Chazam con una donación personalizada.',
-                'precio' => 2.99,
-                'tipo_valor' => 'euros',
-                'puntos' => null,
-                'id_tipo_producto' => 4,
-            ],
             [
                 'titulo' => 'Suscripción de miembro con puntos',
                 'descripcion' => 'Suscripción de miembro con 15000 puntos.',

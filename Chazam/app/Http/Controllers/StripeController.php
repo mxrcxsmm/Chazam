@@ -155,6 +155,8 @@ class StripeController extends Controller
             return redirect()->back()->with('error', 'Por favor, introduce una cantidad válida.');
         }
 
+        $id_producto = $request->id_producto; // Obtener el ID del producto de donaciones
+
         // Configurar Stripe
         Stripe::setApiKey(config('services.stripe.secret'));
 
@@ -172,10 +174,38 @@ class StripeController extends Controller
                 'quantity' => 1,
             ]],
             'mode' => 'payment',
-            'success_url' => route('stripe.success'),
+            'success_url' => route('stripe.donation.success') . '?cantidad=' . $cantidad . '&id_producto=' . $id_producto,
             'cancel_url' => route('stripe.cancel'),
         ]);
 
         return redirect($session->url);
+    }
+
+    public function donationSuccess(Request $request)
+    {
+        // Verificar si el usuario está autenticado
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Debes iniciar sesión para completar la donación.');
+        }
+
+        $user = Auth::user();
+        $cantidad = $request->query('cantidad'); // Obtener la cantidad desde la URL
+        $id_producto = $request->query('id_producto'); // Obtener el ID del producto desde la URL
+
+        // Validar que la cantidad no sea nula o inválida
+        if (!is_numeric($cantidad) || $cantidad <= 0) {
+            return redirect()->route('tienda.index')->with('error', 'Hubo un problema al procesar tu donación.');
+        }
+
+        // Registrar la donación en la tabla de pagos
+        Pago::create([
+            'id_comprador' => Auth::id(), // ID del usuario autenticado
+            'id_producto' => $id_producto, // ID del producto de donaciones
+            'fecha_pago' => now(),
+            'cantidad' => $cantidad, // Cantidad donada
+        ]);
+
+        $mensaje = '¡Gracias por tu donación de ' . $cantidad . '€!';
+        return view('stripe.success', compact('mensaje'));
     }
 }

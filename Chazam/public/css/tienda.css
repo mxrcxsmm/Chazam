@@ -23,9 +23,12 @@ body {
 
 /* Navbar */
 .navbar {
-    background-color: #f1dfff; /* Color de fondo de la barra de navegación */
-    margin-bottom: 0;
-    border: none;
+    background-color: #f1dfff;
+    position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1050;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .navbar a {
@@ -69,18 +72,23 @@ body {
     color: #4b0082;
 }
 
+/* Contenedor principal */
+.main-container {
+    display: flex; /* Altura de la navbar */
+    height: calc(100vh - 56px); /* Altura restante después de la navbar */
+    overflow: hidden;
+}
+
 /* Sidebar */
 .sidebar {
     background-color: #4b0082;
     color: white;
-    height: calc(100vh - 56px); /* Ajusta la altura para que no deje hueco debajo de la navbar */
+    width: 20%;
     padding: 20px;
-    overflow-y: auto; /* Habilita el scroll vertical en la sidebar */
-    position: fixed; /* Fija la sidebar en su posición */
-    top: 56px; /* Altura de la navbar */
-    left: 0;
-    width: 20%; /* Ancho de la sidebar */
-    box-sizing: border-box; /* Incluye el padding en el ancho total */
+    box-sizing: border-box;
+    overflow-y: auto; /* Habilita el scroll vertical */
+    height: 100%; /* Ocupa toda la altura del contenedor principal */
+    position: relative;
 }
 
 .sidebar h3 {
@@ -105,16 +113,17 @@ body {
 
 .sidebar ul li a:hover {
     font-weight: bold;
-    text-decoration: underline;
+    text-decoration: none;
 }
 
 /* Contenido principal */
 .main-content {
-    margin-left: 25%; /* Deja espacio para la sidebar */
-    margin-top: 56px; /* Ajusta el margen superior para evitar que el contenido quede debajo de la navbar */
+    flex: 1; /* Ocupa el espacio restante al lado de la sidebar */
     padding: 20px;
     box-sizing: border-box;
-    overflow-y: auto; /* Habilita el scroll vertical si el contenido excede la altura */
+    overflow-y: auto; /* Habilita el scroll vertical */
+    background-color: #6a0dad;
+    color: white;
 }
 
 .main-content h1 {

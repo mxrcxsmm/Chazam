@@ -36,94 +36,93 @@
         </div>
     </nav>
 
-    <!-- Sidebar y contenido principal -->
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <div class="col-md-3 sidebar">
-                <h3>User</h3>
-                <ul class="categorias">
-                    @foreach ($categorias as $categoria)
-                        <li><a href="#categoria-{{ $categoria->id_tipo_producto }}">{{ $categoria->tipo_producto }}</a></li>
-                        
-                    @endforeach
-                    <li><a href="#donaciones">Donaciones</a></li>
-                    <li><a href="{{ route('retos.guide') }}">Volver</a></li>
-                </ul>
-            </div>
-
-            <!-- Contenido principal -->
-            <div class="col-md-9 main-content">
-                <h1>Tienda</h1>
+    <!-- Contenedor principal -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h3>User</h3>
+            <ul class="categorias">
                 @foreach ($categorias as $categoria)
-                    <div id="categoria-{{ $categoria->id_tipo_producto }}" class="categoria-section">
-                        <h2>{{ $categoria->tipo_producto }}</h2>
-                        <div class="productos-grid">
-                            @foreach ($productos->where('id_tipo_producto', $categoria->id_tipo_producto) as $producto)
-                                <div class="producto-card">
-                                    <a class="producto" href="{{ route('producto.comprar', ['id' => $producto->id_producto]) }}">
-                                        <img src="{{ asset('img/' . $producto->titulo . '.png') }}" alt="{{ $producto->titulo }}">
-                                        <h3>{{ $producto->titulo }}</h3>
-                                        <p>{{ $producto->descripcion }}</p>
-                                        <div class="precio">
-                                            @if ($producto->tipo_valor == 'puntos')
-                                                <span>{{ number_format($producto->precio, 0, '', '.') }}</span>
-                                                <span>Puntos</span>
-                                            @else
-                                                <span>{{ $producto->precio }}</span>
-                                                <span>€</span>
-                                            @endif
-                                        </div>
-                                    </a>
-                                    @if ($producto->tipo_valor == 'puntos')
-                                        <button class="btn btn-primary comprar-con-puntos" data-producto-id="{{ $producto->id_producto }}">
-                                            Comprar con puntos
-                                        </button>
-                                    @endif
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
+                    <li><a href="#categoria-{{ $categoria->id_tipo_producto }}">{{ $categoria->tipo_producto }}</a></li>
                 @endforeach
+                <li><a href="{{ route('retos.guide') }}">Volver</a></li>
+            </ul>
+        </div>
 
-                <div class="donaciones-section">
-                    <h2>Donaciones</h2>
-                    <form action="{{ route('stripe.donar') }}" method="POST" class="donaciones-form">
-                        @csrf
-                        <label for="donacion">Selecciona una cantidad:</label>
-                        <select name="donacion" id="donacion" class="form-select">
-                            <option value="1">1€</option>
-                            <option value="2">2€</option>
-                            <option value="5">5€</option>
-                            <option value="10">10€</option>
-                            <option value="20">20€</option>
-                            <option value="50">50€</option>
-                            <option value="100">100€</option>
-                            <option value="personalizado">Cantidad personalizada</option>
-                        </select>
-
-                        <div id="personalizado-container" style="display: none; margin-top: 10px;">
-                            <label for="cantidad-personalizada">Introduce tu cantidad:</label>
-                            <input type="number" name="cantidad_personalizada" id="cantidad-personalizada" class="form-control" min="1" placeholder="Cantidad en €">
-                        </div>
-
-                        <button type="submit" class="btn btn-success mt-3">Donar</button>
-                    </form>
+        <!-- Contenido principal -->
+        <div class="main-content">
+            <h1>Tienda</h1>
+            @foreach ($categorias as $categoria)
+                <div id="categoria-{{ $categoria->id_tipo_producto }}" class="categoria-section">
+                    <h2>{{ $categoria->tipo_producto }}</h2>
+                    <div class="productos-grid">
+                        @foreach ($productos->where('id_tipo_producto', $categoria->id_tipo_producto) as $producto)
+                            <div class="producto-card">
+                                <a class="producto" href="{{ route('producto.comprar', ['id' => $producto->id_producto]) }}">
+                                    <img src="{{ asset('img/' . $producto->titulo . '.png') }}" alt="{{ $producto->titulo }}">
+                                    <h3>{{ $producto->titulo }}</h3>
+                                    <p>{{ $producto->descripcion }}</p>
+                                    <div class="precio">
+                                        @if ($producto->tipo_valor == 'puntos')
+                                            <span>{{ number_format($producto->precio, 0, '', '.') }}</span>
+                                            <span>Puntos</span>
+                                        @else
+                                            <span>{{ $producto->precio }}</span>
+                                            <span>€</span>
+                                        @endif
+                                    </div>
+                                </a>
+                                @if ($producto->tipo_valor == 'puntos')
+                                    <button class="btn btn-primary comprar-con-puntos"
+                                        data-producto-id="{{ $producto->id_producto }}">
+                                        Comprar con puntos
+                                    </button>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
+            @endforeach
 
-                <script>
-                    document.getElementById('donacion').addEventListener('change', function () {
-                        const personalizadoContainer = document.getElementById('personalizado-container');
-                        if (this.value === 'personalizado') {
-                            personalizadoContainer.style.display = 'block';
-                        } else {
-                            personalizadoContainer.style.display = 'none';
-                        }
-                    });
-                </script>
+            <div class="donaciones-section">
+                <form action="{{ route('stripe.donar') }}" method="POST" class="donaciones-form">
+                    @csrf
+                    <input type="hidden" name="id_producto" value="4"> <!-- ID del producto de donaciones -->
+
+                    <label for="donacion">Selecciona una cantidad:</label>
+                    <select name="donacion" id="donacion" class="form-select">
+                        <option value="1">1€</option>
+                        <option value="2">2€</option>
+                        <option value="5">5€</option>
+                        <option value="10">10€</option>
+                        <option value="20">20€</option>
+                        <option value="50">50€</option>
+                        <option value="100">100€</option>
+                        <option value="personalizado">Cantidad personalizada</option>
+                    </select>
+
+                    <div id="personalizado-container" style="display: none; margin-top: 10px;">
+                        <label for="cantidad-personalizada">Introduce tu cantidad:</label>
+                        <input type="number" name="cantidad_personalizada" id="cantidad-personalizada"
+                            class="form-control" min="1" placeholder="Cantidad en €">
+                    </div>
+
+                    <button type="submit" class="btn btn-success mt-3">Donar</button>
+                </form>
             </div>
         </div>
     </div>
+
+    <script>
+        document.getElementById('donacion').addEventListener('change', function() {
+            const personalizadoContainer = document.getElementById('personalizado-container');
+            if (this.value === 'personalizado') {
+                personalizadoContainer.style.display = 'block';
+            } else {
+                personalizadoContainer.style.display = 'none';
+            }
+        });
+    </script>
 </body>
 
 </html>

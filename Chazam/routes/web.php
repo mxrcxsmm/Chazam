@@ -146,12 +146,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/stripe/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
     Route::post('/comprar-con-puntos/{id}', [StripeController::class, 'comprarConPuntos'])->name('comprar.con.puntos');
     Route::post('/donar', [StripeController::class, 'donar'])->name('stripe.donar');
-    Route::get('/donar/success', function () {
-        return view('stripe.success'); // Vista de éxito
-    })->name('stripe.success');
-    Route::get('/donar/cancel', function () {
-        return view('stripe.cancel'); // Vista de cancelación
-    })->name('stripe.cancel');
+    Route::get('/donar/success', [StripeController::class, 'donationSuccess'])->name('stripe.donation.success');
+    Route::get('/donar/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+    Route::get('/producto/success/{producto}', [StripeController::class, 'productSuccess'])->name('stripe.product.success');
     
     // Rutas para el chat de amigos
     Route::get('user/chats', [FriendChatController::class, 'getUserChats'])->name('user.chats');
