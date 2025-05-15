@@ -20,6 +20,7 @@ jobs:
           coverage: none
 
       - name: Instalar dependencias con Composer
+        working-directory: ./Chazam
         run: composer install --no-dev --prefer-dist --optimize-autoloader
 
       - name: Subir archivos vía FTP
@@ -29,4 +30,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /Chazam/
-          local-dir: ./
+          local-dir: ./Chazam
