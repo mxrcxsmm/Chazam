@@ -144,9 +144,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/producto/{id}/checkout', [StripeController::class, 'checkout'])->name('producto.comprar');
     Route::get('/stripe/success/{id}', [StripeController::class, 'success'])->name('stripe.success');
     Route::get('/stripe/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+    Route::post('/comprar-con-puntos/{id}', [StripeController::class, 'comprarConPuntos'])->name('comprar.con.puntos');
+    Route::post('/donar', [StripeController::class, 'donar'])->name('stripe.donar');
+    Route::get('/donar/success', [StripeController::class, 'donationSuccess'])->name('stripe.donation.success');
+    Route::get('/donar/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+    Route::get('/producto/success/{producto}', [StripeController::class, 'productSuccess'])->name('stripe.product.success');
+    
+    // Rutas para el chat de amigos
     Route::get('user/chats', [FriendChatController::class, 'getUserChats'])->name('user.chats');
     Route::get('user/chat/{chatId}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
     Route::post('user/chat/{chatId}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
+
 
     // Rutas para solicitudes y bloqueos
     Route::post('/solicitudes/enviar', [SolicitudUserController::class, 'enviarSolicitud'])->name('solicitudes.enviar');
@@ -156,5 +164,6 @@ Route::middleware(['auth'])->group(function () {
     
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
+
     Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
 });

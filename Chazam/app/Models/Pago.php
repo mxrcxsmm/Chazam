@@ -32,7 +32,8 @@ class Pago extends Model
     protected $fillable = [
         'id_comprador',
         'fecha_pago',
-        'id_producto'
+        'id_producto',
+        'cantidad',
     ];
 
     /**
