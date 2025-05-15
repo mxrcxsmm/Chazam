@@ -228,20 +228,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         chatStatus.textContent = 'desconectado';
                         chatStatus.style.color = '#b9bbbe';
                     }
-
-                    // Actualiza la imagen de perfil cada 2 minutos
-                    const now = Date.now();
-                    if (now - lastImageUpdate > 120000) { // 120000 ms = 2 minutos
-                        const chatImg = document.getElementById('chat-contact-img');
-                        chatImg.src = currentChat.img ? currentChat.img : '/images/avatar-default.png';
-                        lastImageUpdate = now;
-                    }
                 }
             });
     }
 
     // Llama a esta función cada 15 segundos
     setInterval(refreshCurrentChatHeader, 15000);
+
+    // Refrescar mensajes del chat activo cada 5 segundos
+    setInterval(function() {
+        if (currentChatId) {
+            loadMessages(currentChatId);
+        }
+    }, 5000);
 
     loadChats();
     startMessagePolling();
