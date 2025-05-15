@@ -30,4 +30,4 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /Chazam/
-          local-dir: ./Chazam
+          local-dir: ./Chazam/
