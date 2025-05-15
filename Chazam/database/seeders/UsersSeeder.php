@@ -111,7 +111,7 @@ class UsersSeeder extends Seeder
                 'password' => Hash::make('qweQWE123'),
                 'puntos' => 490,
                 'id_nacionalidad' => 6, // Peruana
-                'id_rol' => 3,
+                'id_rol' => 2,
                 'id_estado' => 1,
                 'img' => null,
                 'descripcion' => 'Usuario de ejemplo'

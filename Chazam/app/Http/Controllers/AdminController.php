@@ -34,7 +34,12 @@ class AdminController extends Controller
             return redirect()->back()->with('error', 'Solo se pueden eliminar usuarios con estado PermaBan.');
         }
 
-        // Proceder con la eliminación
+        // Eliminar las historias del usuario
+        $user->historias()->delete();
+
+        // No eliminamos los pagos, ya que deben permanecer como registro histórico
+
+        // Proceder con la eliminación del usuario
         $user->delete();
 
         return redirect()->route('admin.usuarios.index')->with('eliminar', 'Usuario eliminado correctamente.');
