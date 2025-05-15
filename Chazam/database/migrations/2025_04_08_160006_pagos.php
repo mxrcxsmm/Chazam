@@ -16,6 +16,7 @@ return new class extends Migration
             $table->bigInteger('id_comprador')->unsigned()->nullable();
             $table->datetime('fecha_pago');
             $table->bigInteger('id_producto')->unsigned()->nullable();
+            $table->decimal('cantidad', 8, 2)->nullable();
             $table->timestamps();
         
             $table->foreign('id_comprador')->references('id_usuario')->on('users')->onDelete('set null');
