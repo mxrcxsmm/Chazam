@@ -3,6 +3,42 @@ let chatId = null;
 let companero = null;
 let buscandoCompanero = true;
 let usuarioReportadoId = null; // Nueva variable para mantener el ID del usuario a reportar
+let ultimoSkip = null; // Variable para controlar el cooldown del skip
+
+// Función para verificar si el skip está en cooldown
+function skipEnCooldown() {
+    if (!ultimoSkip) return false;
+    const tiempoTranscurrido = Date.now() - ultimoSkip;
+    const cooldown = 10 * 60 * 1000; // 10 minutos en milisegundos
+    return tiempoTranscurrido < cooldown;
+}
+
+// Función para obtener tiempo restante de cooldown en formato mm:ss
+function getTiempoRestanteCooldown() {
+    if (!ultimoSkip) return '00:00';
+    const tiempoTranscurrido = Date.now() - ultimoSkip;
+    const cooldown = 10 * 60 * 1000;
+    const tiempoRestante = Math.max(0, cooldown - tiempoTranscurrido);
+    const minutos = Math.floor(tiempoRestante / 60000);
+    const segundos = Math.floor((tiempoRestante % 60000) / 1000);
+    return `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+}
+
+// Función para actualizar el estado del botón skip
+function actualizarBotonSkip() {
+    const skipBtn = document.querySelector('.skip-btn');
+    if (!skipBtn) return;
+
+    if (skipEnCooldown()) {
+        skipBtn.disabled = true;
+        skipBtn.innerHTML = `Skip <span class="time">(${getTiempoRestanteCooldown()})</span><span class="triangle"></span><span class="triangle tight"></span>`;
+        skipBtn.classList.add('disabled');
+    } else {
+        skipBtn.disabled = false;
+        skipBtn.innerHTML = `Skip<span class="triangle"></span><span class="triangle tight"></span>`;
+        skipBtn.classList.remove('disabled');
+    }
+}
 
 // Función para buscar un compañero automáticamente
 async function buscarCompaneroAutomatico() {
@@ -87,6 +123,16 @@ function enviarMensaje() {
 
     if (!mensaje) return;
     
+    // Validar longitud máxima de 500 caracteres
+    if (mensaje.length > 500) {
+        Swal.fire({
+            title: 'Mensaje demasiado largo',
+            text: 'El mensaje no puede exceder los 500 caracteres',
+            icon: 'warning'
+        });
+        return;
+    }
+    
     // Procesar el mensaje según el reto actual si existe la función
     let mensajeProcesado;
     try {
@@ -103,10 +149,15 @@ function enviarMensaje() {
     // Manejar el caso donde el mensaje procesado es un objeto
     let contenidoMensaje;
     let tieneEmojis = false;
+    let sumarPuntos = true; // Por defecto, sí sumamos puntos
     
     if (typeof mensajeProcesado === 'object' && mensajeProcesado !== null) {
         contenidoMensaje = mensajeProcesado.texto;
-        tieneEmojis = mensajeProcesado.tieneEmojis;
+        tieneEmojis = mensajeProcesado.tieneEmojis || false;
+        // Para el reto 3, verificar si debe sumar puntos basado en la longitud
+        if (mensajeProcesado.hasOwnProperty('sumarPuntos')) {
+            sumarPuntos = mensajeProcesado.sumarPuntos;
+        }
     } else {
         contenidoMensaje = mensajeProcesado;
     }
@@ -120,7 +171,8 @@ function enviarMensaje() {
         body: JSON.stringify({
             chat_id: chatId,
             contenido: contenidoMensaje,
-            tieneEmojis: tieneEmojis
+            tieneEmojis: tieneEmojis,
+            sumarPuntos: sumarPuntos
         })
     })
     .then(response => response.json())
@@ -387,6 +439,62 @@ document.addEventListener('DOMContentLoaded', function() {
     buscarCompaneroAutomatico();
     actualizarPuntosDiarios(); // Actualizar puntos diarios al cargar la página
     
+    // Configurar el botón de skip
+    document.querySelector('.skip-btn').addEventListener('click', function() {
+        if (skipEnCooldown()) {
+            Swal.fire({
+                title: 'Espera un momento',
+                text: `Debes esperar ${getTiempoRestanteCooldown()} minutos antes de volver a usar el skip`,
+                icon: 'warning'
+            });
+            return;
+        }
+
+        if (!chatId) {
+            return;
+        }
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Saltarás a este usuario y buscarás uno nuevo. Deberás esperar 10 minutos antes de poder usar el skip nuevamente.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, saltar',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                ultimoSkip = Date.now();
+                chatId = null;
+                companero = null;
+                buscandoCompanero = true;
+                
+                // Detener el control de inactividad
+                if (window.detenerControlInactividad) {
+                    window.detenerControlInactividad();
+                }
+                
+                // Actualizar la interfaz
+                document.getElementById('chatHeader').innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                            <span class="visually-hidden">Cargando...</span>
+                        </div>
+                        Buscando usuarios disponibles...
+                    </div>
+                `;
+                
+                // Ocultar el menú de opciones
+                document.getElementById('chatOptions').style.display = 'none';
+                
+                // Limpiar el contenedor de mensajes
+                document.getElementById('mensajesContainer').innerHTML = '';
+                
+                actualizarBotonSkip();
+                buscarCompaneroAutomatico();
+            }
+        });
+    });
+
     // Configurar el botón de enviar mensaje
     document.getElementById('enviarMensaje').addEventListener('click', enviarMensaje);
     
@@ -588,6 +696,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Intervalo para actualizar el estado del botón skip cada segundo
+    setInterval(actualizarBotonSkip, 1000);
 });
 
 // Actualizar estado cuando el usuario cierra la pestaña

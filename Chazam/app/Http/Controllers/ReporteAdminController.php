@@ -11,7 +11,14 @@ class ReporteAdminController extends Controller
     {
         // Obtener todos los reportes
         $reportes = Reporte::with(['reportador', 'reportado'])->get();
-        return view('admin.reportes.index', compact('reportes'));
+
+        // Marcar todos los reportes como leídos
+        Reporte::where('leido', false)->update(['leido' => true]);
+
+        // Contar reportes no leídos (después de marcarlos como leídos, será 0)
+        $nuevosReportes = Reporte::where('leido', false)->count();
+
+        return view('admin.reportes.index', compact('reportes', 'nuevosReportes'));
     }
 
     public function destroy($id_reporte)
@@ -25,5 +32,13 @@ class ReporteAdminController extends Controller
         } catch (\Exception $e) {
             return redirect()->route('admin.reportes.index')->with('error', 'Error al eliminar el reporte: ' . $e->getMessage());
         }
+    }
+
+    public function contarNuevos()
+    {
+        // Contar reportes no leídos
+        $nuevosReportes = Reporte::where('leido', false)->count();
+
+        return response()->json(['nuevos' => $nuevosReportes]);
     }
 }
