@@ -96,7 +96,7 @@ function iniciarControlInactividad() {
                 console.log('Inactividad detectada, mostrando alerta...');
                 mostrarAlertaInactividad();
             }
-        }, 10000);
+        }, 1000);
     }, tiempoInicialEspera);
 }
 
