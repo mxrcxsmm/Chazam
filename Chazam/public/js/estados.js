@@ -4,7 +4,7 @@ let contadorInactividad = null;
 let contadorRegresivo = null;
 let alertaMostrada = false;
 let miAlerta = false;
-let tiempoInicialEspera = 30000; // 30 segundos de espera inicial
+let tiempoInicialEspera = 10000; // 10 segundos de espera inicial después de encontrar compañero
 
 // Función para actualizar el estado del usuario
 function actualizarEstado(estado) {
@@ -82,6 +82,9 @@ function iniciarControlInactividad() {
     console.log('=== INICIANDO CONTROL DE INACTIVIDAD ===');
     // Limpiar contadores existentes
     detenerControlInactividad();
+    
+    // Actualizar el tiempo del último mensaje al iniciar
+    ultimoMensaje = Date.now();
     
     // Esperar el tiempo inicial antes de comenzar a verificar inactividad
     setTimeout(() => {

@@ -230,13 +230,6 @@ class RetoController extends Controller
         $chat = Chat::find($request->chat_id);
         $retoId = $chat->id_reto;
         
-        // Verificar si es un nuevo día para resetear puntos diarios
-        if ($usuarioActual->ultimo_login && $usuarioActual->ultimo_login->format('Y-m-d') !== now()->format('Y-m-d')) {
-            DB::table('users')
-                ->where('id_usuario', $usuarioActual->id_usuario)
-                ->update(['puntos_diarios' => 0]);
-        }
-        
         // Inicializar puntos ganados a 0
         $puntosGanados = 0;
         
