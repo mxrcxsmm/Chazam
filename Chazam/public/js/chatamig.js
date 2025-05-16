@@ -240,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (currentChatId) {
             loadMessages(currentChatId);
         }
-    }, 3000);
+    }, 5000);
 
     loadChats();
     startMessagePolling();
