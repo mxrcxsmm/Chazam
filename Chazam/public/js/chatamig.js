@@ -232,8 +232,8 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
-    // Llama a esta función cada 15 segundos
-    setInterval(refreshCurrentChatHeader, 15000);
+    // Llama a esta función cada 20 segundos
+    setInterval(refreshCurrentChatHeader, 20000);
 
     // Refrescar mensajes del chat activo cada 5 segundos
     setInterval(function() {
