@@ -31,7 +31,7 @@
     <div class="chat-main">
         <div class="chat-header">
             <div class="chat-contact">
-                <img id="chat-contact-img" src="{{ asset('images/avatar-default.png') }}" alt="Contact Avatar">
+                <img id="chat-contact-img" src="{{ asset('/IMG/profile_img/avatar-default.png') }}" alt="Contact Avatar">
                 <div class="contact-info">
                     <h3 id="chat-contact-name">Usuario</h3>
                     <p id="chat-contact-status">Estado</p>
