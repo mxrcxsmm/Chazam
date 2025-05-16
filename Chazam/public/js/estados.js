@@ -68,12 +68,12 @@ function actualizarUltimoMensaje() {
         clearInterval(contadorInactividad);
         contadorInactividad = setInterval(() => {
             const tiempoInactivo = Date.now() - ultimoMensaje;
-            console.log('Tiempo inactivo:', tiempoInactivo / 1000, 'segundos');
+            console.log('Tiempo inactivo:', tiempoInactivo / 10000, 'segundos');
             if (tiempoInactivo >= 60000 && !alertaMostrada) { // 1 minuto
                 console.log('Inactividad detectada, mostrando alerta...');
                 mostrarAlertaInactividad();
             }
-        }, 1000);
+        }, 10000);
     }
 }
 
@@ -96,7 +96,7 @@ function iniciarControlInactividad() {
                 console.log('Inactividad detectada, mostrando alerta...');
                 mostrarAlertaInactividad();
             }
-        }, 10000);
+        }, 1000);
     }, tiempoInicialEspera);
 }
 
