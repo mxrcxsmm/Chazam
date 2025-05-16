@@ -46,6 +46,11 @@ async function buscarCompaneroAutomatico() {
         return;
     }
     
+    // Detener cualquier control de inactividad existente mientras se busca
+    if (window.detenerControlInactividad) {
+        window.detenerControlInactividad();
+    }
+    
     while (buscandoCompanero) {
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -76,11 +81,14 @@ async function buscarCompaneroAutomatico() {
                 buscandoCompanero = false;
                 cargarMensajes();
                 
+                // Solo iniciar el control de inactividad cuando se encuentra un compañero
                 if (window.iniciarControlInactividad) {
-                    window.iniciarControlInactividad();
-                    if (window.actualizarUltimoMensaje) {
-                        window.actualizarUltimoMensaje();
-                    }
+                    setTimeout(() => {
+                        window.iniciarControlInactividad();
+                        if (window.actualizarUltimoMensaje) {
+                            window.actualizarUltimoMensaje();
+                        }
+                    }, 1000); // Pequeño retraso para asegurar que todo está listo
                 }
                 break;
             }

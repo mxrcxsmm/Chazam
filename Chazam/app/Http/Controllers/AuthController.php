@@ -67,6 +67,14 @@ class AuthController extends Controller
                 'racha' => $nuevaRacha
             ]);
 
+            // Verificar y reiniciar puntos diarios si es necesario
+            $hoy = $now->copy()->setTime(0, 0, 0);
+            $ultimoLoginDia = $ultimoLogin ? $ultimoLogin->copy()->setTime(0, 0, 0) : null;
+            
+            if (!$ultimoLoginDia || $ultimoLoginDia->lt($hoy)) {
+                User::where('id_usuario', $user->id_usuario)->update(['puntos_diarios' => 0]);
+            }
+
             // Redirigir según el rol del usuario
             if ($user->rol->nom_rol === 'Administrador') {
                 return redirect()->route('admin.usuarios.index');
