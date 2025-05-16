@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
             chatItem.dataset.chatId = chat.id_chat;
             chatItem.innerHTML = `
                 <div class="chat-avatar">
-                    <img src="${chat.img ? chat.img : '/images/avatar-default.png'}" alt="Avatar">
+                    <img src="${chat.img ? chat.img : '/IMG/profile_img/avatar-default.png'}" alt="Avatar">
                 </div>
                 <div class="chat-info">
                     <div class="chat-header">
