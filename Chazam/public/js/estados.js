@@ -92,7 +92,7 @@ function iniciarControlInactividad() {
         // Verificar inactividad cada segundo
         contadorInactividad = setInterval(() => {
             const tiempoInactivo = Date.now() - ultimoMensaje;
-            console.log('Tiempo inactivo:', tiempoInactivo / 1000, 'segundos');
+            console.log('Tiempo inactivo:', tiempoInactivo / 10000, 'segundos');
             if (tiempoInactivo >= 60000 && !alertaMostrada) { // 1 minuto
                 console.log('Inactividad detectada, mostrando alerta...');
                 mostrarAlertaInactividad();
