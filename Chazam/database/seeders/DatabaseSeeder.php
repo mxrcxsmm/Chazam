@@ -20,6 +20,7 @@ class DatabaseSeeder extends Seeder
             TipoProductosSeeder::class,
             ProductosSeeder::class,
             AmistadSeeder::class,
+            ChatSeeder::class,
         ]);
     }
 }

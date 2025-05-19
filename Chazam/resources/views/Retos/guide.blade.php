@@ -6,7 +6,7 @@
     <div class="button-container">
         <a href="{{ route('retos.reto') }}"><button class="startbutton">Comenzar</button></a>
         <a href="{{ route('user.friendchat') }}"><button class="startbutton">Amigos</button></a>
-        <a href="{{ route('user.comunidades') }}"><button class="startbutton">Comunidades</button></a>
+        <a href="{{ route('user.chats') }}"><button class="startbutton">Comunidades</button></a>
     </div>
 </div>
 
@@ -17,7 +17,7 @@
     justify-content: center;
 }
 
-.friendbutton {
+.startbutton {
     background-color: #9147ff;
     color: white;
     border: none;
@@ -28,7 +28,7 @@
     transition: all 0.3s ease;
 }
 
-.friendbutton:hover {
+.startbutton:hover {
     background-color: #7a30dd;
     transform: scale(1.05);
 }
