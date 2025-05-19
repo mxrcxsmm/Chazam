@@ -1,0 +1,359 @@
+/* Asegurar que el body y html permitan scroll */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-y: auto !important;
+}
+
+.momentms-container {
+    background: transparent !important;
+    min-height: 100vh;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.momentms-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 40px;
+    margin-bottom: 30px;
+    gap: 20px;
+}
+
+.gradient-text {
+    background: linear-gradient(to right, #FF8000, #FF006F);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    font-size: 2.5rem;
+    font-weight: bold;
+    margin: 0;
+    text-align: center;
+}
+
+.create-momentm-btn {
+    background-color: #FFD700;
+    color: #000;
+    padding: 12px 32px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    border: none;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+.create-momentm-btn:hover {
+    background-color: #FFC000;
+    transform: scale(1.05);
+}
+
+.momentms-grid {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.momentms-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 40px;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+    width: 100%;
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.momentm-card {
+    background-color: #A259D9;
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 280px;
+    width: 200px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    border: 2px solid #FFD700;
+    transition: transform 0.2s;
+    cursor: pointer;
+    overflow: hidden;
+}
+.momentm-card:hover {
+    transform: scale(1.04);
+}
+
+.momentm-preview {
+    width: 100%;
+    height: 140px;
+    overflow: hidden;
+    background: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.momentm-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.momentm-info {
+    padding: 15px 10px 10px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+}
+
+.momentm-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #fff;
+    margin-bottom: 5px;
+}
+
+.momentm-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.momentm-username {
+    color: #fff;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-align: center;
+    margin: 0;
+}
+
+.momentm-time {
+    color: #FFD700;
+    font-size: 0.95rem;
+    margin: 0;
+    text-align: center;
+}
+
+.no-content-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    color: white;
+    font-size: 1.2rem;
+    padding: 40px;
+}
+
+/* Estilos para el modal */
+.momentm-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.9);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.momentm-modal-content {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: white;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    padding: 15px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+}
+
+.nav-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.prev-btn {
+    left: 20px;
+}
+
+.next-btn {
+    right: 20px;
+}
+
+.momentm-view {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    background: #8B008B;
+    border-radius: 10px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.momentm-view-header {
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+}
+
+.momentm-user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.momentm-user-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.momentm-user-name {
+    color: white;
+    font-weight: bold;
+}
+
+.momentm-time {
+    color: #FFD700;
+    font-size: 0.95rem;
+}
+
+.momentm-image-container {
+    position: relative;
+    width: 100%;
+    height: 60vh;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.momentm-full-image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.3);
+    position: relative;
+    top: 0;
+    left: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.progress {
+    height: 100%;
+    background: #FFD700;
+    width: 0;
+    transition: width linear;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* Mejorar visibilidad de los botones de navegación */
+.nav-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    padding: 20px;
+    cursor: pointer;
+    border-radius: 50%;
+    transition: background-color 0.3s;
+    z-index: 1002;
+}
+
+.nav-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.delete-momentm-btn {
+    background: #ff4d4d;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 14px;
+    margin-top: 8px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+}
+.delete-momentm-btn:hover {
+    background: #d90000;
+}
+
+.swal2-border-radius {
+    border-radius: 16px !important;
+}
+
+.momentms-searchbar {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+    margin: 30px 0 10px 0;
+}
+.momentms-searchbar input, .momentms-searchbar select {
+    padding: 10px 16px;
+    border-radius: 8px;
+    border: 1.5px solid #FFD700;
+    font-size: 1rem;
+    background: #fff;
+    color: #8B008B;
+}
+
+#vanta-bg {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+}
+body, .momentms-container, .momentm-modal, .modal-content, .momentms-header, .momentms-section {
+    position: relative;
+    z-index: 1;
+}

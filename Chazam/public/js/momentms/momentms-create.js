@@ -15,6 +15,20 @@ const swalChazam = Swal.mixin({
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+    // VANTA FOG
+    VANTA.FOG({
+        el: "#vanta-bg",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        highlightColor: 0x6600ff,
+        midtoneColor: 0x9300ff,
+        lowlightColor: 0xff005f,
+        baseColor: 0xaa91ff,
+        speed: 2.50
+    });
     let cropper = null;
     const image = document.getElementById('image');
     const imageInput = document.getElementById('imageInput');

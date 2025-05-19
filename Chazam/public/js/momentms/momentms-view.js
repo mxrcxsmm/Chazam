@@ -1,4 +1,20 @@
 document.addEventListener('DOMContentLoaded', function() {
+
+    // VANTA FOG
+    VANTA.FOG({
+        el: "#vanta-bg",
+        mouseControls: true,
+        touchControls: true,
+        gyroControls: false,
+        minHeight: 200.00,
+        minWidth: 200.00,
+        highlightColor: 0x6600ff,
+        midtoneColor: 0x9300ff,
+        lowlightColor: 0xff005f,
+        baseColor: 0xaa91ff,
+        speed: 2.50
+    });
+    
     const modal = document.getElementById('momentmModal');
     const closeBtn = document.querySelector('.close-modal');
     const prevBtn = document.getElementById('prevMomentm');
@@ -10,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const MOMENTM_DURATION = 5000; // 5 segundos por momentm
 
     function getAssetUrl(path) {
-        return path.startsWith('http') ? path : '/storage/' + path;
+        return path.startsWith('http') ? path : '{{ asset("") }}' + path;
     }
 
     // Obtener todos los momentms al cargar
@@ -166,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     fetch(`/momentms/${id}`, {
                         method: 'DELETE',
                         headers: {
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content,
                             'Accept': 'application/json'
                         }
                     })
@@ -214,4 +230,61 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
     });
-}); 
+
+    const searchInput = document.getElementById('momentmsSearchInput');
+    const searchFilter = document.getElementById('momentmsSearchFilter');
+    const orderSelect = document.getElementById('momentmsOrder');
+    const section = document.querySelector('.momentms-section');
+
+    let lastController = null;
+
+    function renderMomentms(momentms) {
+        section.innerHTML = '';
+        if (momentms.length === 0) {
+            section.innerHTML = '<div class="no-content-message"><p>No hay Momentms que coincidan.</p></div>';
+            return;
+        }
+        momentms.forEach(m => {
+            section.innerHTML += `
+                <div class="momentm-card" data-momentm-id="${m.id}">
+                    <div class="momentm-preview">
+                        <img src="${m.img}" alt="Momentm de ${m.usuario.username}">
+                    </div>
+                    <div class="momentm-info">
+                        <div class="momentm-avatar">
+                            <img src="${m.usuario.img}" alt="Avatar de ${m.usuario.username}">
+                        </div>
+                        <p class="momentm-username">${m.usuario.username}</p>
+                        <p class="momentm-time">${m.fecha_inicio}</p>
+                        ${m.usuario.id_usuario == window.authUserId ? `
+                            <button class="delete-momentm-btn" data-id="${m.id}">
+                                <i class="fas fa-trash"></i> Eliminar
+                            </button>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+    function buscarMomentms() {
+        const q = searchInput.value.trim();
+        const filtro = searchFilter.value;
+        const orden = orderSelect.value;
+
+        // Cancelar fetch anterior si existe
+        if (lastController) lastController.abort();
+        lastController = new AbortController();
+
+        fetch(`/momentms/search?q=${encodeURIComponent(q)}&filtro=${filtro}&orden=${orden}`, {
+            signal: lastController.signal
+        })
+        .then(res => res.json())
+        .then(data => renderMomentms(data))
+        .catch(e => { /* Ignorar abortos */ });
+    }
+
+    searchInput.addEventListener('input', buscarMomentms);
+    searchFilter.addEventListener('change', buscarMomentms);
+    orderSelect.addEventListener('change', buscarMomentms);
+});
