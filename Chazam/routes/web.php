@@ -12,14 +12,17 @@ use App\Http\Controllers\FriendChatController;
 use App\Http\Controllers\RetoAdminController;
 use App\Http\Controllers\ReporteAdminController;
 use App\Http\Controllers\ProductosAdminController;
+use App\Http\Controllers\MomentmsController;
 use App\Http\Controllers\TiendaController;
 use App\Http\Controllers\PagosAdminController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\StripeController;
+use App\Http\Controllers\SolicitudUserController;
+use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\VistaController;
 
-// Ruta de inicio de sesión
+
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
 
 // Rutas de autenticación
@@ -46,6 +49,7 @@ Route::middleware(['auth'])->group(function () {
         // Rutas para reportes (administrador)
         Route::get('reportes', [ReporteAdminController::class, 'index'])->name('reportes.index');
         Route::delete('reportes/{id}', [ReporteAdminController::class, 'destroy'])->name('reportes.destroy');
+        Route::get('/reportes/nuevos', [ReporteAdminController::class, 'contarNuevos'])->name('admin.reportes.nuevos');
 
         // Rutas para productos (administrador)
         Route::get('productos', [ProductosAdminController::class, 'index'])->name('productos.index');
@@ -56,6 +60,7 @@ Route::middleware(['auth'])->group(function () {
         // Rutas para pagos (administrador)
         Route::get('/pagos', [PagosAdminController::class, 'index'])->name('pagos.index');
         Route::post('/pagos', [PagosAdminController::class, 'store'])->name('pagos.store');
+        Route::post('/pagos/filtrar', [PagosAdminController::class, 'filtrar'])->name('pagos.filtrar');        
         Route::put('/pagos/{id}', [PagosAdminController::class, 'update'])->name('pagos.update');
     });
 
@@ -93,6 +98,13 @@ Route::middleware(['auth'])->group(function () {
                 return view('perfil.puntos');
             })->name('puntos');
         });
+      Route::get('user/momentms', [FriendChatController::class, 'momentms'])->name('user.momentms');
+
+      Route::get('momentms', [MomentmsController::class, 'index'])->name('user.momentms');
+      Route::get('momentms/create', [MomentmsController::class, 'create'])->name('momentms.create');
+      Route::post('/momentms', [MomentmsController::class, 'store'])->name('momentms.store');
+      Route::get('momentms/{id}', [MomentmsController::class, 'show'])->name('momentms.show');
+      Route::get('momentms/{id}/data', [MomentmsController::class, 'getData'])->name('momentms.data');
     });
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {
@@ -113,6 +125,9 @@ Route::middleware(['auth'])->group(function () {
         Route::post('enviar-mensaje', [RetoController::class, 'enviarMensaje'])->name('enviar-mensaje');
         Route::get('mensajes/{chatId}', [RetoController::class, 'obtenerMensajes'])->name('obtener-mensajes');
         Route::post('verificar-estado-chats', [RetoController::class, 'verificarEstadoChats'])->name('verificar-estado-chats');
+        Route::get('verificar-chat/{chatId}', [RetoController::class, 'verificarChat'])->name('verificar-chat');
+        Route::post('limpiar-estado', [RetoController::class, 'limpiarEstado'])->name('limpiar-estado');
+        Route::get('puntos-diarios', [RetoController::class, 'obtenerPuntosDiarios'])->name('puntos-diarios');
     });
 
     // Rutas para el estado de los usuarios
@@ -130,4 +145,26 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/producto/{id}/checkout', [StripeController::class, 'checkout'])->name('producto.comprar');
     Route::get('/stripe/success/{id}', [StripeController::class, 'success'])->name('stripe.success');
     Route::get('/stripe/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+    Route::post('/comprar-con-puntos/{id}', [StripeController::class, 'comprarConPuntos'])->name('comprar.con.puntos');
+    Route::post('/donar', [StripeController::class, 'donar'])->name('stripe.donar');
+    Route::get('/donar/success', [StripeController::class, 'donationSuccess'])->name('stripe.donation.success');
+    Route::get('/donar/cancel', [StripeController::class, 'cancel'])->name('stripe.cancel');
+    Route::get('/producto/success/{producto}', [StripeController::class, 'productSuccess'])->name('stripe.product.success');
+    
+    // Rutas para el chat de amigos
+    Route::get('user/chats', [FriendChatController::class, 'getUserChats'])->name('user.chats');
+    Route::get('user/chat/{chatId}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
+    Route::post('user/chat/{chatId}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
+
+
+    // Rutas para solicitudes y bloqueos
+    Route::post('/solicitudes/enviar', [SolicitudUserController::class, 'enviarSolicitud'])->name('solicitudes.enviar');
+    Route::post('/solicitudes/bloquear', [SolicitudUserController::class, 'bloquearUsuario'])->name('solicitudes.bloquear');
+    Route::get('/solicitudes/verificar-bloqueo/{id_usuario}', [SolicitudUserController::class, 'verificarBloqueo'])->name('solicitudes.verificar-bloqueo');
+    Route::get('/solicitudes/verificar/{id_usuario}', [SolicitudUserController::class, 'verificarSolicitud'])->name('solicitudes.verificar');
+    
+    // Ruta para reportes
+    Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
+
+    Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
 });

@@ -99,6 +99,25 @@ body, html {
     border-bottom: 1px solid #2d2d2d;
 }
 
+.header-titles {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.momentms-btn {
+    color: #FFD700;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+.momentms-btn:hover {
+    color: #FFC000;
+    text-decoration: none;
+}
+
 .sidebar-header h2 {
     color: white;
     font-size: 1.2rem;
@@ -192,8 +211,20 @@ body, html {
     white-space: nowrap;
 }
 
+.message-content {
+    color: rgb(241, 234, 234);
+}
+
+.message-user {
+    color: rgb(241, 234, 234);
+}
+
+.message-time {
+    color: rgb(241, 234, 234);
+}
+
 .last-message {
-    color: #888;
+    color: white;
     font-size: 0.9rem;
     margin: 0;
     white-space: nowrap;
@@ -319,4 +350,42 @@ body, html {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #7a30dd;
+}
+
+.message {
+    margin-bottom: 10px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    background-color: #2d2d2d;
+    border-radius: 8px;
+}
+
+.message-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.message-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+}
+
+.message-username {
+    color: #fff;
+    font-weight: bold;
+    margin-right: auto;
+}
+
+.message-time {
+    color: #b9bbbe;
+    font-size: 0.8rem;
+}
+
+.message-content {
+    color: #dcddde;
+    margin-left: 50px; /* Align with the text after the avatar */
 }

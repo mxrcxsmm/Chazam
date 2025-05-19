@@ -1,17 +1,94 @@
+/* Estilos generales */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #6a0dad;
+    background-color: #6a0dad !important;
+    color: white !important;
+    overflow-x: hidden; /* Evita el scroll horizontal */
+}
+
+.logo {
+    width: 40px; /* Ajusta el tamaño según sea necesario */
+    height: 40px; /* Asegúrate de que sea cuadrado */
+    border-radius: 50%;  /* Hace que el logo sea redondo */
+    object-fit: cover; /* Asegura que la imagen se ajuste correctamente */
+    margin-right: 5px; /* Espacio entre el logo y el texto */
+    border: 3px solid #4b0082; /* Agrega un borde de 3px de grosor */
+}
+
+.categorias{
+    text-decoration: none;
     color: white;
 }
 
-.sidebar {
-    width: 20%;
-    height: 100vh;
-    background-color: #4b0082;
+/* Navbar */
+.navbar {
+    background-color: #f1dfff;
     position: fixed;
+    top: 0;
+    width: 100%;
+    z-index: 1050;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar a {
+    color: #4b0082; /* Cambia el color del texto del enlace */
+    text-decoration: none; /* Elimina el subrayado del enlace */
+    font-weight: normal; /* Asegura que el texto tenga un peso normal */
+}
+
+.navbar .navbar-brand {
+    margin-left: 10px; /* Reduce la separación horizontal */
+}
+
+.navbar .navbar-toggler {
+    border: none; /* Elimina el borde del botón de colapso */
+}
+
+.navbar .navbar-toggler-icon {
+    background-color: #4b0082; /* Color del icono del botón de colapso */
+    border-radius: 50%; /* Hace que el icono sea redondo */
+    padding: 5px;
+}
+
+.navbar .nav-link {
+    color: #4b0082; /* Color de los enlaces */
+    font-weight: bold;
+}
+
+.navbar .nav-link:hover {
+    color: #6a0dad; /* Cambia el color al pasar el cursor */
+    text-decoration: underline; /* Subraya el enlace al pasar el cursor */
+}
+
+.puntos-text {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #4b0082;
+}
+
+.puntos-icon {
+    font-size: 1.5em;
+    color: #4b0082;
+}
+
+/* Contenedor principal */
+.main-container {
+    display: flex; /* Altura de la navbar */
+    height: calc(100vh - 56px); /* Altura restante después de la navbar */
+    overflow: hidden;
+}
+
+/* Sidebar */
+.sidebar {
+    background-color: #4b0082;
+    color: white;
+    width: 20%;
     padding: 20px;
     box-sizing: border-box;
+    overflow-y: auto; /* Habilita el scroll vertical */
+    height: 100%; /* Ocupa toda la altura del contenedor principal */
+    position: relative;
 }
 
 .sidebar h3 {
@@ -36,13 +113,17 @@ body {
 
 .sidebar ul li a:hover {
     font-weight: bold;
-    text-decoration: underline;
+    text-decoration: none;
 }
 
+/* Contenido principal */
 .main-content {
-    margin-left: 20%;
+    flex: 1; /* Ocupa el espacio restante al lado de la sidebar */
     padding: 20px;
     box-sizing: border-box;
+    overflow-y: auto; /* Habilita el scroll vertical */
+    background-color: #6a0dad;
+    color: white;
 }
 
 .main-content h1 {
@@ -61,6 +142,7 @@ body {
     padding-bottom: 5px;
 }
 
+/* Productos */
 .productos-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -108,6 +190,7 @@ body {
     height: 20px;
 }
 
+/* Detalle del producto */
 .producto-detalle {
     background-color: #8a2be2;
     padding: 20px;
@@ -121,6 +204,11 @@ body {
 .producto-detalle h2 {
     font-size: 1.8em;
     margin-bottom: 10px;
+}
+
+.producto {
+    text-decoration: none;
+    color: white;
 }
 
 .producto-detalle p {
@@ -146,4 +234,10 @@ body {
 
 .producto-detalle .btn:hover {
     background-color: #45a049;
+}
+
+/* Botón de compra con puntos */
+.comprar-con-puntos {
+    margin-top: 10px;
+    font-weight: bold;
 }

@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             RetoSeeder::class,
             TipoProductosSeeder::class,
             ProductosSeeder::class,
+            AmistadSeeder::class,
         ]);
     }
 }

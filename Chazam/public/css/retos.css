@@ -117,24 +117,50 @@ body {
     margin-bottom: 30px;
 }
 
+.skip-btn {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.skip-btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    background-color: #e9ecef;
+    border-color: #dee2e6;
+    color: #6c757d;
+}
+
 .skip-btn .triangle {
     display: inline-block;
     width: 0;
     height: 0;
-    border-top: 10px solid transparent;
-    border-bottom: 10px solid transparent;
-    border-left: 15px solid currentColor;
-    transform: translateY(2px);
-    margin-left: 6px;
+    border-style: solid;
+    border-width: 8px 0 8px 12px;
+    border-color: transparent transparent transparent #000;
+    margin-left: 4px;
+    opacity: 0.7;
+    position: relative;
+    top: 1px;
 }
-  
-/* El segundo triángulo no tiene margen para que quede pegado */
+
 .skip-btn .triangle.tight {
-margin-left: -4px;
+    margin-left: -6px;
 }
-  
-  
-  
+
+.skip-btn:hover .triangle {
+    opacity: 1;
+}
+
+.skip-btn.disabled .triangle {
+    border-color: transparent transparent transparent #6c757d;
+}
+
+.skip-btn span.time {
+    margin-left: 5px;
+    font-size: 0.9em;
+    opacity: 0.8;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     /* Ajustes generales */
@@ -423,26 +449,33 @@ margin-left: -4px;
 
 /* Estilos para los mensajes */
 .reto-message {
-    margin-bottom: 1rem;
-    max-width: 70%;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    align-items: flex-start !important;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    gap: 10px;
+    margin-bottom: 1rem;
 }
 
-.reto-message.sent {
-    margin-left: auto;
-    align-items: flex-end;
-}
-
+.reto-message.sent,
 .reto-message.received {
-    margin-right: auto;
-    align-items: flex-start;
+    width: 100% !important;
+    max-width: 100% !important;
+    align-items: flex-start !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
 }
 
 .reto-message-wrapper {
+    width: 100% !important;
+    max-width: 100% !important;
+    align-items: flex-start !important;
     display: flex;
     flex-direction: column;
-    width: 100%;
+    margin: 0 !important;
 }
 
 .reto-message-user-info {
@@ -467,10 +500,12 @@ margin-left: -4px;
 }
 
 .reto-message-content-wrapper {
-    position: relative;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
     padding: 0.5rem 1rem;
     border-radius: 1rem;
-    max-width: 100%;
+    background: none;
 }
 
 .reto-message.sent .reto-message-content-wrapper {
@@ -598,4 +633,32 @@ margin-left: -4px;
 
 .reto-content {
     margin: 0;
+}
+
+/* Animación de puntos ganados */
+@keyframes fadeOutUp {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+
+.puntos-animacion {
+    position: absolute;
+    color: #28a745;
+    font-weight: bold;
+    font-size: 0.9rem;
+    animation: fadeOutUp 1.5s ease-out forwards;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.puntos-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
 }

@@ -25,6 +25,21 @@ class AdminController extends Controller
     public function destroy($id)
     {
         $user = User::findOrFail($id);
+
+        // ID del estado "PermaBan"
+        $idEstadoPermaBan = 4; // Asegúrate de que este ID sea correcto
+
+        // Verificar si el usuario está en estado PermaBan
+        if ($user->id_estado !== $idEstadoPermaBan) {
+            return redirect()->back()->with('error', 'Solo se pueden eliminar usuarios con estado PermaBan.');
+        }
+
+        // Eliminar las historias del usuario
+        $user->historias()->delete();
+
+        // No eliminamos los pagos, ya que deben permanecer como registro histórico
+
+        // Proceder con la eliminación del usuario
         $user->delete();
 
         return redirect()->route('admin.usuarios.index')->with('eliminar', 'Usuario eliminado correctamente.');
@@ -75,6 +90,11 @@ class AdminController extends Controller
             $estadoPermaban = Estado::where('nom_estado', 'PermaBan')->first();
             if ($user->id_estado == $estadoPermaban->id_estado) {
                 return redirect()->route('admin.usuarios.index')->with('error', 'El usuario ya está permabaneado y no se pueden realizar más acciones.');
+            }
+
+            // Verificar si el usuario está actualmente baneado y si el baneo ha expirado
+            if ($user->fin_ban && now()->lt($user->fin_ban)) {
+                return redirect()->route('admin.usuarios.index')->with('error', 'El usuario está actualmente baneado. No se puede aplicar un nuevo baneo hasta que el actual haya expirado.');
             }
 
             // Incrementar el número de strikes hasta un máximo de 4

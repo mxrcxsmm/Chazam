@@ -24,6 +24,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email',
         'password',
         'puntos',
+        'puntos_diarios',
         'id_nacionalidad',
         'id_rol',
         'id_estado',
@@ -45,6 +46,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'fecha_nacimiento' => 'date',
         'puntos' => 'integer',
+        'puntos_diarios' => 'integer',
         'inicio_ban' => 'datetime',
         'fin_ban' => 'datetime',
         'ultimo_login' => 'datetime',
@@ -66,12 +68,22 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Nacionalidad::class, 'id_nacionalidad');
     }
 
+
+    public function amigos()
+    {
+        return $this->belongsToMany(User::class, 'solicitudes', 'id_emisor', 'id_receptor')
+                    ->where('estado', '=', 'aceptada')
+                    ->union(
+                        $this->belongsToMany(User::class, 'solicitudes', 'id_receptor', 'id_emisor')
+                            ->where('estado', '=', 'aceptada')
+                    );
+    }
     /**
      * Get the chat usuarios associated with this user.
      */
     public function chatUsuarios()
     {
-        return $this->hasMany(ChatUsuario::class, 'id_usuario', 'id_usuario');
+        return $this->hasMany(\App\Models\ChatUsuario::class, 'id_usuario');
     }
 
     /* Extras */
@@ -84,7 +96,7 @@ class User extends Authenticatable implements MustVerifyEmail
     // recuperar foto
     public function getImagenPerfilAttribute(): string
     {
-        return $this->img ? asset('img/profile_img/'.$this->img) : asset('img/profile_img/avatar-default.png');
+        return $this->img ? asset('IMG/profile_img/'.$this->img) : asset('IMG/profile_img/avatar-default.png');
     }
 
     // edad en años
@@ -122,5 +134,17 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $query->whereNotNull('fin_ban')
                     ->where('fin_ban', '>', now());
+    }
+
+    // relacion con historias de usuario
+    public function historias()
+    {
+        return $this->hasMany(Historia::class, 'id_usuario');
+    }
+
+    // relacion con pagos
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'id_comprador');
     }
 }
