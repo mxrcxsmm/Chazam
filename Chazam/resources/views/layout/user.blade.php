@@ -42,7 +42,7 @@
             <nav>
                 <ul class="list-unstyled">
                     <li class="mb-4"><a href="{{ route('perfil.personalizacion') }}" class="text-white text-decoration-none">Mis datos</a></li>
-                    <li class="mb-4"><a href="{{ route('perfil.vista') }}" class="text-white text-decoration-none">Perfil</a></li>
+                    <li class="mb-4"><a href="{{ route('perfil.vista') }}" class="text-white text-decoration-none">Personalizar</a></li>
                     <li class="mb-4"><a href="{{ route('perfil.mejoras') }}" class="text-white text-decoration-none">Comprar Mejoras</a></li>
                     <li class="mb-4"><a href="{{ route('tienda.index') }}" class="text-white text-decoration-none">Tienda</a></li>
                     <li class="mb-4"><a href="{{ route('retos.guide') }}" class="text-white text-decoration-none">Volver</a></li>

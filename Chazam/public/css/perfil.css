@@ -2,7 +2,7 @@ body {
     background-color: #DFB5FF;
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
-    color: white;
+    color: #4B0082;
 }
 
 /* .file-upload-wrapper {
@@ -103,7 +103,7 @@ canvas {
     height: 80px;
     object-fit: cover;
     border-radius: 50%;
-    border: 3px solid #E6E6FA;
+    border: 3px solid #E6E6FA; /*eliminar, esto es el borde blanco que envuelve al foto de perfil en el sidebar*/
     margin-bottom: 0.5rem;
 }
 
@@ -292,3 +292,176 @@ canvas {
     right: -15px;
     color: #4B0082;
 }
+
+.marco-option {
+    width: 90px;
+    text-align: center;
+    transition: transform 0.2s ease;
+    border-radius: 1rem;
+    overflow: hidden;
+    background-color: #EBD2FF;
+    padding: 0.5rem;
+    border: 2px solid transparent;
+}
+
+.marco-option:hover {
+    transform: scale(1.05);
+    background-color: #d9c2f2;
+}
+
+.marco-thumb {
+    width: 100%;
+    aspect-ratio: 1/1;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.marco-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 0.5rem;
+    border: none;
+}
+
+.marco-option.selected {
+    border-color: #8750B2;
+    box-shadow: 0 0 0 3px #8750B2 inset;
+}
+
+.marco-externo {
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    padding: 5px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.marco-glow {
+    animation: glowPulse 2s infinite ease-in-out;
+    box-shadow: 0 0 8px var(--glow-color);
+}
+
+@keyframes glowPulse {
+    0% { box-shadow: 0 0 5px var(--glow-color); }
+    50% { box-shadow: 0 0 20px var(--glow-color), 0 0 30px var(--glow-color); }
+    100% { box-shadow: 0 0 5px var(--glow-color); }
+}
+
+input[type="color"] {
+    border: none;
+    padding: 0;
+    outline: none;
+    background: none;
+    box-shadow: none;
+}
+
+input[type="color"]::-webkit-color-swatch-wrapper {
+    padding: 0;
+}
+
+input[type="color"]::-webkit-color-swatch {
+    border: none;
+}
+
+.marco-rotate {
+    animation: rotateSlow 8s linear infinite;
+}
+
+@keyframes rotateSlow {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+.radio-group {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.radio-group .form-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: #EBD2FF;
+    border: 2px solid transparent;
+    border-radius: 9999px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.radio-group .form-check:hover {
+    background-color: #d9c2f2;
+    border-color: #8750B2;
+}
+
+.radio-group .form-check-input {
+    display: none;
+}
+
+
+.radio-group .form-check-input:checked::before {
+    content: "";
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 8px;
+    height: 8px;
+    background-color: #8750B2;
+    border-radius: 50%;
+}
+
+.radio-group .form-check-label {
+    color: #4B0082;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+
+/*.marco-default {
+    background-image: url('/IMG/bordes/default.svg');
+}
+.marco-azuul {
+    background-image: url('/IMG/bordes/azuul.svg');
+}
+.marco-azul-champions {
+    background-image: url('/IMG/bordes/azul-champions.svg');
+}
+.marco-circle-rojonegro {
+    background-image: url('/IMG/bordes/circle-rojonegro.svg');
+}
+.marco-cromado {
+    background-image: url('/IMG/bordes/cromado.svg');
+}
+.marco-cromado-normal {
+    background-image: url('/IMG/bordes/cromado-normal.svg');
+}
+.marco-cromado-peque {
+    background-image: url('/IMG/bordes/cromado-peque.svg');
+}
+.marco-cutre-estrellas {
+    background-image: url('/IMG/bordes/cutre-estrellas.svg');
+}
+.marco-golden-champions {
+    background-image: url('/IMG/bordes/golden-champions.svg');
+}
+.marco-wave-haikei {
+    background-image: url('/IMG/bordes/wave-haikei.svg');
+}
+.marco-estrellas-haikei {
+    background-image: url('/IMG/bordes/estrellas-haikei.svg');
+}*/
