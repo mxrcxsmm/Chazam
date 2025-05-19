@@ -165,7 +165,7 @@ html, body {
     width: 100vw;
     height: 100vh;
     background-color: rgba(0, 0, 0, 0.9);
-    z-index: 1000;
+    z-index: 9999;
     overflow: hidden;
 }
 
@@ -176,6 +176,7 @@ html, body {
     display: flex;
     justify-content: center;
     align-items: center;
+    z-index: 10000;
 }
 
 .close-modal {
@@ -185,24 +186,25 @@ html, body {
     color: white;
     font-size: 30px;
     cursor: pointer;
-    z-index: 1001;
+    z-index: 10001;
 }
 
 .nav-btn {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.5);
     border: none;
     color: white;
-    padding: 15px;
+    padding: 20px;
     cursor: pointer;
     border-radius: 50%;
     transition: background-color 0.3s;
+    z-index: 10001;
 }
 
 .nav-btn:hover {
-    background: rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.8);
 }
 
 .prev-btn {
@@ -352,8 +354,50 @@ html, body {
     width: 100vw;
     height: 100vh;
     z-index: 0;
+    pointer-events: none;
 }
-body, .momentms-container, .momentm-modal, .modal-content, .momentms-header, .momentms-section {
+
+.momentms-container, 
+.momentms-header, 
+.momentms-section, 
+.momentm-card {
     position: relative;
     z-index: 1;
+}
+
+@media (max-width: 700px) {
+    .momentms-searchbar {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+        margin-bottom: 0;
+    }
+    .momentms-searchbar input {
+        width: 100%;
+        margin-bottom: 4px;
+    }
+    .momentms-searchbar select {
+        width: 48%;
+        min-width: 120px;
+    }
+    .momentms-searchbar-row {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+        width: 100%;
+    }
+    .momentms-section {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px;
+        justify-content: center;
+        align-items: start;
+        margin-top: 18px;
+        width: 100%;
+        max-width: 98vw;
+    }
+    .momentm-card {
+        width: 98%;
+        min-width: 0;
+        margin: 0 auto;
+    }
 }

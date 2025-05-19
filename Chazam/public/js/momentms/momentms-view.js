@@ -26,7 +26,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const MOMENTM_DURATION = 5000; // 5 segundos por momentm
 
     function getAssetUrl(path) {
-        return path.startsWith('http') ? path : '{{ asset("") }}' + path;
+        if (path.startsWith('http')) return path;
+        if (path.startsWith('/')) return path;
+        return '/' + path;
     }
 
     // Obtener todos los momentms al cargar

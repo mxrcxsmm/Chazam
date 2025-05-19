@@ -22,17 +22,19 @@
 
     <div class="momentms-searchbar">
         <input type="text" id="momentmsSearchInput" placeholder="Buscar por usuario, nombre o apellido...">
-        <select id="momentmsSearchFilter">
-            <option value="todos">Todos</option>
-            <option value="mios">Mis Momentms</option>
-            <option value="amigos">Solo amigos</option>
-        </select>
-        <select id="momentmsOrder">
-            <option value="fecha_desc">Más recientes</option>
-            <option value="fecha_asc">Más antiguos</option>
-            <option value="alfabetico_asc">Usuario A-Z</option>
-            <option value="alfabetico_desc">Usuario Z-A</option>
-        </select>
+        <div class="momentms-searchbar-row">
+            <select id="momentmsSearchFilter">
+                <option value="todos">Todos</option>
+                <option value="mios">Mis Momentms</option>
+                <option value="amigos">Solo amigos</option>
+            </select>
+            <select id="momentmsOrder">
+                <option value="fecha_desc">Más recientes</option>
+                <option value="fecha_asc">Más antiguos</option>
+                <option value="alfabetico_asc">Usuario A-Z</option>
+                <option value="alfabetico_desc">Usuario Z-A</option>
+            </select>
+        </div>
     </div>
 
     <div class="momentms-grid">

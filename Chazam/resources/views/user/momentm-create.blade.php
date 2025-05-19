@@ -30,7 +30,7 @@
             <div class="editor-tools">
                 <div class="tool-group">
                     <h3>Transformación</h3>
-                    <div class="buttons-container">
+                    <div class="buttons-container" data-group="transformacion">
                         <button class="tool-btn" data-action="rotate-left" title="Rotar izquierda">
                             <i class="fas fa-undo"></i>
                         </button>
@@ -64,7 +64,7 @@
 
                 <div class="tool-group">
                     <h3>Filtros</h3>
-                    <div class="buttons-container">
+                    <div class="buttons-container" data-group="filtros">
                         <button class="filter-btn" data-filter="none">Normal</button>
                         <button class="filter-btn" data-filter="grayscale">B/N</button>
                         <button class="filter-btn" data-filter="sepia">Sepia</button>
@@ -80,6 +80,17 @@
                     </div>
                 </div>
 
+                <div class="tool-group">
+                    <h3>Acciones</h3>
+                    <div class="buttons-container" data-group="acciones">
+                        <button class="tool-btn" data-action="reset" title="Restablecer">
+                            <i class="fas fa-sync"></i>
+                        </button>
+                        <button class="tool-btn" data-action="download" title="Descargar">
+                            <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+                </div>
                 <div class="tool-group tool-group-mensaje">
                     <h3>Mensaje</h3>
                     <div class="text-controls" style="position: relative;">
@@ -111,18 +122,6 @@
                             <i class="fas fa-plus"></i> Añadir
                         </button>
                         <emoji-picker style="position: absolute; bottom: 50px; left: 0; display: none; z-index: 999;"></emoji-picker>
-                    </div>
-                </div>
-
-                <div class="tool-group">
-                    <h3>Acciones</h3>
-                    <div class="buttons-container">
-                        <button class="tool-btn" data-action="reset" title="Restablecer">
-                            <i class="fas fa-sync"></i>
-                        </button>
-                        <button class="tool-btn" data-action="download" title="Descargar">
-                            <i class="fas fa-download"></i>
-                        </button>
                     </div>
                 </div>
             </div>
