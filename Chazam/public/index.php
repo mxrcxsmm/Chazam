@@ -1,14 +1,4 @@
 <?php
-
-// Ejecuta el comando para obtener la IP local en Windows
-$ip = shell_exec('ipconfig | findstr /i "Dirección IPv4"');
-
-// Muestra la IP por pantalla
-echo "<pre>$ip</pre>";
-
-exit();
-
-
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 
