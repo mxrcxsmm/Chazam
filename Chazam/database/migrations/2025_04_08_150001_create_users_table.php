@@ -33,6 +33,7 @@ return new class extends Migration
             $table->dateTime('fin_ban')->nullable();
             $table->dateTime('ultimo_login')->nullable();
             $table->integer('puntos_diarios')->default(0);
+            $table->time('skip_time')->default('00:00:00');
             $table->rememberToken();
             $table->timestamps();
 
