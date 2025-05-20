@@ -19,7 +19,7 @@
 
     <div class="marco-externo {{ $claseMarco }}" style="
         --glow-color: {{ $user->borde_glow_color ?? '#FFD700' }};
-        background-image: url('{{ asset('IMG/bordes/' . ($user->borde_overlay ?? 'default.png')) }}');
+        background-image: url('{{ asset('img/bordes/' . ($user->borde_overlay ?? 'default.png')) }}');
         {{--background-image: url('{{ $user->borde_overlay ? asset("IMG/bordes/{$user->borde_overlay}") : 'none' }}');--}}
     ">
     {{--<div class="marco-externo {{ $claseMarco }} marco-{{ $marcoNombre }}">--}}
@@ -50,7 +50,7 @@
             @foreach ($marcos as $file => $nombre)
                 <div class="marco-option {{ $user->borde_overlay === $file ? 'selected' : '' }}" data-marco="{{ $file }}">
                     <div class="marco-thumb">
-                        <img src="{{ asset('IMG/bordes/' . $file) }}" alt="{{ $nombre }}">
+                        <img src="{{ asset('img/bordes/' . $file) }}" alt="{{ $nombre }}">
                     </div>
                 </div>
             @endforeach

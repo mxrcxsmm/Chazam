@@ -71,16 +71,9 @@ class PerfilController extends Controller
         $user->fecha_nacimiento = $request->input('fecha_nacimiento');
         $user->descripcion = $request->input('descripcion');
 
-        if ($request->has('remove_img') && $user->img) {
-            // Eliminar archivo físico si existe y es personalizado (no el default)
-            if (Storage::disk('public')->exists(str_replace('storage/', '', $user->img))) {
-                Storage::disk('public')->delete(str_replace('storage/', '', $user->img));
-            }
-        
+        if ($request->input('remove_img') === '1') {
             $user->img = null;
-        }        
-
-        if ($request->hasFile('img')) {
+        } else if ($request->hasFile('img')) {
             $image = $request->file('img');
             $realPath = $image->getRealPath();
             $hash = md5_file($realPath);

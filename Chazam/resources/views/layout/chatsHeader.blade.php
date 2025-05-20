@@ -23,7 +23,7 @@
         <div class="container-fluid d-flex justify-content-between align-items-center">
 
             <!-- Logo o nombre de la app -->
-            <a href="#"><img src="{{ asset('IMG/Logo_Chazam.png') }}" alt="Logo" class="logo">Chazam</a>
+            <a href="#"><img src="{{ asset('img/Logo_Chazam.png') }}" alt="Logo" class="logo">Chazam</a>
 
             <!-- Racha, puntos y perfil -->
             <div class="d-flex align-items-center gap-4">

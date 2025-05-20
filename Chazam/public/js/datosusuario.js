@@ -12,6 +12,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const removePhotoBtn = document.getElementById('removePhotoBtn');
     const removeImgInput = document.getElementById('remove_img');
 
+    let stream;
+    let originalImage = previewImg.src;
+
     if (removePhotoBtn) {
         removePhotoBtn.addEventListener('click', () => {
             Swal.fire({
@@ -23,48 +26,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Actualiza el campo hidden
                     removeImgInput.value = '1';
+                    form.dataset.skipValidation = 'true';
 
-                    // Restablece la imagen al avatar por defecto
-                    const defaultAvatar = '/IMG/profile_img/avatar-default.png';
+                    const defaultAvatar = '/img/profile_img/avatar-default.png';
                     previewImg.src = defaultAvatar;
-
-                    // Limpia input file
                     fileInput.value = '';
-
-                    // Oculta botones innecesarios
                     discardBtn.classList.add('d-none');
                     downloadBtn.classList.add('d-none');
 
-                    // Actualiza la imagen del layout si existe
                     const layoutImg = document.querySelector('.sidebar img');
                     if (layoutImg) layoutImg.src = defaultAvatar;
 
-                    // Dispara el submit vía AJAX automáticamente
                     form.dispatchEvent(new Event('submit', { cancelable: true }));
                 }
             });
         });
     }
 
-    let stream;
-    let originalImage = previewImg.src;
-
-    // Mostrar cámara al abrir el modal
     modal.addEventListener('shown.bs.modal', async () => {
         stream = await navigator.mediaDevices.getUserMedia({ video: true });
         video.srcObject = stream;
     });
 
-    // Detener cámara al cerrar el modal
     modal.addEventListener('hidden.bs.modal', () => {
-        if (stream) {
-            stream.getTracks().forEach(track => track.stop());
-        }
+        if (stream) stream.getTracks().forEach(track => track.stop());
     });
 
-    // Captura de imagen desde la cámara
     captureBtn.addEventListener('click', () => {
         const ctx = canvas.getContext('2d');
         canvas.width = video.videoWidth;
@@ -83,18 +71,18 @@ document.addEventListener("DOMContentLoaded", () => {
             const dataTransfer = new DataTransfer();
             dataTransfer.items.add(file);
             fileInput.files = dataTransfer.files;
+            removeImgInput.value = '0';
         }, "image/jpeg");
 
         bootstrap.Modal.getInstance(modal).hide();
     });
 
-    // Subida de imagen desde archivo
-    uploadBtn.addEventListener('click', () => {
-        fileInput.click();
-    });
+    uploadBtn.addEventListener('click', () => fileInput.click());
 
     fileInput.addEventListener('change', function () {
         if (this.files && this.files[0]) {
+            removeImgInput.value = '0';
+            
             const reader = new FileReader();
             reader.onload = e => {
                 previewImg.src = e.target.result;
@@ -105,7 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Descartar imagen nueva
     discardBtn.addEventListener('click', () => {
         previewImg.src = originalImage;
         discardBtn.classList.add('d-none');
@@ -115,10 +102,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
-    
-        // Limpiar errores anteriores
+
+        if (form.dataset.skipValidation === 'true') {
+            form.dataset.skipValidation = 'false';
+            sendFormAjax(form);
+            return;
+        }
+
         document.querySelectorAll('.error-message').forEach(el => el.remove());
-    
+
         const nombre = form.nombre.value.trim();
         const apellido = form.apellido.value.trim();
         const username = form.username.value.trim();
@@ -126,9 +118,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const descripcion = form.descripcion.value.trim();
         const hoy = new Date();
         const fechaMinima = new Date(hoy.getFullYear() - 13, hoy.getMonth(), hoy.getDate());
-    
+
         let valido = true;
-    
+
         const mostrarError = (campo, mensaje) => {
             const error = document.createElement('div');
             error.className = 'error-message';
@@ -136,31 +128,16 @@ document.addEventListener("DOMContentLoaded", () => {
             campo.insertAdjacentElement('afterend', error);
             valido = false;
         };
-    
-        if (!nombre.match(/^[\p{L}\s\-]+$/u)) {
-            mostrarError(form.nombre, 'Nombre inválido. Solo letras, espacios y guiones.');
-        }
-    
-        if (!apellido.match(/^[\p{L}\s\-]+$/u)) {
-            mostrarError(form.apellido, 'Apellido inválido. Solo letras, espacios y guiones.');
-        }
-    
-        if (!username || username.length > 30) {
-            mostrarError(form.username, 'Username obligatorio y máximo 30 caracteres.');
-        }
-    
+
+        if (!nombre.match(/^[\p{L}\s\-]+$/u)) mostrarError(form.nombre, 'Nombre inválido.');
+        if (!apellido.match(/^[\p{L}\s\-]+$/u)) mostrarError(form.apellido, 'Apellido inválido.');
+        if (!username || username.length > 30) mostrarError(form.username, 'Username obligatorio y máximo 30 caracteres.');
         if (fechaNacimiento) {
             const fecha = new Date(fechaNacimiento);
-            if (fecha > fechaMinima) {
-                mostrarError(form.fecha_nacimiento, 'Debes tener al menos 13 años.');
-            }
+            if (fecha > fechaMinima) mostrarError(form.fecha_nacimiento, 'Debes tener al menos 13 años.');
         }
-    
-        if (descripcion.length > 1000) {
-            mostrarError(form.descripcion, 'Máximo 1000 caracteres.');
-        }
-    
-        // Si hay errores JS, comprobar username duplicado antes de salir
+        if (descripcion.length > 1000) mostrarError(form.descripcion, 'Máximo 1000 caracteres.');
+
         if (!valido) {
             fetch('/check-availability', {
                 method: 'POST',
@@ -168,30 +145,24 @@ document.addEventListener("DOMContentLoaded", () => {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
                 },
-                body: JSON.stringify({
-                    type: 'username',
-                    value: username
-                })
+                body: JSON.stringify({ type: 'username', value: username })
             })
             .then(res => res.json())
             .then(data => {
-                if (!data.available) {
-                    mostrarError(form.username, 'Este nombre de usuario ya está en uso.');
-                }
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'Por favor corrige los errores del formulario.'
-                });
+                if (!data.available) mostrarError(form.username, 'Este nombre de usuario ya está en uso.');
+                Swal.fire({ icon: 'error', title: 'Oops...', text: 'Corrige los errores del formulario.' });
             });
-    
+
             return;
         }
-    
-        // Enviar AJAX completo
-        const formData = new FormData(this);
-    
-        fetch(this.action, {
+
+        sendFormAjax(form);
+    });
+
+    function sendFormAjax(form) {
+        const formData = new FormData(form);
+
+        fetch(form.action, {
             method: 'POST',
             body: formData,
             headers: {
@@ -206,59 +177,90 @@ document.addEventListener("DOMContentLoaded", () => {
                     if (errorData.errors && errorData.errors.username) {
                         mostrarError(form.username, errorData.errors.username[0]);
                     }
-    
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Oops...',
-                        text: 'Por favor corrige los errores del formulario.'
-                    });
+                    Swal.fire({ icon: 'error', title: 'Oops...', text: 'Corrige los errores del formulario.' });
                     return;
                 }
-    
                 throw new Error('Error en la respuesta');
             }
-    
             return response.json();
         })
         .then(data => {
             if (!data) return;
-    
-            Swal.fire({
-                icon: 'success',
-                title: '¡Éxito!',
-                text: data.message,
-                showConfirmButton: false,
-                timer: 2000
-            });
-    
-            if (data.img) {
-                const newImgSrc = '/' + data.img;
+
+            Swal.fire({ icon: 'success', title: '¡Éxito!', text: data.message, showConfirmButton: false, timer: 2000 });
+
+            if (data.img !== undefined) {
+                const newImgSrc = data.img ? '/' + data.img : '/img/profile_img/avatar-default.png';
                 previewImg.src = newImgSrc;
                 originalImage = newImgSrc;
                 const layoutImg = document.querySelector('.sidebar img');
                 if (layoutImg) layoutImg.src = newImgSrc;
-            }
-    
+            
+                // Verificar si el botón existe
+                let btn = document.getElementById('removePhotoBtn');
+                if (data.img) {
+                    if (!btn) {
+                        btn = document.createElement('button');
+                        btn.type = 'button';
+                        btn.id = 'removePhotoBtn';
+                        btn.className = 'btn btn-outline-secondary';
+                        btn.textContent = 'Quitar foto';
+            
+                        btn.addEventListener('click', () => {
+                            Swal.fire({
+                                title: '¿Estás seguro?',
+                                text: "Tu imagen de perfil será eliminada.",
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonText: 'Sí, quitar',
+                                cancelButtonText: 'Cancelar'
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                    removeImgInput.value = '1';
+                                    form.dataset.skipValidation = 'true';
+            
+                                    const defaultAvatar = '/img/profile_img/avatar-default.png';
+                                    previewImg.src = defaultAvatar;
+                                    fileInput.value = '';
+                                    discardBtn.classList.add('d-none');
+                                    downloadBtn.classList.add('d-none');
+            
+                                    const layoutImg = document.querySelector('.sidebar img');
+                                    if (layoutImg) layoutImg.src = defaultAvatar;
+            
+                                    btn.remove(); // Ocultar el botón tras quitar
+                                    form.dispatchEvent(new Event('submit', { cancelable: true }));
+                                }
+                            });
+                        });
+            
+                        // Insertar el botón junto a los otros
+                        const container = uploadBtn.parentElement;
+                        container.appendChild(btn);
+                    } else {
+                        btn.classList.remove('d-none');
+                    }
+                } else if (btn) {
+                    btn.remove(); // Si no hay imagen, ocultar el botón
+                }
+            }            
+
             if (data.username) {
                 const layoutUsername = document.querySelector('.sidebar div:nth-child(2)');
                 if (layoutUsername) layoutUsername.textContent = data.username;
             }
-    
+
             if (data.nombre_completo) {
                 const layoutNombre = document.querySelector('.sidebar .small');
                 if (layoutNombre) layoutNombre.textContent = data.nombre_completo;
             }
-    
+
             discardBtn.classList.add('d-none');
             downloadBtn.classList.add('d-none');
         })
         .catch(error => {
             console.error('Error:', error);
-            Swal.fire({
-                icon: 'error',
-                title: 'Oops...',
-                text: 'Hubo un error al actualizar los datos.'
-            });
+            Swal.fire({ icon: 'error', title: 'Oops...', text: 'Hubo un error al actualizar los datos.' });
         });
-    });      
+    }
 });

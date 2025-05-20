@@ -22,7 +22,7 @@ sidebarPicker.addEventListener('input', () => {
             this.classList.add('selected');
             const file = this.dataset.marco;
             input.value = file;
-            avatarWrapper.style.backgroundImage = `url('/IMG/bordes/${file}')`;
+            avatarWrapper.style.backgroundImage = `url('/img/bordes/${file}')`;
         });
     });
     

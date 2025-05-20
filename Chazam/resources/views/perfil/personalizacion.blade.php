@@ -89,11 +89,7 @@
         
             <div class="d-flex justify-content-center gap-3">
                 <button type="button" class="btn btn-outline-secondary" id="uploadBtn">Subir archivo</button>
-            
-                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cameraModal">
-                    Tomar foto
-                </button>
-            
+                <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cameraModal">Tomar foto</button>
                 @if($user->img)
                     <button type="button" class="btn btn-outline-secondary" id="removePhotoBtn">
                         Quitar foto
@@ -101,8 +97,9 @@
                 @endif
             </div>
             
-            <input type="hidden" name="remove_img" id="remove_img" value="0">
-            
+            <input type="hidden" name="remove_img" id="remove_img" value="0">            
+        
+            <input type="file" id="img" name="img" accept="image/*" class="d-none">
         </div>        
 
         {{-- Modal cámara --}}
