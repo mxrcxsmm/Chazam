@@ -57,6 +57,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const overlayLayer = document.getElementById('overlay-layer');
     const resetOverlaysBtn = document.getElementById('resetOverlaysBtn');
 
+    const defaultLogo = originalImage; // Guarda la ruta del logo por defecto
+
     // Renderiza la imagen con filtros, ajustes y overlays
     function renderImage(callback) {
         if (!originalImage) return;
@@ -207,8 +209,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Filtros visuales
     filterButtons.forEach(button => {
         button.addEventListener('click', () => {
-            if (!originalImage) {
-                alert('Por favor, sube una imagen primero');
+            if (!originalImage || originalImage === defaultLogo) {
+                Swal.fire({
+                    icon: 'error',
+                    title: '¡Error!',
+                    text: 'Por favor, sube una imagen o toma una foto primero'
+                });
                 return;
             }
             const filter = button.dataset.filter;
@@ -222,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Sliders de ajustes
     sliders.forEach(slider => {
         slider.addEventListener('input', () => {
-            if (!originalImage) return;
+            if (!originalImage || originalImage === defaultLogo) return;
             const action = slider.dataset.action;
             currentAdjust[action] = parseInt(slider.value);
             renderImage();
@@ -363,34 +369,66 @@ document.addEventListener('DOMContentLoaded', function() {
         let isDragging = false;
         let offsetX, offsetY;
 
-        element.addEventListener('mousedown', dragStart);
-        document.addEventListener('mousemove', drag);
-        document.addEventListener('mouseup', dragEnd);
+        // Soporte ratón
+        element.addEventListener('mousedown', dragStartMouse);
+        document.addEventListener('mousemove', dragMouse);
+        document.addEventListener('mouseup', dragEndMouse);
 
-        function dragStart(e) {
+        // Soporte táctil
+        element.addEventListener('touchstart', dragStartTouch, { passive: false });
+        document.addEventListener('touchmove', dragTouch, { passive: false });
+        document.addEventListener('touchend', dragEndTouch);
+
+        // --- RATÓN ---
+        function dragStartMouse(e) {
             e.preventDefault();
             isDragging = true;
             element.classList.add('dragging');
-            // Calcula el offset entre el cursor y la esquina del overlay
             const rect = element.getBoundingClientRect();
             offsetX = e.clientX - rect.left;
             offsetY = e.clientY - rect.top;
         }
-
-        function drag(e) {
+        function dragMouse(e) {
             if (!isDragging) return;
             e.preventDefault();
+            moveElement(e.clientX, e.clientY);
+        }
+        function dragEndMouse() {
+            isDragging = false;
+            element.classList.remove('dragging');
+        }
 
+        // --- TÁCTIL ---
+        function dragStartTouch(e) {
+            if (e.touches.length !== 1) return;
+            isDragging = true;
+            element.classList.add('dragging');
+            const rect = element.getBoundingClientRect();
+            offsetX = e.touches[0].clientX - rect.left;
+            offsetY = e.touches[0].clientY - rect.top;
+        }
+        function dragTouch(e) {
+            if (!isDragging || e.touches.length !== 1) return;
+            e.preventDefault();
+            moveElement(e.touches[0].clientX, e.touches[0].clientY);
+        }
+        function dragEndTouch() {
+            isDragging = false;
+            element.classList.remove('dragging');
+        }
+
+        // --- Movimiento común ---
+        function moveElement(clientX, clientY) {
             const rect = overlayLayer.getBoundingClientRect();
             const elementRect = element.getBoundingClientRect();
 
-            // Nueva posición basada en el offset
-            let newX = e.clientX - rect.left - offsetX;
-            let newY = e.clientY - rect.top - offsetY;
+            // Calcula la posición relativa al overlayLayer
+            let newX = clientX - rect.left - offsetX;
+            let newY = clientY - rect.top - offsetY;
 
-            // Limitar al contenedor
-            newX = Math.max(0, Math.min(newX, rect.width - elementRect.width));
-            newY = Math.max(0, Math.min(newY, rect.height - elementRect.height));
+            // Limitar al contenedor (¡ojo! el overlay debe poder llegar a 0 y a (ancho-con-anchoOverlay))
+            newX = Math.max(0, Math.min(newX, rect.width - element.offsetWidth));
+            newY = Math.max(0, Math.min(newY, rect.height - element.offsetHeight));
 
             element.style.left = newX + 'px';
             element.style.top = newY + 'px';
@@ -401,11 +439,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 overlay.x = newX;
                 overlay.y = newY;
             }
-        }
-
-        function dragEnd() {
-            isDragging = false;
-            element.classList.remove('dragging');
         }
     }
 
@@ -428,10 +461,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Reemplazar el botón de fijar por el de resetear
     document.getElementById('resetOverlaysBtn').addEventListener('click', function() {
-        // Limpiar overlays
+        // Limpiar overlays visuales
         overlayLayer.innerHTML = '';
         overlays = [];
         renderImage();
+
+        // Limpiar el input de mensaje y restablecer controles
+        textInput.value = '';
+        textColor.value = '#ffffff';
+        fontSize.value = '30';
+        fontFamily.value = 'Arial';
     });
 
     // --- MODIFICAR FUNCIÓN DE GUARDADO ---
@@ -452,10 +491,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const cropBoxData = cropper.getCropBoxData();
         const overlayRect = overlayLayer.getBoundingClientRect();
 
-        // 2. Crea un canvas del tamaño del recorte
+        // 2. Crea un canvas del tamaño fijo
+        const EXPORT_SIZE = 1000; // o 1200, o el valor que prefieras
         const canvas = document.createElement('canvas');
-        canvas.width = cropData.width;
-        canvas.height = cropData.height;
+        canvas.width = EXPORT_SIZE;
+        canvas.height = EXPORT_SIZE;
         const ctx = canvas.getContext('2d');
 
         // 3. Carga la imagen original
@@ -481,26 +521,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             ctx.filter = filterStr.trim();
 
-            // 5. Dibuja la imagen original recortada
+            // 5. Dibuja la imagen original recortada, escalada al canvas de exportación
             ctx.drawImage(
                 img,
                 cropData.x, cropData.y, cropData.width, cropData.height,
-                0, 0, canvas.width, canvas.height
+                0, 0, EXPORT_SIZE, EXPORT_SIZE
             );
             ctx.filter = 'none';
 
             // 6. Dibuja los overlays HTML en la posición y tamaño relativa al recorte
             overlays.forEach(overlay => {
-                // overlay.x, overlay.y son en px relativos al overlayLayer
-                // Calcula la posición relativa al área recortada dentro del overlayLayer
-                const relX = ((overlay.x - cropBoxData.left) / cropBoxData.width) * canvas.width;
-                const relY = ((overlay.y - cropBoxData.top) / cropBoxData.height) * canvas.height;
+                // Calcula la posición relativa al cropBox
+                const relX = ((overlay.x - cropBoxData.left) / cropBoxData.width) * EXPORT_SIZE;
+                const relY = ((overlay.y - cropBoxData.top) / cropBoxData.height) * EXPORT_SIZE;
 
-                // Calcula el tamaño proporcional
+                // Escala el tamaño de fuente
                 let fontSize = overlay.size || 30;
                 if (overlay.type === 'emoji') fontSize = 40;
-                // El tamaño base es respecto al cropBox, no al overlayLayer completo
-                const scale = canvas.width / cropBoxData.width;
+                const scale = EXPORT_SIZE / cropBoxData.width;
                 const scaledFontSize = fontSize * scale;
 
                 if (overlay.type === 'text') {

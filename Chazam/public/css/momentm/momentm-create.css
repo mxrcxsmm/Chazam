@@ -405,7 +405,6 @@ body {
     z-index: 1000;
     padding: 5px;
     border-radius: 3px;
-    transform: translate(-50%, -50%);
 }
 
 .draggable.dragging {
