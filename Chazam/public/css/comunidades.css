@@ -14,13 +14,26 @@ body, html {
     background-color: #1a1a1a;
     padding: 20px;
     box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.section-title {
+    color: white;
+    margin: 20px 0;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #9147ff;
+}
+
+.section-title h2 {
+    margin: 0;
+    font-size: 1.5rem;
 }
 
 .comunidades-list {
     display: flex;
     flex-direction: column;
     gap: 15px;
-    overflow-y: auto;
+    margin-bottom: 30px;
 }
 
 .comunidad-item {
@@ -37,6 +50,10 @@ body, html {
     background-color: #3a3a3a;
 }
 
+.comunidad-info {
+    flex: 1;
+}
+
 .comunidad-info h3 {
     color: white;
     margin: 0;
@@ -45,8 +62,19 @@ body, html {
 
 .comunidad-info p {
     color: #b9bbbe;
-    margin: 5px 0 0;
+    margin: 5px 0;
     font-size: 0.9rem;
+}
+
+.comunidad-meta {
+    color: #9147ff;
+    font-size: 0.8rem;
+    margin: 5px 0;
+}
+
+.comunidad-actions {
+    display: flex;
+    gap: 10px;
 }
 
 .join-btn {
@@ -61,4 +89,30 @@ body, html {
 
 .join-btn:hover {
     background-color: #7a30dd;
+}
+
+.create-btn {
+    background-color: #43b581;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.create-btn:hover {
+    background-color: #3ca374;
+}
+
+.no-comunidades {
+    text-align: center;
+    color: #b9bbbe;
+    padding: 20px;
+    background-color: #2d2d2d;
+    border-radius: 8px;
+}
+
+.no-comunidades p {
+    margin-bottom: 15px;
 }
