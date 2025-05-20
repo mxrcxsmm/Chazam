@@ -17,8 +17,8 @@
         <!-- Sidebar fijo a la izquierda -->
         <aside id="sidebar" class="sidebar">
             <div class="text-center mb-4">
-                @if(isset($user->img) && $user->img)
-                    <img src="{{ asset($user->img) }}" alt="Foto de perfil">
+                @if(isset($user->imagen_perfil) && $user->imagen_perfil)
+                    <img src="{{ asset($user->imagen_perfil) }}" alt="Foto de perfil">
                 @else
                     <i class="bi bi-person-circle fs-2"></i>
                 @endif

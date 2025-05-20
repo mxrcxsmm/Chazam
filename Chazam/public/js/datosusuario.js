@@ -9,6 +9,44 @@ document.addEventListener("DOMContentLoaded", () => {
     const discardBtn = document.getElementById('discardBtn');
     const downloadBtn = document.getElementById('downloadBtn');
     const form = document.querySelector('.formulario');
+    const removePhotoBtn = document.getElementById('removePhotoBtn');
+    const removeImgInput = document.getElementById('remove_img');
+
+    if (removePhotoBtn) {
+        removePhotoBtn.addEventListener('click', () => {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Tu imagen de perfil será eliminada.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, quitar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Actualiza el campo hidden
+                    removeImgInput.value = '1';
+
+                    // Restablece la imagen al avatar por defecto
+                    const defaultAvatar = '/IMG/profile_img/avatar-default.png';
+                    previewImg.src = defaultAvatar;
+
+                    // Limpia input file
+                    fileInput.value = '';
+
+                    // Oculta botones innecesarios
+                    discardBtn.classList.add('d-none');
+                    downloadBtn.classList.add('d-none');
+
+                    // Actualiza la imagen del layout si existe
+                    const layoutImg = document.querySelector('.sidebar img');
+                    if (layoutImg) layoutImg.src = defaultAvatar;
+
+                    // Dispara el submit vía AJAX automáticamente
+                    form.dispatchEvent(new Event('submit', { cancelable: true }));
+                }
+            });
+        });
+    }
 
     let stream;
     let originalImage = previewImg.src;

@@ -29,7 +29,7 @@ class RetoController extends Controller
         
         // Actualizar estado a Disponible (5)
         User::where('id_usuario', $user->id_usuario)->update(['id_estado' => 5]);
-        
+
         // Obtener el reto del día desde la caché o seleccionar uno nuevo
         $reto = $this->getRetoDelDia();
         
@@ -40,6 +40,7 @@ class RetoController extends Controller
             'username' => $user->username,
             'nombre_completo' => $user->nombre_completo,
             'imagen_perfil' => $user->imagen_perfil,
+            // 'imagen_perfil' => $user->img,
             'user_id' => $user->id_usuario
         ]);
     }

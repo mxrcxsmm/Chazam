@@ -64,7 +64,7 @@
             <label class="form-label fw-bold fs-5">Imagen de perfil</label>
         
             <div id="previewContainer" class="position-relative mb-3">
-                <img src="{{ asset($user->img ?? '') }}" id="profilePreview" alt="Foto de perfil"
+                <img src="{{ asset($user->imagen_perfil ?? '') }}" id="profilePreview" alt="Foto de perfil"
                      class="rounded-circle shadow"
                      style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #8750B2;">
         
@@ -89,12 +89,20 @@
         
             <div class="d-flex justify-content-center gap-3">
                 <button type="button" class="btn btn-outline-secondary" id="uploadBtn">Subir archivo</button>
+            
                 <button type="button" class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#cameraModal">
                     Tomar foto
                 </button>
+            
+                @if($user->img)
+                    <button type="button" class="btn btn-outline-secondary" id="removePhotoBtn">
+                        Quitar foto
+                    </button>
+                @endif
             </div>
-        
-            <input type="file" id="img" name="img" accept="image/*" class="d-none">
+            
+            <input type="hidden" name="remove_img" id="remove_img" value="0">
+            
         </div>        
 
         {{-- Modal cámara --}}
