@@ -184,3 +184,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/retos/verificar-disclaimer', [RetoController::class, 'verificarDisclaimer'])->middleware(['auth']);
     Route::post('/retos/guardar-disclaimer', [RetoController::class, 'guardarDisclaimer'])->middleware(['auth']);
 });
+
+Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');
