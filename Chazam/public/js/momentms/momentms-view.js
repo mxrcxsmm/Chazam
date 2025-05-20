@@ -361,7 +361,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function buscarMomentms() {
         const q = searchInput.value.trim();
         const filtro = searchFilter.value;
-        const orden = orderSelect.value;
+        let orden = orderSelect.value;
+        
+        // Si el orden es "default", usar "fecha_desc"
+        if (orden === 'default') {
+            orden = 'fecha_desc';
+        }
 
         // Cancelar fetch anterior si existe
         if (lastController) lastController.abort();

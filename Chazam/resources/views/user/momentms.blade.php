@@ -14,6 +14,10 @@
 <!-- Momentms View CSS -->
 <link rel="stylesheet" href="{{ asset('css/momentm/momentms-view.css') }}">
 
+<script>
+    window.authUserId = {{ Auth::user()->id_usuario }};
+</script>
+
 <div class="momentms-container">
     <div class="momentms-header">
         <h1 class="gradient-text">MOMENTMS DEL DIA</h1>
@@ -29,6 +33,7 @@
                 <option value="amigos">Solo amigos</option>
             </select>
             <select id="momentmsOrder">
+                <option value="default" selected>Por defecto</option>
                 <option value="fecha_desc">Más recientes</option>
                 <option value="fecha_asc">Más antiguos</option>
                 <option value="alfabetico_asc">Usuario A-Z</option>

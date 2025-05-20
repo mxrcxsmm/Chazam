@@ -639,5 +639,17 @@ body, .create-momentm-container, .editor-container, .editor-workspace, .img-cont
     text-align: center;
 }
 
+/* Estilos para el spinner */
+#editor-spinner {
+    animation: spinner-border 0.75s linear infinite;
+    border: 0.25em solid currentColor;
+    border-right-color: transparent;
+    border-radius: 50%;
+}
+
+@keyframes spinner-border {
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
 
 

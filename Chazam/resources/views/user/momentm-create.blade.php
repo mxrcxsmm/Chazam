@@ -1,16 +1,13 @@
 @include('layout.chatsHeader')
 <link rel="stylesheet" href="{{ asset('css/momentm/momentm-create.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="{{ asset('js/momentms/momentms-create.js') }}"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-<link rel="stylesheet" href="{{ asset('css/momentm/momentm-create.css') }}">
-<script src="{{ asset('js/momentms/momentms-create.js') }}"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+
+
 <div class="create-momentm-container">
     <a href="{{ url()->previous() }}" class="back-btn">
         <i class="fas fa-arrow-left"></i> Volver atrás
@@ -29,10 +26,12 @@
         </div>
 
         <div class="editor-workspace">
-            <div class="img-container">
-                <img id="image" src="{{ asset('img/Logo_Chazam.png') }}" alt="Imagen a editar" class="editor-logo">
+            <div class="img-container" style="position: relative;">
                 <img id="image" src="{{ asset('img/Logo_Chazam.png') }}" alt="Imagen a editar" class="editor-logo">
                 <div id="overlay-layer"></div>
+                <div id="editor-spinner" class="spinner-border text-warning" role="status" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 2000; width: 3rem; height: 3rem; border-width: 0.25em;">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
             </div>
             <div class="editor-tools">
                 <div class="tool-group">

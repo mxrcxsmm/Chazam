@@ -41,6 +41,7 @@ class MomentmsController extends Controller
                   ->orWhere('id_usuario', $user->id_usuario);
         })
         ->where('updated_at', '>=', now()->subDay())
+        ->orderBy('fecha_inicio', 'desc')
         ->with('usuario')
         ->get();
 
@@ -155,6 +156,11 @@ class MomentmsController extends Controller
         $query = $request->input('q');
         $filtro = $request->input('filtro', 'todos');
         $orden = $request->input('orden', 'fecha_desc');
+
+        // Si el orden es 'default', forzamos a 'fecha_desc'
+        if ($orden === 'default') {
+            $orden = 'fecha_desc';
+        }
 
         // Validar el query según las reglas de username, nombre y apellido
         $validator = \Validator::make(['query' => $query], [

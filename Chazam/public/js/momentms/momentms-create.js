@@ -1,4 +1,3 @@
-// Configuración global de SweetAlert2 para tu paleta
 const swalChazam = Swal.mixin({
     customClass: {
         popup: 'swal2-chazam-popup',
@@ -62,6 +61,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Renderiza la imagen con filtros, ajustes y overlays
     function renderImage(callback) {
         if (!originalImage) return;
+
+        // Mostrar spinner
+        const spinner = document.getElementById('editor-spinner');
+        spinner.style.display = 'block';
+
+        // 1. Guarda el estado del cropper si existe
+        let cropData, canvasData, cropBoxData;
+        if (cropper) {
+            cropData = cropper.getData();
+            canvasData = cropper.getCanvasData();
+            cropBoxData = cropper.getCropBoxData();
+        }
+
         const img = new window.Image();
         img.onload = function() {
             const canvas = document.createElement('canvas');
@@ -88,7 +100,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.filter = filterStr.trim();
             ctx.drawImage(img, 0, 0);
             ctx.filter = 'none';
-            // NO dibujar overlays aquí
             image.src = canvas.toDataURL();
             image.classList.remove('editor-logo');
             setTimeout(() => {
@@ -105,8 +116,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     cropBoxMovable: true,
                     cropBoxResizable: true,
                     toggleDragModeOnDblclick: false,
+                    ready() {
+                        // 2. Restaura el estado guardado
+                        if (cropData) cropper.setData(cropData);
+                        if (canvasData) cropper.setCanvasData(canvasData);
+                        if (cropBoxData) cropper.setCropBoxData(cropBoxData);
+                        // Ocultar spinner al terminar
+                        spinner.style.display = 'none';
+                        if (callback) callback();
+                    }
                 });
-                if (callback) callback();
             }, 100);
         };
         img.src = originalImage;
