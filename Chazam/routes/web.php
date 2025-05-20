@@ -104,8 +104,10 @@ Route::middleware(['auth'])->group(function () {
       Route::get('momentms', [MomentmsController::class, 'index'])->name('user.momentms');
       Route::get('momentms/create', [MomentmsController::class, 'create'])->name('momentms.create');
       Route::post('/momentms', [MomentmsController::class, 'store'])->name('momentms.store');
+      Route::get('momentms/search', [MomentmsController::class, 'search'])->name('momentms.search');
       Route::get('momentms/{id}', [MomentmsController::class, 'show'])->name('momentms.show');
       Route::get('momentms/{id}/data', [MomentmsController::class, 'getData'])->name('momentms.data');
+      Route::delete('/momentms/{id}', [MomentmsController::class, 'destroy'])->name('momentms.destroy');
     });
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {
