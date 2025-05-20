@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Solicitud;
+use App\Models\Chat;
+use App\Models\ChatUsuario;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -164,5 +166,115 @@ class SolicitudUserController extends Controller
         return response()->json([
             'estado' => null
         ]);
+    }
+
+    /**
+     * Obtener las solicitudes de amistad pendientes
+     */
+    public function getPendientes()
+    {
+        try {
+            $solicitudes = Solicitud::with(['emisor' => function($query) {
+                $query->select('id_usuario', 'username', 'img');
+            }])
+            ->where('id_receptor', Auth::id())
+            ->where('estado', 'pendiente')
+            ->get();
+
+            return response()->json($solicitudes);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener las solicitudes: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Responder a una solicitud de amistad
+     */
+    public function responderSolicitud(Request $request)
+    {
+        try {
+            $request->validate([
+                'id_solicitud' => 'required|exists:solicitudes,id_solicitud',
+                'respuesta' => 'required|in:aceptada,rechazada'
+            ]);
+
+            DB::beginTransaction();
+
+            $solicitud = Solicitud::where('id_solicitud', $request->id_solicitud)
+                ->where('id_receptor', Auth::id())
+                ->where('estado', 'pendiente')
+                ->first();
+
+            if (!$solicitud) {
+                DB::rollBack();
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Solicitud no encontrada o ya procesada'
+                ], 404);
+            }
+
+            // Actualizar el estado de la solicitud actual
+            $solicitud->estado = $request->respuesta;
+            $solicitud->save();
+
+            // Si se acepta la solicitud, crear un chat entre los usuarios si no existe
+            if ($request->respuesta === 'aceptada') {
+                // Buscar un chat privado (sin id_reto) entre ambos usuarios
+                $chatExistente = \App\Models\Chat::whereNull('id_reto')
+                    ->whereHas('chatUsuarios', function($q) use ($solicitud) {
+                        $q->where('id_usuario', $solicitud->id_emisor);
+                    })
+                    ->whereHas('chatUsuarios', function($q) use ($solicitud) {
+                        $q->where('id_usuario', $solicitud->id_receptor);
+                    })
+                    ->first();
+
+                if (!$chatExistente) {
+                    // Crear nuevo chat privado
+                    $chat = \App\Models\Chat::create([
+                        'nombre' => 'Chat privado',
+                        'fecha_creacion' => now(),
+                        'descripcion' => 'Chat entre amigos',
+                        'id_reto' => null
+                    ]);
+
+                    // Agregar ambos usuarios al chat
+                    \App\Models\ChatUsuario::create([
+                        'id_chat' => $chat->id_chat,
+                        'id_usuario' => $solicitud->id_emisor
+                    ]);
+                    \App\Models\ChatUsuario::create([
+                        'id_chat' => $chat->id_chat,
+                        'id_usuario' => $solicitud->id_receptor
+                    ]);
+                }
+
+                // Crear una solicitud recíproca para mantener el registro
+                \App\Models\Solicitud::create([
+                    'id_emisor' => $solicitud->id_receptor,
+                    'id_receptor' => $solicitud->id_emisor,
+                    'estado' => 'aceptada'
+                ]);
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => $request->respuesta === 'aceptada' ? 'Solicitud aceptada' : 'Solicitud rechazada',
+                'estado' => $request->respuesta,
+                'solicitud' => $solicitud
+            ]);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al procesar la solicitud: ' . $e->getMessage()
+            ], 500);
+        }
     }
 } 

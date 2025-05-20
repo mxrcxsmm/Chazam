@@ -123,6 +123,10 @@
                         <li><a class="dropdown-item" href="#" id="sendFriendRequest">
                             <i class="fas fa-user-plus me-2"></i>Enviar solicitud de amistad
                         </a></li>
+                        <li><a class="dropdown-item" href="#" id="viewFriendRequests">
+                            <i class="fas fa-user-friends me-2"></i>Solicitudes pendientes
+                            <span class="badge bg-danger ms-2" id="solicitudesCount">0</span>
+                        </a></li>
                         <li><a class="dropdown-item" href="#" id="reportUser">
                             <i class="fas fa-flag me-2"></i>Reportar usuario
                         </a></li>
@@ -153,6 +157,24 @@
                 <button class="btn btn-primary" type="button" id="enviarMensaje">
                     <i class="fas fa-paper-plane"></i>
                 </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Solicitudes de Amistad -->
+<div class="modal fade" id="solicitudesModal" tabindex="-1" aria-labelledby="solicitudesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header bg-purple text-white">
+                <h5 class="modal-title" id="solicitudesModalLabel">Solicitudes de Amistad</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="solicitudesContainer">
+                <!-- Las solicitudes se cargarán aquí dinámicamente -->
+                <div class="text-center py-3" id="noSolicitudes">
+                    <p class="text-muted">No tienes solicitudes pendientes</p>
+                </div>
             </div>
         </div>
     </div>
@@ -325,3 +347,56 @@
 <script src="{{ asset('js/estados.js') }}"></script>
 <script src="{{ asset('js/chatrandom.js') }}"></script>
 <script src="{{ asset('js/reto' . $reto->id_reto . '.js') }}"></script>
+
+<style>
+.solicitud-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.solicitud-item:last-child {
+    border-bottom: none;
+}
+
+.solicitud-info {
+    flex-grow: 1;
+}
+
+.solicitud-username {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.solicitud-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-aceptar {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-rechazar {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-aceptar:hover {
+    background-color: #218838;
+}
+
+.btn-rechazar:hover {
+    background-color: #c82333;
+}
+</style>

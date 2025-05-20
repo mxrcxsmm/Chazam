@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             ProductosSeeder::class,
             AmistadSeeder::class,
             ComunidadSeeder::class,
+            ChatSeeder::class,
         ]);
     }
 }
