@@ -176,6 +176,8 @@ Route::middleware(['auth'])->group(function () {
 
     // Rutas para comunidades
     Route::get('/comunidades', [ComunidadesController::class, 'index'])->name('comunidades.index');
+    Route::get('/comunidades/create', [ComunidadesController::class, 'create'])->name('comunidades.create');
+    Route::post('/comunidades', [ComunidadesController::class, 'store'])->name('comunidades.store');
     Route::post('/comunidades/{id}/join', [ComunidadesController::class, 'join'])->name('comunidades.join');
 
     Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');

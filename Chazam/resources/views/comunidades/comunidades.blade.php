@@ -8,6 +8,9 @@
     <div class="section-title">
         <h2>Mis Comunidades</h2>
     </div>
+    <div style="margin-bottom: 20px; text-align: right;">
+        <a href="{{ route('comunidades.create') }}" class="create-btn">+ Crear comunidad</a>
+    </div>
     <div class="comunidades-list" id="comunidades-creadas">
         @if($comunidadesCreadas->isEmpty())
             <div class="no-comunidades">
