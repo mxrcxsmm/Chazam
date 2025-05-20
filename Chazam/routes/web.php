@@ -20,6 +20,7 @@ use App\Models\User;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\SolicitudUserController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\ComunidadesController;
 
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -170,5 +171,13 @@ Route::middleware(['auth'])->group(function () {
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
 
+    // Rutas para comunidades
+    Route::get('/comunidades', [ComunidadesController::class, 'index'])->name('comunidades.index');
+    Route::post('/comunidades/{id}/join', [ComunidadesController::class, 'join'])->name('comunidades.join');
+
     Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
+
+    // Rutas para el disclaimer
+    Route::get('/retos/verificar-disclaimer', [RetoController::class, 'verificarDisclaimer'])->middleware(['auth']);
+    Route::post('/retos/guardar-disclaimer', [RetoController::class, 'guardarDisclaimer'])->middleware(['auth']);
 });
