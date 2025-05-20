@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
             chatItem.dataset.chatId = chat.id_chat;
             chatItem.innerHTML = `
                 <div class="chat-avatar">
-                    <img src="${chat.img ? chat.img : '/images/avatar-default.png'}" alt="Avatar">
+                    <img src="${chat.img ? chat.img : '/IMG/profile_img/avatar-default.png'}" alt="Avatar">
                 </div>
                 <div class="chat-info">
                     <div class="chat-header">
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
             msgDiv.className = 'message';
             msgDiv.innerHTML = `
                 <div class="message-header">
-                    <img src="/images/avatar-default.png" alt="Avatar" class="message-avatar">
+                    <img src="/IMG/profile_img/avatar-default.png" alt="Avatar" class="message-avatar">
                     <span class="message-username">${msg.usuario}</span>
                     <span class="message-time">${msg.fecha_envio}</span>
                 </div>
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Actualiza la imagen de perfil
         const chatImg = document.getElementById('chat-contact-img');
-        chatImg.src = companero.img ? companero.img : '/images/avatar-default.png';
+        chatImg.src = companero.img ? companero.img : '/IMG/profile_img/avatar-default.png';
     }
 
     function refreshCurrentChatHeader() {
@@ -228,20 +228,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         chatStatus.textContent = 'desconectado';
                         chatStatus.style.color = '#b9bbbe';
                     }
-
-                    // Actualiza la imagen de perfil cada 2 minutos
-                    const now = Date.now();
-                    if (now - lastImageUpdate > 120000) { // 120000 ms = 2 minutos
-                        const chatImg = document.getElementById('chat-contact-img');
-                        chatImg.src = currentChat.img ? currentChat.img : '/images/avatar-default.png';
-                        lastImageUpdate = now;
-                    }
                 }
             });
     }
 
-    // Llama a esta función cada 15 segundos
-    setInterval(refreshCurrentChatHeader, 15000);
+    // Llama a esta función cada 20 segundos
+    setInterval(refreshCurrentChatHeader, 20000);
+
+    // Refrescar mensajes del chat activo cada 5 segundos
+    setInterval(function() {
+        if (currentChatId) {
+            loadMessages(currentChatId);
+        }
+    }, 5000);
 
     loadChats();
     startMessagePolling();
