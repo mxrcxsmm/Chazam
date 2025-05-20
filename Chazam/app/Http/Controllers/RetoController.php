@@ -495,4 +495,154 @@ class RetoController extends Controller
             'puntos_diarios' => $puntosDiarios
         ]);
     }
+
+    /**
+     * Verifica si el usuario tiene el skip en cooldown
+     */
+    public function verificarSkip()
+    {
+        try {
+            $user = Auth::user();
+            Log::info('Verificando skip para usuario: ' . $user->id_usuario);
+            Log::info('Tiempo actual de skip: ' . $user->skip_time);
+            
+            // Si el tiempo de skip es 00:00:00 o null, no está en cooldown
+            if (!$user->skip_time || $user->skip_time->format('H:i:s') === '00:00:00') {
+                Log::info('Usuario no está en cooldown');
+                return response()->json([
+                    'en_cooldown' => false
+                ]);
+            }
+            
+            $now = Carbon::now();
+            $skipTime = $user->skip_time;
+            
+            // Verificar si el tiempo de skip ha expirado
+            if ($now->gt($skipTime)) {
+                DB::table('users')
+                    ->where('id_usuario', $user->id_usuario)
+                    ->update(['skip_time' => '00:00:00']);
+                Log::info('Tiempo de skip expirado, reseteando a 00:00:00');
+                return response()->json([
+                    'en_cooldown' => false
+                ]);
+            }
+            
+            Log::info('Usuario en cooldown: sí');
+            
+            return response()->json([
+                'en_cooldown' => true
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al verificar skip: ' . $e->getMessage());
+            return response()->json([
+                'en_cooldown' => false
+            ]);
+        }
+    }
+
+    /**
+     * Obtiene el tiempo restante del cooldown del skip
+     */
+    public function tiempoSkip()
+    {
+        try {
+            $user = Auth::user();
+            $skipTime = Carbon::parse($user->skip_time);
+            $now = Carbon::now();
+            
+            // Si el tiempo de skip es 00:00:00, no hay cooldown
+            if ($skipTime->format('H:i:s') === '00:00:00') {
+                return response()->json([
+                    'tiempo_restante' => '00:00'
+                ]);
+            }
+            
+            // Calcular el tiempo restante
+            if ($now->gt($skipTime)) {
+                DB::table('users')
+                    ->where('id_usuario', $user->id_usuario)
+                    ->update(['skip_time' => '00:00:00']);
+                    
+                return response()->json([
+                    'tiempo_restante' => '00:00'
+                ]);
+            }
+            
+            // Calcular minutos y segundos restantes
+            $tiempoRestante = $now->diffInSeconds($skipTime);
+            $minutos = floor($tiempoRestante / 60);
+            $segundos = $tiempoRestante % 60;
+            
+            Log::info('Tiempo restante calculado: ' . sprintf('%02d:%02d', $minutos, $segundos));
+            
+            return response()->json([
+                'tiempo_restante' => sprintf('%02d:%02d', $minutos, $segundos)
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al calcular tiempo restante: ' . $e->getMessage());
+            return response()->json([
+                'tiempo_restante' => '00:00'
+            ]);
+        }
+    }
+
+    /**
+     * Activa el cooldown del skip
+     */
+    public function activarSkip()
+    {
+        try {
+            $user = Auth::user();
+            Log::info('Activando skip para usuario: ' . $user->id_usuario);
+            
+            // Establecer el tiempo de skip a 10 minutos desde ahora
+            $tiempoSkip = Carbon::now()->addMinutes(10);
+            Log::info('Nuevo tiempo de skip: ' . $tiempoSkip->format('H:i:s'));
+            
+            // Actualizar usando Query Builder
+            DB::table('users')
+                ->where('id_usuario', $user->id_usuario)
+                ->update(['skip_time' => $tiempoSkip]);
+            
+            Log::info('Tiempo de skip después de actualizar: ' . $tiempoSkip->format('H:i:s'));
+            
+            return response()->json([
+                'success' => true,
+                'tiempo_skip' => $tiempoSkip->format('H:i:s')
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Error al activar skip: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Verifica si el disclaimer ya fue mostrado hoy
+     */
+    public function verificarDisclaimer()
+    {
+        $user = Auth::user();
+        $cacheKey = 'disclaimer_' . $user->id_usuario . '_' . now()->format('Y-m-d');
+        
+        return response()->json([
+            'mostrado' => Cache::has($cacheKey)
+        ]);
+    }
+
+    /**
+     * Guarda en caché que el disclaimer fue mostrado hoy
+     */
+    public function guardarDisclaimer()
+    {
+        $user = Auth::user();
+        $cacheKey = 'disclaimer_' . $user->id_usuario . '_' . now()->format('Y-m-d');
+        
+        Cache::put($cacheKey, true, now()->endOfDay());
+        
+        return response()->json(['success' => true]);
+    }
 }
