@@ -245,4 +245,90 @@ document.addEventListener('DOMContentLoaded', function() {
 
     loadChats();
     startMessagePolling();
+
+    // Sobrescribe la función responderSolicitud para recargar los chats tras aceptar
+    window.responderSolicitud = async function(idSolicitud, respuesta) {
+        try {
+            const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
+            if (!solicitudDiv) return;
+
+            // Deshabilitar botones durante la operación
+            const buttons = solicitudDiv.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = true);
+
+            const response = await fetch('/solicitudes/responder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    id_solicitud: idSolicitud,
+                    respuesta: respuesta
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al procesar la solicitud');
+            }
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Actualizar la interfaz
+                const actionsDiv = solicitudDiv.querySelector('.solicitud-actions');
+                actionsDiv.innerHTML = `
+                    <span class="badge ${data.estado === 'aceptada' ? 'bg-success' : 'bg-danger'}">
+                        ${data.estado === 'aceptada' ? 'Aceptada' : 'Rechazada'}
+                    </span>
+                `;
+
+                // Mostrar mensaje de éxito
+                Swal.fire({
+                    title: data.estado === 'aceptada' ? '¡Solicitud aceptada!' : 'Solicitud rechazada',
+                    text: data.estado === 'aceptada' ? 'Ahora son amigos' : 'La solicitud ha sido rechazada',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                }).then(() => {
+                    // Si se aceptó la amistad, recargar la lista de chats
+                    if (data.estado === 'aceptada' && typeof window.loadChats === 'function') {
+                        window.loadChats();
+                    }
+                });
+
+                // Actualizar el contador de solicitudes
+                const solicitudesCount = document.getElementById('solicitudesCount');
+                const count = parseInt(solicitudesCount.textContent);
+                solicitudesCount.textContent = Math.max(0, count - 1);
+
+                // Si no hay más solicitudes, mostrar el mensaje
+                if (count - 1 === 0) {
+                    const container = document.getElementById('solicitudesContainer');
+                    const noSolicitudes = document.getElementById('noSolicitudes');
+                    if (container && noSolicitudes) {
+                        container.innerHTML = '';
+                        noSolicitudes.style.display = 'block';
+                        container.appendChild(noSolicitudes);
+                    }
+                }
+            } else {
+                throw new Error(data.message || 'Error al procesar la solicitud');
+            }
+        } catch (error) {
+            console.error('Error al responder solicitud:', error);
+            Swal.fire({
+                title: 'Error',
+                text: error.message || 'Ocurrió un error al procesar la solicitud',
+                icon: 'error'
+            });
+
+            // Restaurar botones en caso de error
+            const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
+            if (solicitudDiv) {
+                const buttons = solicitudDiv.querySelectorAll('button');
+                buttons.forEach(btn => btn.disabled = false);
+            }
+        }
+    }
 });

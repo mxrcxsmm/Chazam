@@ -20,6 +20,7 @@ use App\Models\User;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\SolicitudUserController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\SolicitudController;
 
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -166,6 +167,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/solicitudes/bloquear', [SolicitudUserController::class, 'bloquearUsuario'])->name('solicitudes.bloquear');
     Route::get('/solicitudes/verificar-bloqueo/{id_usuario}', [SolicitudUserController::class, 'verificarBloqueo'])->name('solicitudes.verificar-bloqueo');
     Route::get('/solicitudes/verificar/{id_usuario}', [SolicitudUserController::class, 'verificarSolicitud'])->name('solicitudes.verificar');
+    Route::get('/solicitudes/pendientes', [SolicitudUserController::class, 'getPendientes'])->name('solicitudes.pendientes');
+    Route::post('/solicitudes/responder', [SolicitudUserController::class, 'responderSolicitud'])->name('solicitudes.responder');
     
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
