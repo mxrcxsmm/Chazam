@@ -33,8 +33,11 @@ class Chat extends Model
         'fecha_creacion',
         'img',
         'nombre',
+        'tipocomunidad',
+        'codigo',
         'descripcion',
         'id_reto',
+        'creator',
     ];
 
     /**
@@ -70,5 +73,13 @@ class Chat extends Model
     public function mensajes()
     {
         return $this->hasManyThrough(Mensaje::class, ChatUsuario::class, 'id_chat', 'id_chat_usuario', 'id_chat', 'id_chat_usuario');
+    }
+
+    /**
+     * Get the creator of the chat.
+     */
+    public function creador()
+    {
+        return $this->belongsTo(User::class, 'creator', 'id_usuario');
     }
 }

@@ -1,12 +1,12 @@
 @include('layout.chatsHeader')
 
 <div class="center-container">
-    <img src="{{ asset('IMG/Logo_Chazam.png') }}" alt="Logo" class="logo2">
+    <img src="{{ asset('img/Logo_Chazam.png') }}" alt="Logo" class="logo2">
     <p class="startingtext">¿Preparado para conocer a gente nueva?</p>
     <div class="button-container">
         <a href="{{ route('retos.reto') }}"><button class="startbutton">Comenzar</button></a>
         <a href="{{ route('user.friendchat') }}"><button class="startbutton">Amigos</button></a>
-        <a href="{{ route('user.comunidades') }}"><button class="startbutton">Comunidades</button></a>
+        <a href="{{ route('chats.index') }}"><button class="startbutton">Comunidades</button></a>
     </div>
 </div>
 
@@ -17,7 +17,7 @@
     justify-content: center;
 }
 
-.friendbutton {
+.startbutton {
     background-color: #9147ff;
     color: white;
     border: none;
@@ -28,7 +28,7 @@
     transition: all 0.3s ease;
 }
 
-.friendbutton:hover {
+.startbutton:hover {
     background-color: #7a30dd;
     transform: scale(1.05);
 }

@@ -23,7 +23,7 @@
         <div class="container-fluid d-flex justify-content-between align-items-center">
 
             <!-- Logo o nombre de la app -->
-            <a href="{{ route('retos.guide') }}"><img src="{{ asset('IMG/Logo_Chazam.png') }}" alt="Logo" class="logo">Chazam</a>
+            <a href="{{ route('retos.guide') }}"><img src="{{ asset('img/Logo_Chazam.png') }}" alt="Logo" class="logo">Chazam</a>
 
             <!-- Racha, puntos y perfil -->
             <div class="d-flex align-items-center gap-4">
@@ -87,7 +87,7 @@
                     <ul class="list-unstyled">
                         <li class="mb-4"><a href="{{ route('perfil.personalizacion') }}" class="text-white text-decoration-none">Personalizar</a></li>
                         <li class="mb-4"><a href="{{ route('user.friendchat') }}" class="text-white text-decoration-none">Amigos</a></li>
-                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comunidades</a></li>
+                        <li class="mb-4"><a href="{{ route('comunidades.index') }}" class="text-white text-decoration-none">Comunidades</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Reportar</a></li>
                         <li class="mb-4"><a href="{{route('tienda.index')}}" class="text-white text-decoration-none">Tienda</a></li>
                     </ul>
