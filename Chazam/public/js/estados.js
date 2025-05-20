@@ -4,7 +4,7 @@ let contadorInactividad = null;
 let contadorRegresivo = null;
 let alertaMostrada = false;
 let miAlerta = false;
-let tiempoInicialEspera = 30000; // 30 segundos de espera inicial
+let tiempoInicialEspera = 10000; // 10 segundos de espera inicial después de encontrar compañero
 
 // Función para actualizar el estado del usuario
 function actualizarEstado(estado) {
@@ -68,12 +68,12 @@ function actualizarUltimoMensaje() {
         clearInterval(contadorInactividad);
         contadorInactividad = setInterval(() => {
             const tiempoInactivo = Date.now() - ultimoMensaje;
-            console.log('Tiempo inactivo:', tiempoInactivo / 1000, 'segundos');
+            console.log('Tiempo inactivo:', tiempoInactivo / 10000, 'segundos');
             if (tiempoInactivo >= 60000 && !alertaMostrada) { // 1 minuto
                 console.log('Inactividad detectada, mostrando alerta...');
                 mostrarAlertaInactividad();
             }
-        }, 1000);
+        }, 10000);
     }
 }
 
@@ -83,13 +83,15 @@ function iniciarControlInactividad() {
     // Limpiar contadores existentes
     detenerControlInactividad();
     
+    // Actualizar el tiempo del último mensaje al iniciar
+    ultimoMensaje = Date.now();
+    
     // Esperar el tiempo inicial antes de comenzar a verificar inactividad
     setTimeout(() => {
         console.log('Iniciando verificación de inactividad después del tiempo de espera');
         // Verificar inactividad cada segundo
         contadorInactividad = setInterval(() => {
             const tiempoInactivo = Date.now() - ultimoMensaje;
-            console.log('Tiempo inactivo:', tiempoInactivo / 1000, 'segundos');
             if (tiempoInactivo >= 60000 && !alertaMostrada) { // 1 minuto
                 console.log('Inactividad detectada, mostrando alerta...');
                 mostrarAlertaInactividad();

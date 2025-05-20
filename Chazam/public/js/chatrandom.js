@@ -3,11 +3,80 @@ let chatId = null;
 let companero = null;
 let buscandoCompanero = true;
 let usuarioReportadoId = null; // Nueva variable para mantener el ID del usuario a reportar
+let ultimoSkip = null; // Variable para controlar el cooldown del skip
+
+// Función para verificar si el skip está en cooldown
+async function skipEnCooldown() {
+    try {
+        const response = await fetch('/retos/verificar-skip', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            return data.en_cooldown;
+        }
+        return false;
+    } catch (error) {
+        console.error('Error al verificar cooldown:', error);
+        return false;
+    }
+}
+
+// Función para obtener tiempo restante de cooldown
+async function getTiempoRestanteCooldown() {
+    try {
+        const response = await fetch('/retos/tiempo-skip', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            return data.tiempo_restante;
+        }
+        return '00:00';
+    } catch (error) {
+        console.error('Error al obtener tiempo restante:', error);
+        return '00:00';
+    }
+}
+
+// Función para actualizar el estado del botón skip
+async function actualizarBotonSkip() {
+    const skipBtn = document.querySelector('.skip-btn');
+    if (!skipBtn) return;
+
+    const enCooldown = await skipEnCooldown();
+    const tiempoRestante = await getTiempoRestanteCooldown();
+
+    if (enCooldown) {
+        skipBtn.disabled = true;
+        skipBtn.innerHTML = `Skip <span class="time">(${tiempoRestante})</span><span class="triangle"></span><span class="triangle tight"></span>`;
+        skipBtn.classList.add('disabled');
+    } else {
+        skipBtn.disabled = false;
+        skipBtn.innerHTML = `Skip<span class="triangle"></span><span class="triangle tight"></span>`;
+        skipBtn.classList.remove('disabled');
+    }
+}
 
 // Función para buscar un compañero automáticamente
 async function buscarCompaneroAutomatico() {
     if (chatId) {
         return;
+    }
+    
+    // Detener cualquier control de inactividad existente mientras se busca
+    if (window.detenerControlInactividad) {
+        window.detenerControlInactividad();
     }
     
     while (buscandoCompanero) {
@@ -40,11 +109,14 @@ async function buscarCompaneroAutomatico() {
                 buscandoCompanero = false;
                 cargarMensajes();
                 
+                // Solo iniciar el control de inactividad cuando se encuentra un compañero
                 if (window.iniciarControlInactividad) {
-                    window.iniciarControlInactividad();
-                    if (window.actualizarUltimoMensaje) {
-                        window.actualizarUltimoMensaje();
-                    }
+                    setTimeout(() => {
+                        window.iniciarControlInactividad();
+                        if (window.actualizarUltimoMensaje) {
+                            window.actualizarUltimoMensaje();
+                        }
+                    }, 1000); // Pequeño retraso para asegurar que todo está listo
                 }
                 break;
             }
@@ -87,6 +159,16 @@ function enviarMensaje() {
 
     if (!mensaje) return;
     
+    // Validar longitud máxima de 500 caracteres
+    if (mensaje.length > 500) {
+        Swal.fire({
+            title: 'Mensaje demasiado largo',
+            text: 'El mensaje no puede exceder los 500 caracteres',
+            icon: 'warning'
+        });
+        return;
+    }
+    
     // Procesar el mensaje según el reto actual si existe la función
     let mensajeProcesado;
     try {
@@ -103,10 +185,15 @@ function enviarMensaje() {
     // Manejar el caso donde el mensaje procesado es un objeto
     let contenidoMensaje;
     let tieneEmojis = false;
+    let sumarPuntos = true; // Por defecto, sí sumamos puntos
     
     if (typeof mensajeProcesado === 'object' && mensajeProcesado !== null) {
         contenidoMensaje = mensajeProcesado.texto;
-        tieneEmojis = mensajeProcesado.tieneEmojis;
+        tieneEmojis = mensajeProcesado.tieneEmojis || false;
+        // Para el reto 3, verificar si debe sumar puntos basado en la longitud
+        if (mensajeProcesado.hasOwnProperty('sumarPuntos')) {
+            sumarPuntos = mensajeProcesado.sumarPuntos;
+        }
     } else {
         contenidoMensaje = mensajeProcesado;
     }
@@ -120,7 +207,8 @@ function enviarMensaje() {
         body: JSON.stringify({
             chat_id: chatId,
             contenido: contenidoMensaje,
-            tieneEmojis: tieneEmojis
+            tieneEmojis: tieneEmojis,
+            sumarPuntos: sumarPuntos
         })
     })
     .then(response => response.json())
@@ -387,6 +475,87 @@ document.addEventListener('DOMContentLoaded', function() {
     buscarCompaneroAutomatico();
     actualizarPuntosDiarios(); // Actualizar puntos diarios al cargar la página
     
+    // Configurar el botón de skip
+    document.querySelector('.skip-btn').addEventListener('click', async function() {
+        console.log('Botón skip clickeado');
+        if (await skipEnCooldown()) {
+            const tiempoRestante = await getTiempoRestanteCooldown();
+            Swal.fire({
+                title: 'Espera un momento',
+                text: `Debes esperar ${tiempoRestante} antes de volver a usar el skip`,
+                icon: 'warning'
+            });
+            return;
+        }
+
+        if (!chatId) {
+            return;
+        }
+
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: 'Saltarás a este usuario y buscarás uno nuevo. Deberás esperar 10 minutos antes de poder usar el skip nuevamente.',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, saltar',
+            cancelButtonText: 'Cancelar'
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    console.log('Activando skip...');
+                    const response = await fetch('/retos/activar-skip', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                        }
+                    });
+
+                    console.log('Respuesta activar skip:', response.status);
+                    if (response.ok) {
+                        const data = await response.json();
+                        console.log('Datos respuesta:', data);
+                        
+                        chatId = null;
+                        companero = null;
+                        buscandoCompanero = true;
+                        
+                        // Detener el control de inactividad
+                        if (window.detenerControlInactividad) {
+                            window.detenerControlInactividad();
+                        }
+                        
+                        // Actualizar la interfaz
+                        document.getElementById('chatHeader').innerHTML = `
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                                Buscando usuarios disponibles...
+                            </div>
+                        `;
+                        
+                        // Ocultar el menú de opciones
+                        document.getElementById('chatOptions').style.display = 'none';
+                        
+                        // Limpiar el contenedor de mensajes
+                        document.getElementById('mensajesContainer').innerHTML = '';
+                        
+                        actualizarBotonSkip();
+                        buscarCompaneroAutomatico();
+                    }
+                } catch (error) {
+                    console.error('Error al activar skip:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Ocurrió un error al intentar saltar al siguiente usuario',
+                        icon: 'error'
+                    });
+                }
+            }
+        });
+    });
+
     // Configurar el botón de enviar mensaje
     document.getElementById('enviarMensaje').addEventListener('click', enviarMensaje);
     
@@ -588,6 +757,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+
+    // Intervalo para actualizar el estado del botón skip cada segundo
+    setInterval(actualizarBotonSkip, 1000);
 });
 
 // Actualizar estado cuando el usuario cierra la pestaña

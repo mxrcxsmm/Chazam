@@ -12,7 +12,8 @@ class RolesSeeder extends Seeder
         DB::table('roles')->insert([
             ['nom_rol' => 'Administrador'],
             ['nom_rol' => 'Usuario'],
-            ['nom_rol' => 'Premium']
+            ['nom_rol' => 'Premium'],
+            ['nom_rol' => 'Miembro']
         ]);
     }
 } 

@@ -34,7 +34,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'inicio_ban',
         'fin_ban',
         'ultimo_login',
-        'racha'
+        'racha',
+        'skip_time'
     ];
 
     protected $hidden = [
@@ -50,6 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'inicio_ban' => 'datetime',
         'fin_ban' => 'datetime',
         'ultimo_login' => 'datetime',
+        'skip_time' => 'datetime'
     ];
 
     /* RELACIONES */
@@ -140,5 +142,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function historias()
     {
         return $this->hasMany(Historia::class, 'id_usuario');
+    }
+
+    // relacion con pagos
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'id_comprador');
     }
 }
