@@ -1,7 +1,7 @@
 @include('layout.chatsHeader')
 
 <div class="center-container">
-    <img src="{{ asset('IMG/Logo_Chazam.png') }}" alt="Logo" class="logo2">
+    <img src="{{ asset('img/Logo_Chazam.png') }}" alt="Logo" class="logo2">
     <p class="startingtext">¿Qué quieres hacer hoy?</p>
     <div class="button-container">
         <a href="{{ route('user.mis-comunidades') }}"><button class="startbutton">Mis Comunidades</button></a>

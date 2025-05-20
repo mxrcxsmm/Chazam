@@ -1,7 +1,7 @@
 @include('layout.chatsHeader')
 
 <div class="center-container">
-    <img src="{{ asset('IMG/Logo_Chazam.png') }}" alt="Logo" class="logo2">
+    <img src="{{ asset('img/Logo_Chazam.png') }}" alt="Logo" class="logo2">
     <p class="startingtext">¿Preparado para conocer a gente nueva?</p>
     <div class="button-container">
         <a href="{{ route('retos.reto') }}"><button class="startbutton">Comenzar</button></a>

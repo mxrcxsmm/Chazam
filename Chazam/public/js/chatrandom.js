@@ -292,7 +292,7 @@ function agregarMensaje(mensaje, usuario) {
     userImage.style.objectFit = 'cover';
     userImage.style.borderRadius = '50%';
     userImage.onerror = function() {
-        this.src = '/IMG/profile_img/avatar-default.png';
+        this.src = '/img/profile_img/avatar-default.png';
     };
     
     // Contenedor principal del mensaje (nombre, mensaje, hora)
@@ -509,11 +509,11 @@ async function cargarSolicitudesAmistad() {
             solicitudDiv.id = `solicitud-${solicitud.id_solicitud}`;
             solicitudDiv.innerHTML = `
                 <div class="solicitud-info d-flex align-items-center gap-2">
-                    <img src="${solicitud.emisor.img || '/IMG/profile_img/avatar-default.png'}" 
+                    <img src="${solicitud.emisor.img || '/img/profile_img/avatar-default.png'}" 
                          alt="${solicitud.emisor.username}" 
                          class="rounded-circle"
                          style="width: 32px; height: 32px; object-fit: cover;"
-                         onerror="this.src='/IMG/profile_img/avatar-default.png'">
+                         onerror="this.src='/img/profile_img/avatar-default.png'">
                     <span class="solicitud-username">${solicitud.emisor.username}</span>
                 </div>
                 <div class="solicitud-actions d-flex gap-2">

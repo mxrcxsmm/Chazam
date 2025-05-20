@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
             chatItem.dataset.chatId = chat.id_chat;
             chatItem.innerHTML = `
                 <div class="chat-avatar">
-                    <img src="${chat.img ? chat.img : '/IMG/profile_img/avatar-default.png'}" alt="Avatar">
+                    <img src="${chat.img ? chat.img : '/img/profile_img/avatar-default.png'}" alt="Avatar">
                 </div>
                 <div class="chat-info">
                     <div class="chat-header">
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
             msgDiv.className = 'message';
             msgDiv.innerHTML = `
                 <div class="message-header">
-                    <img src="/IMG/profile_img/avatar-default.png" alt="Avatar" class="message-avatar">
+                    <img src="/img/profile_img/avatar-default.png" alt="Avatar" class="message-avatar">
                     <span class="message-username">${msg.usuario}</span>
                     <span class="message-time">${msg.fecha_envio}</span>
                 </div>
@@ -247,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Actualiza la imagen de perfil
         const chatImg = document.getElementById('chat-contact-img');
-        chatImg.src = companero.img ? companero.img : '/IMG/profile_img/avatar-default.png';
+        chatImg.src = companero.img ? companero.img : '/img/profile_img/avatar-default.png';
     }
 
     function refreshCurrentChatHeader() {
