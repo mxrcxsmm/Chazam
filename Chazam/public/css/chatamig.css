@@ -212,7 +212,10 @@ body, html {
 }
 
 .message-content {
-    color: rgb(241, 234, 234);
+    color: #dcddde;
+    margin-left: 50px; /* Align with the text after the avatar */
+    word-break: break-word;
+    white-space: pre-line;
 }
 
 .message-user {
@@ -388,4 +391,6 @@ body, html {
 .message-content {
     color: #dcddde;
     margin-left: 50px; /* Align with the text after the avatar */
+    word-break: break-word;
+    white-space: pre-line;
 }

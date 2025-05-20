@@ -104,9 +104,46 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
+    // --- NUEVO: Contador y validación de caracteres ---
+    // Crear el contador de caracteres
+    const contadorContainer = document.createElement('div');
+    contadorContainer.id = 'contador-caracteres';
+    contadorContainer.style.fontSize = '12px';
+    contadorContainer.style.color = '#6c757d';
+    contadorContainer.style.marginTop = '5px';
+    contadorContainer.style.textAlign = 'right';
+    // Insertar el contador justo después del input
+    const inputGroup = document.querySelector('.message-input-container');
+    if (inputGroup) {
+        inputGroup.insertAdjacentElement('afterend', contadorContainer);
+    }
+    // Actualizar el contador al escribir
+    messageInput.addEventListener('input', function() {
+        const longitud = this.value.trim().length;
+        const caracteresRestantes = 500 - longitud;
+        let textoContador = `${longitud}/500 caracteres`;
+        if (caracteresRestantes < 50) {
+            contadorContainer.style.color = '#dc3545';
+        } else {
+            contadorContainer.style.color = '#6c757d';
+        }
+        contadorContainer.textContent = textoContador;
+    });
+    // Inicializar el contador
+    messageInput.dispatchEvent(new Event('input'));
+
+    // Modificar sendMessage para validar máximo 500 caracteres
     function sendMessage() {
         const messageInput = document.querySelector('.message-input-container input');
         const message = messageInput.value.trim();
+        if (message.length > 500) {
+            Swal.fire({
+                title: 'Mensaje demasiado largo',
+                text: 'El mensaje no puede exceder los 500 caracteres',
+                icon: 'warning'
+            });
+            return;
+        }
         if (message && currentChatId) {
             fetch(window.userChatConfig.sendUrl(currentChatId), {
                 method: 'POST',
@@ -120,7 +157,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     loadMessages(currentChatId);
-            messageInput.value = '';
+                    messageInput.value = '';
+                    messageInput.dispatchEvent(new Event('input'));
                 }
             });
         }
