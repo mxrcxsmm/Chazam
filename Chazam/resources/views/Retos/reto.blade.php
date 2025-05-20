@@ -197,6 +197,52 @@
 <script>
     window.userId = {{ Auth::user()->id_usuario }};
     window.retoId = {{ $reto->id_reto }};
+    
+    // Verificar si ya se mostró el disclaimer hoy
+    fetch('/retos/verificar-disclaimer')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.mostrado) {
+                Swal.fire({
+                    title: 'Aviso',
+                    html: `
+                        <div class="text-start">
+                            <p>Por favor, tenga en cuenta que:</p>
+                            <ul>
+                                <li>Si recarga o cierra esta página, perderá el chat actual</li>
+                                <li>El usuario con el que está emparejado también perderá la conexión</li>
+                            </ul>
+                            <div class="form-check mt-3">
+                                <input class="form-check-input" type="checkbox" id="noMostrarHoy">
+                                <label class="form-check-label" for="noMostrarHoy">
+                                    No volver a mostrar el día de hoy
+                                </label>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#4B0082',
+                    showCancelButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        document.getElementById('noMostrarHoy').addEventListener('change', function() {
+                            if (this.checked) {
+                                fetch('/retos/guardar-disclaimer', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
     console.log('=== INICIO DE LA VISTA RETO ===');
     console.log('User ID:', window.userId);
     console.log('Reto ID:', window.retoId);

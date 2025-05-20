@@ -618,4 +618,30 @@ class RetoController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Verifica si el disclaimer ya fue mostrado hoy
+     */
+    public function verificarDisclaimer()
+    {
+        $user = Auth::user();
+        $cacheKey = 'disclaimer_' . $user->id_usuario . '_' . now()->format('Y-m-d');
+        
+        return response()->json([
+            'mostrado' => Cache::has($cacheKey)
+        ]);
+    }
+
+    /**
+     * Guarda en caché que el disclaimer fue mostrado hoy
+     */
+    public function guardarDisclaimer()
+    {
+        $user = Auth::user();
+        $cacheKey = 'disclaimer_' . $user->id_usuario . '_' . now()->format('Y-m-d');
+        
+        Cache::put($cacheKey, true, now()->endOfDay());
+        
+        return response()->json(['success' => true]);
+    }
 }

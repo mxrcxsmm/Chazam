@@ -24,3 +24,4 @@
 <link rel="stylesheet" href="{{ asset('css/comunidades.css') }}">
 
 <script src="{{ asset('js/comunidades.js') }}"></script>
+
