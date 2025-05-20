@@ -20,8 +20,10 @@ use App\Models\User;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\SolicitudUserController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\VistaController;
 use App\Http\Controllers\ComunidadesController;
 use App\Http\Controllers\SolicitudController;
+
 
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -88,10 +90,10 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('perfil')->name('perfil.')->group(function () {
             Route::get('/dashboard', [PerfilController::class, 'dashboard'])->name('dashboard');
             Route::get('/personalizacion', [PerfilController::class, 'edit'])->name('personalizacion');
+            Route::get('/vista', [VistaController::class, 'show'])->name('vista');
+            Route::post('/marco', [VistaController::class, 'cambiarMarco'])->name('cambiarMarco');
+            Route::post('/glow', [VistaController::class, 'cambiarBrillo'])->name('cambiarBrillo');
             Route::put('/update', [PerfilController::class, 'update'])->name('update');
-            Route::get('/vista', function () {
-                return view('perfil.vista');
-            })->name('vista');
             Route::get('/mejoras', function () {
                 return view('perfil.mejoras');
             })->name('mejoras');
