@@ -5,6 +5,12 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+<link rel="stylesheet" href="{{ asset('css/momentm/momentm-create.css') }}">
+<script src="{{ asset('js/momentms/momentms-create.js') }}"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 <div class="create-momentm-container">
     <a href="{{ url()->previous() }}" class="back-btn">
         <i class="fas fa-arrow-left"></i> Volver atrás
@@ -24,6 +30,7 @@
 
         <div class="editor-workspace">
             <div class="img-container">
+                <img id="image" src="{{ asset('img/Logo_Chazam.png') }}" alt="Imagen a editar" class="editor-logo">
                 <img id="image" src="{{ asset('img/Logo_Chazam.png') }}" alt="Imagen a editar" class="editor-logo">
                 <div id="overlay-layer"></div>
             </div>
@@ -73,6 +80,10 @@
                         <button class="filter-btn" data-filter="vintage">Vintage</button>
                         <button class="filter-btn" data-filter="warm">Cálido</button>
                         <button class="filter-btn" data-filter="cool">Frío</button>
+                        <button class="filter-btn" data-filter="dramatic">Drama</button>
+                        <button class="filter-btn" data-filter="bright">Brillo+</button>
+                        <button class="filter-btn" data-filter="soft-bw">B/N-</button>
+                        <button class="filter-btn" data-filter="strong-blur">Blur+</button>
                         <button class="filter-btn" data-filter="dramatic">Drama</button>
                         <button class="filter-btn" data-filter="bright">Brillo+</button>
                         <button class="filter-btn" data-filter="soft-bw">B/N-</button>
@@ -148,3 +159,4 @@
 </div>
 
 <style>
+
