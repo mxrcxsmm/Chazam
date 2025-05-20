@@ -75,7 +75,7 @@ class StripeController extends Controller
             } else {
                 Log::error('El producto no tiene puntos válidos', ['producto_id' => $producto->id_producto]);
             }
-        } elseif ($producto->id_tipo_producto == 3) { // Combo: Suscripción + Puntos
+        } elseif ($producto->id_tipo_producto == 2) { // Combo: Suscripción + Puntos
             $premiumRole = Rol::where('nom_rol', 'Premium')->first(); // Buscar el rol Premium
             if ($premiumRole) {
                 $user->id_rol = $premiumRole->id_rol; // Asignar el rol Premium
