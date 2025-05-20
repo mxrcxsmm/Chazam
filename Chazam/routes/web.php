@@ -22,6 +22,7 @@ use App\Http\Controllers\SolicitudUserController;
 use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\VistaController;
 use App\Http\Controllers\ComunidadesController;
+use App\Http\Controllers\SolicitudController;
 
 
 
@@ -105,8 +106,10 @@ Route::middleware(['auth'])->group(function () {
       Route::get('momentms', [MomentmsController::class, 'index'])->name('user.momentms');
       Route::get('momentms/create', [MomentmsController::class, 'create'])->name('momentms.create');
       Route::post('/momentms', [MomentmsController::class, 'store'])->name('momentms.store');
+      Route::get('momentms/search', [MomentmsController::class, 'search'])->name('momentms.search');
       Route::get('momentms/{id}', [MomentmsController::class, 'show'])->name('momentms.show');
       Route::get('momentms/{id}/data', [MomentmsController::class, 'getData'])->name('momentms.data');
+      Route::delete('/momentms/{id}', [MomentmsController::class, 'destroy'])->name('momentms.destroy');
     });
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {
@@ -169,6 +172,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/solicitudes/bloquear', [SolicitudUserController::class, 'bloquearUsuario'])->name('solicitudes.bloquear');
     Route::get('/solicitudes/verificar-bloqueo/{id_usuario}', [SolicitudUserController::class, 'verificarBloqueo'])->name('solicitudes.verificar-bloqueo');
     Route::get('/solicitudes/verificar/{id_usuario}', [SolicitudUserController::class, 'verificarSolicitud'])->name('solicitudes.verificar');
+    Route::get('/solicitudes/pendientes', [SolicitudUserController::class, 'getPendientes'])->name('solicitudes.pendientes');
+    Route::post('/solicitudes/responder', [SolicitudUserController::class, 'responderSolicitud'])->name('solicitudes.responder');
     
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
@@ -183,3 +188,5 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/retos/verificar-disclaimer', [RetoController::class, 'verificarDisclaimer'])->middleware(['auth']);
     Route::post('/retos/guardar-disclaimer', [RetoController::class, 'guardarDisclaimer'])->middleware(['auth']);
 });
+
+Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');
