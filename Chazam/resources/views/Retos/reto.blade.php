@@ -46,7 +46,7 @@
                 @if($reto->id_reto == 1)
                     <h5 class="text-center mb-3">Reto de Emojis</h5>
                     <div class="text-center mb-3">
-                        <img src="{{ asset('IMG/instrucciones_reto/reto1.gif') }}" alt="Instrucciones Reto de Emojis" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
+                        <img src="{{ asset('img/instrucciones_reto/reto1.gif') }}" alt="Instrucciones Reto de Emojis" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
                     </div>
                     <p>En este reto:</p>
                     <ul>
@@ -58,7 +58,7 @@
                 @elseif($reto->id_reto == 2)
                     <h5 class="text-center mb-3">Reto de Texto Encriptado</h5>
                     <div class="text-center mb-3">
-                        <img src="{{ asset('IMG/instrucciones_reto/reto2.gif') }}" alt="Instrucciones Reto de Texto Encriptado" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
+                        <img src="{{ asset('img/instrucciones_reto/reto2.gif') }}" alt="Instrucciones Reto de Texto Encriptado" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
                     </div>
                     <p>En este reto:</p>
                     <ul>
@@ -70,20 +70,19 @@
                 @elseif($reto->id_reto == 3)
                     <h5 class="text-center mb-3">Reto de Palabras Desordenadas</h5>
                     <div class="text-center mb-3">
-                        <img src="{{ asset('IMG/instrucciones_reto/reto3.gif') }}" alt="Instrucciones Reto de Palabras Desordenadas" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
+                        <img src="{{ asset('img/instrucciones_reto/reto3.gif') }}" alt="Instrucciones Reto de Palabras Desordenadas" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
                     </div>
                     <p>En este reto:</p>
                     <ul>
                         <li>Tus mensajes se enviarán con las palabras en orden aleatorio</li>
                         <li>Intenta entender lo que tu compañero quiere decir a pesar del desorden</li>
                         <li>Solo ganarás puntos con mensajes que tengan al menos 60 caracteres</li>
-                        <li>El límite máximo es de 500 caracteres por mensaje</li>
                     </ul>
                     <p class="mt-3 text-center"><strong>¡Descifra el desorden y comunícate!</strong></p>
                 @elseif($reto->id_reto == 4)
                     <h5 class="text-center mb-3">Reto de Texto Invertido</h5>
                     <div class="text-center mb-3">
-                        <img src="{{ asset('IMG/instrucciones_reto/reto4.gif') }}" alt="Instrucciones Reto de Texto Invertido" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
+                        <img src="{{ asset('img/instrucciones_reto/reto4.gif') }}" alt="Instrucciones Reto de Texto Invertido" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
                     </div>
                     <p>En este reto:</p>
                     <ul>

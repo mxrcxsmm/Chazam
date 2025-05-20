@@ -292,7 +292,7 @@ function agregarMensaje(mensaje, usuario) {
     userImage.style.objectFit = 'cover';
     userImage.style.borderRadius = '50%';
     userImage.onerror = function() {
-        this.src = '/IMG/profile_img/avatar-default.png';
+        this.src = '/img/profile_img/avatar-default.png';
     };
     
     // Contenedor principal del mensaje (nombre, mensaje, hora)

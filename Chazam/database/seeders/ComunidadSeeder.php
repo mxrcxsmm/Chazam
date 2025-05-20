@@ -20,6 +20,7 @@ class ComunidadSeeder extends Seeder
                 'tipocomunidad' => 'publica',
                 'creator' => 1,
                 'fecha_creacion' => Carbon::now(),
+                'img' => 'php.jpg',
             ],
             [
                 'nombre' => 'Gamers Chazam',
@@ -27,6 +28,7 @@ class ComunidadSeeder extends Seeder
                 'tipocomunidad' => 'publica',
                 'creator' => 1,
                 'fecha_creacion' => Carbon::now(),
+                'img' => 'gamers.jpg',
             ],
             [
                 'nombre' => 'Música y Arte',
@@ -34,6 +36,7 @@ class ComunidadSeeder extends Seeder
                 'tipocomunidad' => 'publica',
                 'creator' => 1,
                 'fecha_creacion' => Carbon::now(),
+                'img' => 'music_art.jpg',
             ],
             [
                 'nombre' => 'Comunidad Cerrada',
@@ -42,6 +45,7 @@ class ComunidadSeeder extends Seeder
                 'codigo' => 'CHAZAM2024',
                 'creator' => 1,
                 'fecha_creacion' => Carbon::now(),
+                'img' => 'secret.jpg',
             ],
         ];
 

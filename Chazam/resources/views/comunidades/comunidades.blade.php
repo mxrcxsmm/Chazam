@@ -16,6 +16,9 @@
         @else
             @foreach($comunidadesCreadas as $comunidad)
                 <div class="comunidad-item">
+                    <div class="comunidad-imagen">
+                        <img src="{{ asset('img/comunidades/' . $comunidad->img) }}" alt="{{ $comunidad->nombre }}">
+                    </div>
                     <div class="comunidad-info">
                         <h3>{{ $comunidad->nombre }}</h3>
                         <p>{{ $comunidad->descripcion }}</p>
@@ -44,11 +47,14 @@
         @else
             @foreach($comunidadesPublicas as $comunidad)
                 <div class="comunidad-item">
+                    <div class="comunidad-imagen">
+                        <img src="{{ asset('img/comunidades/' . $comunidad->img) }}" alt="{{ $comunidad->nombre }}">
+                    </div>
                     <div class="comunidad-info">
                         <h3>{{ $comunidad->nombre }}</h3>
                         <p>{{ $comunidad->descripcion }}</p>
                         <div class="comunidad-meta">
-                            <span>{{ $comunidad->chat_usuarios_count }} miembros</span>
+                            <span>{{ $comunidad->chat_usuarios_count }} miembros</span> <br>
                             <span>Creado por: {{ $comunidad->creador->username }}</span>
                         </div>
                         <div class="comunidad-actions">
@@ -72,6 +78,9 @@
         @else
             @foreach($comunidadesPrivadas as $comunidad)
                 <div class="comunidad-item">
+                    <div class="comunidad-imagen">
+                        <img src="{{ asset('img/comunidades/' . $comunidad->img) }}" alt="{{ $comunidad->nombre }}">
+                    </div>
                     <div class="comunidad-info">
                         <h3>{{ $comunidad->nombre }}</h3>
                         <p>{{ $comunidad->descripcion }}</p>
