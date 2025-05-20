@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <title>@yield('title', 'Mi Aplicación')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Three.js para VANTA FOG -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
 
+<!-- VANTA FOG -->
+<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
@@ -15,11 +20,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="{{ asset('css/retos.css') }}">
-    @yield('head')
+    @stack('head')
 </head>
 <body>
+    <div id="vanta-bg" style="z-index: 0;"></div>
     {{-- Navbar --}}
-    <nav class="navbar navbar-expand-lg navbar-light shadow-sm px-4 py-2">
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm px-4 py-2" style="position: relative; z-index: 1;">
         <div class="container-fluid d-flex justify-content-between align-items-center">
 
             <!-- Logo o nombre de la app -->
@@ -44,7 +50,7 @@
                 <!-- Botón para abrir el menú -->
                 <button class="btn btn-outline-dark" onclick="toggleSidebar()">
                     @if(isset($imagen_perfil) && $imagen_perfil)
-                    <img src="{{ asset($imagen_perfil) }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
+                    <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
                 @else
                     <i class="bi bi-person-circle"></i>
                 @endif
@@ -55,7 +61,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="text-center">
                             @if(isset($imagen_perfil) && $imagen_perfil)
-                            <img src="{{ asset($imagen_perfil) }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #E6E6FA;">
+                            <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #E6E6FA;">
                             @else
                                 <i class="bi bi-person-circle fs-2"></i>
                             @endif
@@ -85,11 +91,11 @@
                     <hr class="border-light">
 
                     <ul class="list-unstyled">
-                        <li class="mb-4"><a href="{{ route('perfil.personalizacion') }}" class="text-white text-decoration-none">Personalizar</a></li>
+                        <li class="mb-4"><a href="{{ route('perfil.personalizacion') }}" class="text-white text-decoration-none">Perfil</a></li>
                         <li class="mb-4"><a href="{{ route('user.friendchat') }}" class="text-white text-decoration-none">Amigos</a></li>
                         <li class="mb-4"><a href="{{ route('comunidades.index') }}" class="text-white text-decoration-none">Comunidades</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Reportar</a></li>
-                        <li class="mb-4"><a href="{{route('tienda.index')}}" class="text-white text-decoration-none">Tienda</a></li>
+                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comprar puntos</a></li>
                     </ul>
 
                     <form method="POST" action="{{ route('logout') }}" class="mt-auto">
