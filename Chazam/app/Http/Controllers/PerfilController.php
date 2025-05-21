@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\File;
 
 class PerfilController extends Controller
 {
@@ -71,21 +72,33 @@ class PerfilController extends Controller
         $user->fecha_nacimiento = $request->input('fecha_nacimiento');
         $user->descripcion = $request->input('descripcion');
 
+        // 1) Si el usuario ha marcado “quitar foto”
         if ($request->input('remove_img') === '1') {
+            // Borra la anterior si existe
+            if ($user->img && File::exists(public_path($user->img))) {
+                File::delete(public_path($user->img));
+            }
             $user->img = null;
-        } else if ($request->hasFile('img')) {
-            $image = $request->file('img');
-            $realPath = $image->getRealPath();
-            $hash = md5_file($realPath);
-            $extension = $image->getClientOriginalExtension();
-            $filename = $user->username . '_' . $hash . '.' . $extension;
 
-            $path = 'perfiles/' . $filename;
-            if (!Storage::disk('public')->exists($path)) {
-                $image->storeAs('perfiles', $filename, 'public');
+        // 2) Si viene un archivo nuevo
+        } elseif ($request->hasFile('img')) {
+            // Borra la anterior si existe
+            if ($user->img && File::exists(public_path($user->img))) {
+                File::delete(public_path($user->img));
             }
 
-            $user->img = 'storage/' . $path;
+            $file      = $request->file('img');
+            $extension = $file->getClientOriginalExtension();
+            $hash      = md5_file($file->getRealPath());
+            $filename  = $user->username . '_' . $hash . '.' . $extension;
+
+            $destination = public_path('img/profile_img');
+            if (! File::isDirectory($destination)) {
+                File::makeDirectory($destination, 0755, true);
+            }
+
+            $file->move($destination, $filename);
+            $user->img = 'img/profile_img/'.$filename;
         }
 
         $user->save();
