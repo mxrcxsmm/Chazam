@@ -44,3 +44,16 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+function toggleDetalles(btn) {
+    var detalles = btn.closest('tr').nextElementSibling;
+    if (detalles.classList.contains('d-none')) {
+        detalles.classList.remove('d-none');
+        btn.querySelector('i').classList.remove('fa-plus');
+        btn.querySelector('i').classList.add('fa-minus');
+    } else {
+        detalles.classList.add('d-none');
+        btn.querySelector('i').classList.remove('fa-minus');
+        btn.querySelector('i').classList.add('fa-plus');
+    }
+}

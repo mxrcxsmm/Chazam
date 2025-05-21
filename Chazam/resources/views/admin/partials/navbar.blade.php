@@ -11,9 +11,6 @@
                     <a class="nav-link" href="{{ route('admin.usuarios.index') }}">Usuarios</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ route('admin.retos.index') }}">Retos</a>
-                </li>
-                <li class="nav-item">
                     <a class="nav-link" href="{{ route('admin.reportes.index') }}">
                         Reportes
                         <span id="contador-reportes" class="badge bg-danger">0</span>

@@ -90,6 +90,7 @@
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comunidades</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Reportar</a></li>
                         <li class="mb-4"><a href="{{route('tienda.index')}}" class="text-white text-decoration-none">Tienda</a></li>
+                        <li class="mb-4"><a href="{{ route('compras.historial') }}" class="text-white text-decoration-none">Mis Compras</a></li>
                     </ul>
 
                     <form method="POST" action="{{ route('logout') }}" class="mt-auto">
