@@ -8,6 +8,9 @@
     <div class="section-title">
         <h2>Mis Comunidades</h2>
     </div>
+    <div style="margin-bottom: 20px; text-align: right;">
+        <a href="{{ route('comunidades.create') }}" class="create-btn">+ Crear comunidad</a>
+    </div>
     <div class="comunidades-list" id="comunidades-creadas">
         @if($comunidadesCreadas->isEmpty())
             <div class="no-comunidades">
@@ -16,6 +19,9 @@
         @else
             @foreach($comunidadesCreadas as $comunidad)
                 <div class="comunidad-item">
+                    <div class="comunidad-imagen">
+                        <img src="{{ asset('img/comunidades/' . $comunidad->img) }}" alt="{{ $comunidad->nombre }}">
+                    </div>
                     <div class="comunidad-info">
                         <h3>{{ $comunidad->nombre }}</h3>
                         <p>{{ $comunidad->descripcion }}</p>
@@ -44,11 +50,14 @@
         @else
             @foreach($comunidadesPublicas as $comunidad)
                 <div class="comunidad-item">
+                    <div class="comunidad-imagen">
+                        <img src="{{ asset('img/comunidades/' . $comunidad->img) }}" alt="{{ $comunidad->nombre }}">
+                    </div>
                     <div class="comunidad-info">
                         <h3>{{ $comunidad->nombre }}</h3>
                         <p>{{ $comunidad->descripcion }}</p>
                         <div class="comunidad-meta">
-                            <span>{{ $comunidad->chat_usuarios_count }} miembros</span>
+                            <span>{{ $comunidad->chat_usuarios_count }} miembros</span> <br>
                             <span>Creado por: {{ $comunidad->creador->username }}</span>
                         </div>
                         <div class="comunidad-actions">
@@ -72,6 +81,9 @@
         @else
             @foreach($comunidadesPrivadas as $comunidad)
                 <div class="comunidad-item">
+                    <div class="comunidad-imagen">
+                        <img src="{{ asset('img/comunidades/' . $comunidad->img) }}" alt="{{ $comunidad->nombre }}">
+                    </div>
                     <div class="comunidad-info">
                         <h3>{{ $comunidad->nombre }}</h3>
                         <p>{{ $comunidad->descripcion }}</p>

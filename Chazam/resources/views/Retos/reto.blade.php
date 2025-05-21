@@ -77,7 +77,6 @@
                         <li>Tus mensajes se enviarán con las palabras en orden aleatorio</li>
                         <li>Intenta entender lo que tu compañero quiere decir a pesar del desorden</li>
                         <li>Solo ganarás puntos con mensajes que tengan al menos 60 caracteres</li>
-                        <li>El límite máximo es de 500 caracteres por mensaje</li>
                     </ul>
                     <p class="mt-3 text-center"><strong>¡Descifra el desorden y comunícate!</strong></p>
                 @elseif($reto->id_reto == 4)
