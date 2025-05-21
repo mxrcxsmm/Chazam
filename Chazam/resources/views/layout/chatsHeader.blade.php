@@ -47,6 +47,11 @@
                     <span>pts</span>
                 </div>
 
+                <!-- Botón de amistades -->
+                <button class="btn btn-outline-dark" id="btnAmistades" type="button">
+                    <i class="bi bi-people-fill"></i>
+                </button>
+
                 <!-- Botón para abrir el menú -->
                 <button class="btn btn-outline-dark" onclick="toggleSidebar()">
                     @if(isset($imagen_perfil) && $imagen_perfil)
@@ -121,6 +126,27 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/estados.js') }}"></script>
+    <script src="{{ asset('js/hamburger.js') }}"></script>
     @stack('scripts')
+
+    <!-- Modal de amistades (¡fuera del navbar y de cualquier div!) -->
+    <div class="modal fade" id="modalAmistades" tabindex="-1" aria-labelledby="modalAmistadesLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAmistadesLabel">Mis Amistades</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="listaAmistades" class="list-group">
+                        <!-- Aquí se cargarán las amistades dinámicamente -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
