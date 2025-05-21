@@ -2,21 +2,25 @@ body, html {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100vh;
-    overflow: hidden;
+    height: 100%;
+    background-color: #1a1a1a;
+    overflow-x: hidden;
+    position: relative;
 }
 
-.center-container {
+.main-container {
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 80vh;
-    text-align: center;
+    width: 100%;
     background-color: #1a1a1a;
     padding: 20px;
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow-y: scroll;
+    height: calc(100vh - 80px); /* Ajustamos la altura restando el espacio del header */
+    position: absolute;
+    top: 80px; /* Altura del header */
+    left: 0;
+    right: 0;
 }
 
 .section-title {
@@ -36,20 +40,38 @@ body, html {
     flex-direction: column;
     gap: 15px;
     margin-bottom: 30px;
+    width: 100%;
+    align-items: flex-start;
 }
 
 .comunidad-item {
-    background-color: #2d2d2d;
-    padding: 15px;
-    border-radius: 8px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    gap: 20px;
+    padding: 20px;
+    background: #2d2d2d;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    margin-bottom: 20px;
     transition: background-color 0.2s ease;
+    width: 100%;
 }
 
 .comunidad-item:hover {
     background-color: #3a3a3a;
+}
+
+.comunidad-imagen {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.comunidad-imagen img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .comunidad-info {
@@ -57,7 +79,9 @@ body, html {
 }
 
 .comunidad-info h3 {
-    color: white;
+    color: #ffffff;
+    margin: 0;
+    font-size: 1.2rem;
 }
 
 .comunidad-info p {
