@@ -17,8 +17,8 @@
         <!-- Sidebar fijo a la izquierda -->
         <aside id="sidebar" class="sidebar">
             <div class="text-center mb-4">
-                @if(isset($imagen_perfil) && $imagen_perfil)
-                    <img src="{{ asset($imagen_perfil) }}" alt="Foto de perfil">
+                @if(isset($user->imagen_perfil) && $user->imagen_perfil)
+                    <img src="{{ asset($user->imagen_perfil) }}" alt="Foto de perfil">
                 @else
                     <i class="bi bi-person-circle fs-2"></i>
                 @endif
@@ -42,9 +42,10 @@
             <nav>
                 <ul class="list-unstyled">
                     <li class="mb-4"><a href="{{ route('perfil.personalizacion') }}" class="text-white text-decoration-none">Mis datos</a></li>
-                    <li class="mb-4"><a href="{{ route('perfil.vista') }}" class="text-white text-decoration-none">Perfil</a></li>
+                    <li class="mb-4"><a href="{{ route('perfil.vista') }}" class="text-white text-decoration-none">Personalizar</a></li>
                     <li class="mb-4"><a href="{{ route('perfil.mejoras') }}" class="text-white text-decoration-none">Comprar Mejoras</a></li>
                     <li class="mb-4"><a href="{{ route('tienda.index') }}" class="text-white text-decoration-none">Tienda</a></li>
+                    <li class="mb-4"><a href="{{ route('retos.guide') }}" class="text-white text-decoration-none">Volver</a></li>
                 </ul>
             </nav>
 
@@ -61,5 +62,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    @stack('scripts')
 </body>
 </html>

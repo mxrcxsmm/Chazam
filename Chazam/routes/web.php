@@ -21,6 +21,11 @@ use App\Models\User;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\SolicitudUserController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\VistaController;
+use App\Http\Controllers\ComunidadesController;
+use App\Http\Controllers\SolicitudController;
+use App\Http\Controllers\AmistadController;
+
 
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -81,10 +86,10 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('perfil')->name('perfil.')->group(function () {
             Route::get('/dashboard', [PerfilController::class, 'dashboard'])->name('dashboard');
             Route::get('/personalizacion', [PerfilController::class, 'edit'])->name('personalizacion');
+            Route::get('/vista', [VistaController::class, 'show'])->name('vista');
+            Route::post('/marco', [VistaController::class, 'cambiarMarco'])->name('cambiarMarco');
+            Route::post('/glow', [VistaController::class, 'cambiarBrillo'])->name('cambiarBrillo');
             Route::put('/update', [PerfilController::class, 'update'])->name('update');
-            Route::get('/vista', function () {
-                return view('perfil.vista');
-            })->name('vista');
             Route::get('/mejoras', function () {
                 return view('perfil.mejoras');
             })->name('mejoras');
@@ -97,8 +102,10 @@ Route::middleware(['auth'])->group(function () {
       Route::get('momentms', [MomentmsController::class, 'index'])->name('user.momentms');
       Route::get('momentms/create', [MomentmsController::class, 'create'])->name('momentms.create');
       Route::post('/momentms', [MomentmsController::class, 'store'])->name('momentms.store');
+      Route::get('momentms/search', [MomentmsController::class, 'search'])->name('momentms.search');
       Route::get('momentms/{id}', [MomentmsController::class, 'show'])->name('momentms.show');
       Route::get('momentms/{id}/data', [MomentmsController::class, 'getData'])->name('momentms.data');
+      Route::delete('/momentms/{id}', [MomentmsController::class, 'destroy'])->name('momentms.destroy');
     });
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {
@@ -161,12 +168,21 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/solicitudes/bloquear', [SolicitudUserController::class, 'bloquearUsuario'])->name('solicitudes.bloquear');
     Route::get('/solicitudes/verificar-bloqueo/{id_usuario}', [SolicitudUserController::class, 'verificarBloqueo'])->name('solicitudes.verificar-bloqueo');
     Route::get('/solicitudes/verificar/{id_usuario}', [SolicitudUserController::class, 'verificarSolicitud'])->name('solicitudes.verificar');
+    Route::get('/solicitudes/pendientes', [SolicitudUserController::class, 'getPendientes'])->name('solicitudes.pendientes');
+    Route::post('/solicitudes/responder', [SolicitudUserController::class, 'responderSolicitud'])->name('solicitudes.responder');
     
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
 
+    // Rutas para comunidades
+    Route::get('/comunidades', [ComunidadesController::class, 'index'])->name('comunidades.index');
+    Route::get('/comunidades/create', [ComunidadesController::class, 'create'])->name('comunidades.create');
+    Route::post('/comunidades', [ComunidadesController::class, 'store'])->name('comunidades.store');
+    Route::post('/comunidades/{id}/join', [ComunidadesController::class, 'join'])->name('comunidades.join');
+
     Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
 
+<<<<<<< HEAD
     Route::get('/mis-compras', [CompraController::class, 'historial'])->name('compras.historial');
     Route::get('/mis-compras/factura/{pagoId}', [CompraController::class, 'descargarFactura'])
         ->middleware('auth')
@@ -174,4 +190,16 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mis-compras/filtrar', [CompraController::class, 'filtrarAjax'])
         ->middleware('auth')
         ->name('compras.filtrar');
+=======
+    // Rutas para el disclaimer
+    Route::get('/retos/verificar-disclaimer', [RetoController::class, 'verificarDisclaimer'])->middleware(['auth']);
+    Route::post('/retos/guardar-disclaimer', [RetoController::class, 'guardarDisclaimer'])->middleware(['auth']);
+
+    // Rutas de amistades
+    Route::get('/api/amistades', [App\Http\Controllers\AmistadController::class, 'index']);
+    Route::delete('/api/amistades/{idUsuario}', [App\Http\Controllers\AmistadController::class, 'destroy']);
+    Route::post('/api/amistades/{idUsuario}/bloquear', [App\Http\Controllers\AmistadController::class, 'bloquear']);
+>>>>>>> 005a41b1cfc72e5791e3e61a45ea7c9b237344d8
 });
+
+Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');

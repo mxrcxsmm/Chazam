@@ -7,7 +7,6 @@ use App\Models\ChatUsuario;
 use App\Models\Mensaje;
 use App\Models\Chat;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Comunidad;
 
 class FriendChatController extends Controller
 {
@@ -101,7 +100,7 @@ class FriendChatController extends Controller
 
     public function comunidades()
     {
-        $comunidades = Comunidad::all();
-        return view('user.comunidades', compact('comunidades'));
+        $chats = Chat::whereNull('id_reto')->get();
+        return view('user.comunidades', compact('chats'));
     }
 } 

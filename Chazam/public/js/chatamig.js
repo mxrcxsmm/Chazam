@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
             chatItem.dataset.chatId = chat.id_chat;
             chatItem.innerHTML = `
                 <div class="chat-avatar">
-                    <img src="${chat.img ? chat.img : '/images/avatar-default.png'}" alt="Avatar">
+                    <img src="${chat.img ? chat.img : '/img/profile_img/avatar-default.png'}" alt="Avatar">
                 </div>
                 <div class="chat-info">
                     <div class="chat-header">
@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
             msgDiv.className = 'message';
             msgDiv.innerHTML = `
                 <div class="message-header">
-                    <img src="/images/avatar-default.png" alt="Avatar" class="message-avatar">
+                    <img src="/img/profile_img/avatar-default.png" alt="Avatar" class="message-avatar">
                     <span class="message-username">${msg.usuario}</span>
                     <span class="message-time">${msg.fecha_envio}</span>
                 </div>
@@ -104,9 +104,46 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
 
+    // --- NUEVO: Contador y validación de caracteres ---
+    // Crear el contador de caracteres
+    const contadorContainer = document.createElement('div');
+    contadorContainer.id = 'contador-caracteres';
+    contadorContainer.style.fontSize = '12px';
+    contadorContainer.style.color = '#6c757d';
+    contadorContainer.style.marginTop = '5px';
+    contadorContainer.style.textAlign = 'right';
+    // Insertar el contador justo después del input
+    const inputGroup = document.querySelector('.message-input-container');
+    if (inputGroup) {
+        inputGroup.insertAdjacentElement('afterend', contadorContainer);
+    }
+    // Actualizar el contador al escribir
+    messageInput.addEventListener('input', function() {
+        const longitud = this.value.trim().length;
+        const caracteresRestantes = 500 - longitud;
+        let textoContador = `${longitud}/500 caracteres`;
+        if (caracteresRestantes < 50) {
+            contadorContainer.style.color = '#dc3545';
+        } else {
+            contadorContainer.style.color = '#6c757d';
+        }
+        contadorContainer.textContent = textoContador;
+    });
+    // Inicializar el contador
+    messageInput.dispatchEvent(new Event('input'));
+
+    // Modificar sendMessage para validar máximo 500 caracteres
     function sendMessage() {
         const messageInput = document.querySelector('.message-input-container input');
         const message = messageInput.value.trim();
+        if (message.length > 500) {
+            Swal.fire({
+                title: 'Mensaje demasiado largo',
+                text: 'El mensaje no puede exceder los 500 caracteres',
+                icon: 'warning'
+            });
+            return;
+        }
         if (message && currentChatId) {
             fetch(window.userChatConfig.sendUrl(currentChatId), {
                 method: 'POST',
@@ -120,7 +157,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.success) {
                     loadMessages(currentChatId);
-            messageInput.value = '';
+                    messageInput.value = '';
+                    messageInput.dispatchEvent(new Event('input'));
                 }
             });
         }
@@ -209,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Actualiza la imagen de perfil
         const chatImg = document.getElementById('chat-contact-img');
-        chatImg.src = companero.img ? companero.img : '/images/avatar-default.png';
+        chatImg.src = companero.img ? companero.img : '/img/profile_img/avatar-default.png';
     }
 
     function refreshCurrentChatHeader() {
@@ -228,20 +266,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         chatStatus.textContent = 'desconectado';
                         chatStatus.style.color = '#b9bbbe';
                     }
-
-                    // Actualiza la imagen de perfil cada 2 minutos
-                    const now = Date.now();
-                    if (now - lastImageUpdate > 120000) { // 120000 ms = 2 minutos
-                        const chatImg = document.getElementById('chat-contact-img');
-                        chatImg.src = currentChat.img ? currentChat.img : '/images/avatar-default.png';
-                        lastImageUpdate = now;
-                    }
                 }
             });
     }
 
-    // Llama a esta función cada 15 segundos
-    setInterval(refreshCurrentChatHeader, 15000);
+    // Llama a esta función cada 20 segundos
+    setInterval(refreshCurrentChatHeader, 20000);
+
+    // Refrescar mensajes del chat activo cada 5 segundos
+    setInterval(function() {
+        if (currentChatId) {
+            loadMessages(currentChatId);
+        }
+    }, 5000);
 
     loadChats();
     startMessagePolling();

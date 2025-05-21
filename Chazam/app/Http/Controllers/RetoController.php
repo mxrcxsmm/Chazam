@@ -29,7 +29,7 @@ class RetoController extends Controller
         
         // Actualizar estado a Disponible (5)
         User::where('id_usuario', $user->id_usuario)->update(['id_estado' => 5]);
-        
+
         // Obtener el reto del día desde la caché o seleccionar uno nuevo
         $reto = $this->getRetoDelDia();
         
@@ -40,6 +40,7 @@ class RetoController extends Controller
             'username' => $user->username,
             'nombre_completo' => $user->nombre_completo,
             'imagen_perfil' => $user->imagen_perfil,
+            // 'imagen_perfil' => $user->img,
             'user_id' => $user->id_usuario
         ]);
     }
@@ -617,5 +618,31 @@ class RetoController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Verifica si el disclaimer ya fue mostrado hoy
+     */
+    public function verificarDisclaimer()
+    {
+        $user = Auth::user();
+        $cacheKey = 'disclaimer_' . $user->id_usuario . '_' . now()->format('Y-m-d');
+        
+        return response()->json([
+            'mostrado' => Cache::has($cacheKey)
+        ]);
+    }
+
+    /**
+     * Guarda en caché que el disclaimer fue mostrado hoy
+     */
+    public function guardarDisclaimer()
+    {
+        $user = Auth::user();
+        $cacheKey = 'disclaimer_' . $user->id_usuario . '_' . now()->format('Y-m-d');
+        
+        Cache::put($cacheKey, true, now()->endOfDay());
+        
+        return response()->json(['success' => true]);
     }
 }
