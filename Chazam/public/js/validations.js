@@ -174,27 +174,33 @@ function validateSignUpForm() {
 
 // Inicializar el datepicker con las restricciones
 function initDatepicker() {
-    const datepickers = document.querySelectorAll('.datepicker');
-    const hoy = new Date();
-    const edadMinima = new Date(hoy.getFullYear() - 13, hoy.getMonth(), hoy.getDate());
-
-    M.Datepicker.init(datepickers, {
+    var today = new Date();
+    var maxDate = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate() - 1);
+    var elems = document.querySelectorAll('.datepicker');
+    M.Datepicker.init(elems, {
         format: 'yyyy-mm-dd',
-        yearRange: [edadMinima.getFullYear() - 100, edadMinima.getFullYear()],
-        maxDate: edadMinima,
-        defaultDate: edadMinima,
-        setDefaultDate: true,
-        autoClose: true,
-        showClearBtn: false,
+        yearRange: [1900, maxDate.getFullYear()],
+        maxDate: maxDate,
+        setDefaultDate: false,
+        defaultDate: maxDate,
         i18n: {
-            months: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-            monthsShort: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
-            weekdays: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
-            weekdaysShort: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
-            weekdaysAbbrev: ["D", "L", "M", "M", "J", "V", "S"],
             cancel: 'Cancelar',
             clear: 'Limpiar',
-            done: 'Aceptar'
+            done: 'Aceptar',
+            months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            monthsShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+            weekdaysShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+            weekdaysAbbrev: ['D','L','M','M','J','V','S']
+        },
+        onSelect: function(date) {
+            // Formatea la fecha seleccionada y la pone en el input
+            if (this.el) {
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const dd = String(date.getDate()).padStart(2, '0');
+                this.el.value = `${yyyy}-${mm}-${dd}`;
+            }
         }
     });
 }
