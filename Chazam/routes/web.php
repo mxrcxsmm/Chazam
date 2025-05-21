@@ -23,6 +23,7 @@ use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\VistaController;
 use App\Http\Controllers\ComunidadesController;
 use App\Http\Controllers\SolicitudController;
+use App\Http\Controllers\AmistadController;
 
 
 
@@ -189,6 +190,11 @@ Route::middleware(['auth'])->group(function () {
     // Rutas para el disclaimer
     Route::get('/retos/verificar-disclaimer', [RetoController::class, 'verificarDisclaimer'])->middleware(['auth']);
     Route::post('/retos/guardar-disclaimer', [RetoController::class, 'guardarDisclaimer'])->middleware(['auth']);
+
+    // Rutas de amistades
+    Route::get('/api/amistades', [App\Http\Controllers\AmistadController::class, 'index']);
+    Route::delete('/api/amistades/{idUsuario}', [App\Http\Controllers\AmistadController::class, 'destroy']);
+    Route::post('/api/amistades/{idUsuario}/bloquear', [App\Http\Controllers\AmistadController::class, 'bloquear']);
 });
 
 Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');
