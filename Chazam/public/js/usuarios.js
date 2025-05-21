@@ -46,14 +46,11 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 function toggleDetalles(btn) {
-    var detalles = btn.closest('tr').nextElementSibling;
-    if (detalles.classList.contains('d-none')) {
-        detalles.classList.remove('d-none');
-        btn.querySelector('i').classList.remove('fa-plus');
-        btn.querySelector('i').classList.add('fa-minus');
-    } else {
-        detalles.classList.add('d-none');
-        btn.querySelector('i').classList.remove('fa-minus');
-        btn.querySelector('i').classList.add('fa-plus');
+    // Solo funciona en móvil
+    if (window.innerWidth > 768) return;
+    const tr = btn.closest('tr');
+    const detalles = tr.nextElementSibling;
+    if (detalles && detalles.classList.contains('detalles-usuario')) {
+        detalles.classList.toggle('d-none');
     }
 }

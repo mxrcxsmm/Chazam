@@ -130,7 +130,6 @@
                             <td class="td-estado">{{ $user->estado->nom_estado ?? 'Sin estado' }}</td>
                             <td class="td-rol">{{ $user->rol->nom_rol ?? 'Sin rol' }}</td>
                             <td class="td-acciones">
-                                <!-- Botón + solo visible en móvil -->
                                 <button class="btn-mas d-inline-block d-md-none" onclick="toggleDetalles(this)">
                                     <i class="fas fa-plus"></i>
                                 </button>
@@ -161,7 +160,7 @@
                             </td>
                         </tr>
                         <!-- Fila de detalles, oculta por defecto, solo para móvil -->
-                        <tr class="detalles-usuario d-none d-md-table-row">
+                        <tr class="detalles-usuario d-none">
                             <td colspan="11">
                                 <strong>ID:</strong> {{ $user->id_usuario }}<br>
                                 <strong>Nombre de Usuario:</strong> {{ $user->username }}<br>

@@ -242,10 +242,16 @@ label {
         padding: 0 6px;
         cursor: pointer;
     }
-}
-
-@media (min-width: 769px) {
     .detalles-usuario {
         display: none !important;
     }
+
+    .detalles-usuario:not(.d-none) {
+        display: table-row !important;
+    }
+}
+
+/* Por defecto, oculta la fila de detalles */
+.detalles-usuario {
+    display: none !important;
 }

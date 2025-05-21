@@ -182,7 +182,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
 
-<<<<<<< HEAD
+    // Rutas para que el usuario vea sus propias compras
     Route::get('/mis-compras', [CompraController::class, 'historial'])->name('compras.historial');
     Route::get('/mis-compras/factura/{pagoId}', [CompraController::class, 'descargarFactura'])
         ->middleware('auth')
@@ -190,7 +190,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/mis-compras/filtrar', [CompraController::class, 'filtrarAjax'])
         ->middleware('auth')
         ->name('compras.filtrar');
-=======
+
     // Rutas para el disclaimer
     Route::get('/retos/verificar-disclaimer', [RetoController::class, 'verificarDisclaimer'])->middleware(['auth']);
     Route::post('/retos/guardar-disclaimer', [RetoController::class, 'guardarDisclaimer'])->middleware(['auth']);
@@ -199,7 +199,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/api/amistades', [App\Http\Controllers\AmistadController::class, 'index']);
     Route::delete('/api/amistades/{idUsuario}', [App\Http\Controllers\AmistadController::class, 'destroy']);
     Route::post('/api/amistades/{idUsuario}/bloquear', [App\Http\Controllers\AmistadController::class, 'bloquear']);
->>>>>>> 005a41b1cfc72e5791e3e61a45ea7c9b237344d8
 });
 
 Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');
