@@ -44,6 +44,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [AdminController::class, 'destroy'])->name('usuarios.destroy');
         Route::post('/usuarios/filtrar', [AdminController::class, 'filtrar'])->name('usuarios.filtrar');
         Route::post('/usuarios/{id}/ban', [AdminController::class, 'ban'])->name('usuarios.ban');
+        Route::get('/usuarios/{id}/json', [AdminController::class, 'getUserJson'])->name('usuarios.json');
 
         // Rutas para reportes (administrador)
         Route::get('reportes', [ReporteAdminController::class, 'index'])->name('reportes.index');

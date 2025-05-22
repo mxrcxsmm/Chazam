@@ -90,7 +90,6 @@
                                 <i class="fas fa-eraser"></i> Limpiar Filtros
                             </button>
                         </div>
-
                     </div>
                 </div>
             </form>
@@ -130,9 +129,13 @@
                             <td class="td-estado">{{ $user->estado->nom_estado ?? 'Sin estado' }}</td>
                             <td class="td-rol">{{ $user->rol->nom_rol ?? 'Sin rol' }}</td>
                             <td class="td-acciones">
-                                <button class="btn-mas d-inline-block d-md-none" onclick="toggleDetalles(this)">
-                                    <i class="fas fa-plus"></i>
-                                </button>
+                                <!-- Icono "+" clicable solo en móvil -->
+                                <i class="fas fa-plus text-primary d-inline-block d-md-none"
+                                   style="cursor:pointer; font-size: 1.3em;"
+                                   data-bs-toggle="modal"
+                                   data-bs-target="#modalUsuario"
+                                   data-user-id="{{ $user->id_usuario }}"
+                                   title="Ver detalles"></i>
                                 <!-- Acciones normales (editar, eliminar, etc.) -->
                                 <form action="{{ route('admin.usuarios.destroy', $user->id_usuario) }}"
                                     method="POST" class="delete-form" style="display:inline-block;">
@@ -159,25 +162,25 @@
                                 @endif
                             </td>
                         </tr>
-                        <!-- Fila de detalles, oculta por defecto, solo para móvil -->
-                        <tr class="detalles-usuario d-none">
-                            <td colspan="11">
-                                <strong>ID:</strong> {{ $user->id_usuario }}<br>
-                                <strong>Nombre de Usuario:</strong> {{ $user->username }}<br>
-                                <strong>Email:</strong> {{ $user->email }}<br>
-                                <strong>Nombre Completo:</strong> {{ $user->nombre }} {{ $user->apellido }}<br>
-                                <strong>Fecha nacimiento:</strong> {{ $user->fecha_nacimiento->format('Y-m-d') }}<br>
-                                <strong>Género:</strong> {{ $user->genero }}<br>
-                                <strong>Descripción:</strong> {{ $user->descripcion }}<br>
-                                <strong>Nacionalidad:</strong> {{ $user->nacionalidad->nombre ?? 'Sin nacionalidad' }}<br>
-                                <strong>Estado:</strong> {{ $user->estado->nom_estado ?? 'Sin estado' }}<br>
-                                <strong>Rol:</strong> {{ $user->rol->nom_rol ?? 'Sin rol' }}
-                            </td>
-                        </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
+    </div>
+
+    <!-- Modal para mostrar info completa del usuario -->
+    <div class="modal fade" id="modalUsuario" tabindex="-1" aria-labelledby="modalUsuarioLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-scrollable modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalUsuarioLabel">Información completa del usuario</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+          </div>
+          <div class="modal-body" id="modalUsuarioBody">
+            <!-- Aquí se cargará la info por JS -->
+          </div>
+        </div>
+      </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
