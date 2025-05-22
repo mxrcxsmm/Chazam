@@ -491,19 +491,22 @@ async function cargarSolicitudesAmistad() {
         const solicitudesCount = document.getElementById('solicitudesCount');
 
         // Actualizar contador
-        solicitudesCount.textContent = data.length;
+        if (solicitudesCount) solicitudesCount.textContent = data.length;
 
         if (data.length === 0) {
-            noSolicitudes.style.display = 'block';
-            container.innerHTML = '';
-            container.appendChild(noSolicitudes);
+            if (container && noSolicitudes) {
+                noSolicitudes.style.display = 'block';
+                container.innerHTML = '';
+                container.appendChild(noSolicitudes);
+            }
             return;
         }
 
-        noSolicitudes.style.display = 'none';
-        container.innerHTML = '';
+        if (noSolicitudes) noSolicitudes.style.display = 'none';
+        if (container) container.innerHTML = '';
 
         data.forEach(solicitud => {
+            if (!container) return;
             const solicitudDiv = document.createElement('div');
             solicitudDiv.className = 'solicitud-item d-flex align-items-center justify-content-between p-2 border-bottom';
             solicitudDiv.id = `solicitud-${solicitud.id_solicitud}`;
@@ -529,11 +532,21 @@ async function cargarSolicitudesAmistad() {
         });
     } catch (error) {
         console.error('Error al cargar solicitudes:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'No se pudieron cargar las solicitudes de amistad',
-            icon: 'error'
-        });
+        const container = document.getElementById('solicitudesContainer');
+        const noSolicitudes = document.getElementById('noSolicitudes');
+        if (container && noSolicitudes && container.children.length === 0) {
+            noSolicitudes.style.display = 'block';
+            container.innerHTML = '';
+            container.appendChild(noSolicitudes);
+        }
+        // Solo muestra el SweetAlert si realmente no hay contenedor
+        if (!container) {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudieron cargar las solicitudes de amistad',
+                icon: 'error'
+            });
+        }
     }
 }
 
@@ -566,38 +579,38 @@ async function responderSolicitud(idSolicitud, respuesta) {
         const data = await response.json();
         
         if (data.success) {
-            // Actualizar la interfaz
-            const actionsDiv = solicitudDiv.querySelector('.solicitud-actions');
-            actionsDiv.innerHTML = `
-                <span class="badge ${data.estado === 'aceptada' ? 'bg-success' : 'bg-danger'}">
-                    ${data.estado === 'aceptada' ? 'Aceptada' : 'Rechazada'}
-                </span>
-            `;
-
+            if (data.estado === 'rechazada') {
+                // Eliminar el elemento del DOM si fue rechazada
+                solicitudDiv.remove();
+                // Actualizar el contador de solicitudes
+                const solicitudesCount = document.getElementById('solicitudesCount');
+                const count = parseInt(solicitudesCount.textContent);
+                solicitudesCount.textContent = Math.max(0, count - 1);
+                // Si no hay más solicitudes, mostrar el mensaje
+                const container = document.getElementById('solicitudesContainer');
+                if (container.children.length === 0) {
+                    const noSolicitudes = document.getElementById('noSolicitudes');
+                    if (noSolicitudes) {
+                        container.innerHTML = '';
+                        noSolicitudes.style.display = 'block';
+                        container.appendChild(noSolicitudes);
+                    }
+                }
+            } else {
+                // Si fue aceptada, actualizar el badge
+                const actionsDiv = solicitudDiv.querySelector('.solicitud-actions');
+                actionsDiv.innerHTML = `
+                    <span class="badge bg-success">Aceptada</span>
+                `;
+            }
             // Mostrar mensaje de éxito
             Swal.fire({
                 title: data.estado === 'aceptada' ? '¡Solicitud aceptada!' : 'Solicitud rechazada',
-                text: data.estado === 'aceptada' ? 'Ahora son amigos' : 'La solicitud ha sido rechazada',
+                text: data.estado === 'aceptada' ? 'Ahora son amigxs' : 'La solicitud ha sido rechazada',
                 icon: 'success',
                 timer: 2000,
                 showConfirmButton: false
             });
-
-            // Actualizar el contador de solicitudes
-            const solicitudesCount = document.getElementById('solicitudesCount');
-            const count = parseInt(solicitudesCount.textContent);
-            solicitudesCount.textContent = Math.max(0, count - 1);
-
-            // Si no hay más solicitudes, mostrar el mensaje
-            if (count - 1 === 0) {
-                const container = document.getElementById('solicitudesContainer');
-                const noSolicitudes = document.getElementById('noSolicitudes');
-                if (container && noSolicitudes) {
-                    container.innerHTML = '';
-                    noSolicitudes.style.display = 'block';
-                    container.appendChild(noSolicitudes);
-                }
-            }
         } else {
             throw new Error(data.message || 'Error al procesar la solicitud');
         }

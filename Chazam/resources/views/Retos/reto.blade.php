@@ -171,10 +171,8 @@
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="solicitudesContainer">
-                <!-- Las solicitudes se cargarán aquí dinámicamente -->
-                <div class="text-center py-3" id="noSolicitudes">
-                    <p class="text-muted">No tienes solicitudes pendientes</p>
-                </div>
+                <div id="noSolicitudes" style="display:none;">No tienes solicitudes pendientes</div>
+                <!-- Aquí se agregan dinámicamente las solicitudes -->
             </div>
         </div>
     </div>

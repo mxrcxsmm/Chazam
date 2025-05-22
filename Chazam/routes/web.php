@@ -196,9 +196,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/retos/guardar-disclaimer', [RetoController::class, 'guardarDisclaimer'])->middleware(['auth']);
 
     // Rutas de amistades
-    Route::get('/api/amistades', [App\Http\Controllers\AmistadController::class, 'index']);
-    Route::delete('/api/amistades/{idUsuario}', [App\Http\Controllers\AmistadController::class, 'destroy']);
-    Route::post('/api/amistades/{idUsuario}/bloquear', [App\Http\Controllers\AmistadController::class, 'bloquear']);
+    Route::get('/amistades', [AmistadController::class, 'index'])->name('amistades.index');
+    Route::delete('/amistades/{idUsuario}', [AmistadController::class, 'destroy'])->name('amistades.destroy');
+    Route::post('/amistades/{idUsuario}/bloquear', [AmistadController::class, 'bloquear'])->name('amistades.bloquear');
 });
 
 Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');
