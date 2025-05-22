@@ -28,6 +28,14 @@
             <td>{{ $user->estado->nom_estado ?? 'Sin estado' }}</td>
             <td>{{ $user->rol->nom_rol ?? 'Sin rol' }}</td>
             <td>
+                <!-- Botón para abrir modal en móvil -->
+                <button class="btn btn-primary btn-mas d-inline-block d-md-none"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalUsuario"
+                    data-user='@json($user)'>
+                    <i class="fas fa-plus"></i>
+                </button>
+                <!-- Acciones normales (eliminar, banear, etc.) -->
                 <form action="{{ route('admin.usuarios.destroy', $user->id_usuario) }}" method="POST" style="display:inline-block;">
                     @csrf
                     @method('DELETE')
@@ -52,3 +60,19 @@
         @endforeach
     </tbody>
 </table>
+
+<!-- Modal para mostrar info completa del usuario -->
+<div class="modal fade" id="modalUsuario" tabindex="-1" aria-labelledby="modalUsuarioLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="modalUsuarioLabel">Información completa del usuario</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body" id="modalUsuarioBody">
+        <!-- Aquí se cargará la info por JS -->
+      </div>
+    </div>
+  </div>
+</div>
+<script src="{{asset('js/usuarios.js')}}"></script>

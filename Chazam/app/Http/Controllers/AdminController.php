@@ -132,4 +132,22 @@ class AdminController extends Controller
             return back()->with('error', 'Error al banear el usuario: ' . $e->getMessage());
         }
     }
+
+    public function getUserJson($id)
+    {
+        $user = \App\Models\User::with(['nacionalidad', 'estado', 'rol'])->findOrFail($id);
+
+        return response()->json([
+            'id_usuario' => $user->id_usuario,
+            'username' => $user->username,
+            'email' => $user->email,
+            'nombre_completo' => $user->nombre . ' ' . $user->apellido,
+            'fecha_nacimiento' => $user->fecha_nacimiento ? $user->fecha_nacimiento->format('Y-m-d') : '',
+            'genero' => $user->genero,
+            'descripcion' => $user->descripcion,
+            'nacionalidad' => $user->nacionalidad->nombre ?? '',
+            'estado' => $user->estado->nom_estado ?? '',
+            'rol' => $user->rol->nom_rol ?? ''
+        ]);
+    }
 }
