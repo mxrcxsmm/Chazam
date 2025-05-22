@@ -220,7 +220,6 @@ class SolicitudUserController extends Controller
             $solicitud->estado = $request->respuesta;
             $solicitud->save();
 
-            // Si se acepta la solicitud, crear un chat entre los usuarios si no existe
             if ($request->respuesta === 'aceptada') {
                 // Buscar un chat privado (sin id_reto) entre ambos usuarios
                 $chatExistente = \App\Models\Chat::whereNull('id_reto')
@@ -258,6 +257,29 @@ class SolicitudUserController extends Controller
                     'id_receptor' => $solicitud->id_emisor,
                     'estado' => 'aceptada'
                 ]);
+            } else if ($request->respuesta === 'rechazada') {
+                // Eliminar chats relacionados
+                $chats = \App\Models\Chat::whereHas('chatUsuarios', function($query) use ($solicitud) {
+                    $query->where('id_usuario', $solicitud->id_emisor)
+                          ->orWhere('id_usuario', $solicitud->id_receptor);
+                })->get();
+
+                foreach ($chats as $chat) {
+                    // Eliminar mensajes
+                    \App\Models\Mensaje::whereIn('id_chat_usuario', function($query) use ($chat) {
+                        $query->select('id_chat_usuario')
+                              ->from('chat_usuario')
+                              ->where('id_chat', $chat->id_chat);
+                    })->delete();
+
+                    // Eliminar relaciones chat_usuario
+                    \App\Models\ChatUsuario::where('id_chat', $chat->id_chat)->delete();
+
+                    // Eliminar el chat
+                    $chat->delete();
+                }
+                // Eliminar la solicitud rechazada de la base de datos
+                $solicitud->delete();
             }
 
             DB::commit();
