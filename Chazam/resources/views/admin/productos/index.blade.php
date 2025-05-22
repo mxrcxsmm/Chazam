@@ -71,91 +71,101 @@
 
     <!-- Modal para Crear Producto -->
     <div id="createModal" class="modal fade" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <form id="createForm" action="{{ route('admin.productos.store') }}" method="POST">
-                    @csrf
-                    <div class="modal-header">
+                <div class="producto-form-container">
+                    <form id="createForm" action="{{ route('admin.productos.store') }}" method="POST" class="producto-form">
+                        @csrf
                         <h5 class="modal-title" id="createModalLabel">Crear Producto</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="titulo" class="form-label">Título</label>
-                            <input type="text" name="titulo" id="titulo" class="form-control">
+                        <div class="row">
+                            <div class="input-field col-md-6 mb-3">
+                                <label for="titulo">Título</label>
+                                <input type="text" name="titulo" id="titulo">
+                            </div>
+                            <div class="input-field col-md-6 mb-3">
+                                <label for="precio">Precio</label>
+                                <input type="number" name="precio" id="precio" step="0.01" min="0">
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="descripcion" class="form-label">Descripción</label>
-                            <textarea name="descripcion" id="descripcion" class="form-control"></textarea>
+                        <div class="row">
+                            <div class="input-field col-md-6 mb-3">
+                                <label for="tipo_valor">Tipo de Valor</label>
+                                <select name="tipo_valor" id="tipo_valor">
+                                    <option value="" disabled selected>Seleccione un tipo</option>
+                                    <option value="euros">Euros</option>
+                                    <option value="puntos">Puntos</option>
+                                </select>
+                            </div>
+                            <div class="input-field col-md-6 mb-3">
+                                <label for="id_tipo_producto">Tipo de Producto</label>
+                                <select name="id_tipo_producto" id="id_tipo_producto">
+                                    <option value="" disabled selected>Seleccione un tipo</option>
+                                    @foreach ($tiposProducto as $tipo)
+                                        <option value="{{ $tipo->id_tipo_producto }}">{{ $tipo->tipo_producto }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="valor" class="form-label">Precio</label>
-                            <input type="number" name="precio" id="precio" class="form-control" step="0.01" min="0">
+                        <div class="row">
+                            <div class="input-field col-12 mb-3">
+                                <label for="descripcion">Descripción</label>
+                                <textarea name="descripcion" id="descripcion"></textarea>
+                            </div>
                         </div>
-                        <div class="mb-3">
-                            <label for="tipo_valor" class="form-label">Tipo de Valor</label>
-                            <select name="tipo_valor" id="tipo_valor" class="form-select">
-                                <option value="" disabled selected>Seleccione un tipo</option>
-                                <option value="euros">Euros</option>
-                                <option value="puntos">Puntos</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="id_tipo_producto" class="form-label">Tipo de Producto</label>
-                            <select name="id_tipo_producto" id="id_tipo_producto" class="form-select">
-                                <option value="" disabled selected>Seleccione un tipo</option>
-                                @foreach ($tiposProducto as $tipo)
-                                    <option value="{{ $tipo->id_tipo_producto }}">{{ $tipo->tipo_producto }}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Guardar</button>
-                    </div>
-                </form>
+                        <button type="submit" class="btn btn-custom">Guardar</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Modal para Editar Producto -->
     <div id="editModal" class="modal fade" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+        <div class="modal-dialog modal-xl">
             <div class="modal-content">
-                <form id="editForm" method="POST">
-                    @csrf
-                    @method('PUT')
-                    <div class="mb-3">
-                        <label for="edit_titulo" class="form-label">Título</label>
-                        <input type="text" name="titulo" id="edit_titulo" class="form-control">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_descripcion" class="form-label">Descripción</label>
-                        <textarea name="descripcion" id="edit_descripcion" class="form-control"></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_valor" class="form-label">Precio</label>
-                        <input type="number" name="precio" id="edit_precio" class="form-control" step="0.01" min="0">
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_tipo_valor" class="form-label">Tipo de Valor</label>
-                        <select name="tipo_valor" id="edit_tipo_valor" class="form-select">
-                            <option value="" disabled selected>Seleccione un tipo</option>
-                            <option value="euros">Euros</option>
-                            <option value="puntos">Puntos</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="edit_id_tipo_producto" class="form-label">Tipo de Producto</label>
-                        <select name="id_tipo_producto" id="edit_id_tipo_producto" class="form-select">
-                            <option value="" disabled>Seleccione un tipo</option>
-                            @foreach ($tiposProducto as $tipo)
-                                <option value="{{ $tipo->id_tipo_producto }}">{{ $tipo->tipo_producto }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Actualizar</button>
-                </form>
+                <div class="producto-form-container">
+                    <form id="editForm" method="POST" class="producto-form">
+                        @csrf
+                        @method('PUT')
+                        <h5 class="modal-title" id="editModalLabel">Editar Producto</h5>
+                        <div class="row">
+                            <div class="input-field col-md-6 mb-3">
+                                <label for="edit_titulo">Título</label>
+                                <input type="text" name="titulo" id="edit_titulo">
+                            </div>
+                            <div class="input-field col-md-6 mb-3">
+                                <label for="edit_precio">Precio</label>
+                                <input type="number" name="precio" id="edit_precio" step="0.01" min="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col-md-6 mb-3">
+                                <label for="edit_tipo_valor">Tipo de Valor</label>
+                                <select name="tipo_valor" id="edit_tipo_valor">
+                                    <option value="" disabled selected>Seleccione un tipo</option>
+                                    <option value="euros">Euros</option>
+                                    <option value="puntos">Puntos</option>
+                                </select>
+                            </div>
+                            <div class="input-field col-md-6 mb-3">
+                                <label for="edit_id_tipo_producto">Tipo de Producto</label>
+                                <select name="id_tipo_producto" id="edit_id_tipo_producto">
+                                    <option value="" disabled>Seleccione un tipo</option>
+                                    @foreach ($tiposProducto as $tipo)
+                                        <option value="{{ $tipo->id_tipo_producto }}">{{ $tipo->tipo_producto }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="input-field col-12 mb-3">
+                                <label for="edit_descripcion">Descripción</label>
+                                <textarea name="descripcion" id="edit_descripcion"></textarea>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-custom">Actualizar</button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
