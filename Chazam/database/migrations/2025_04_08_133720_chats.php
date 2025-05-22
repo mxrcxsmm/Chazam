@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('img')->nullable();
             $table->string('nombre', 100);
             $table->string('tipocomunidad')->nullable();
-            $table->string('codigo', 10)->nullable();
+            $table->string('codigo', 10)->nullable()->unique();
             $table->text('descripcion')->nullable();
             $table->bigInteger('id_reto')->nullable()->unsigned();
             
