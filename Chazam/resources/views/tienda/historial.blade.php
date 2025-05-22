@@ -13,6 +13,22 @@
     <div class="container mt-4">
         <h2 class="mb-4">Mis Compras</h2>
 
+        <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap" id="filtros-tipo-valor">
+            <button type="button" class="btn btn-filtro active" data-tipo="todos"
+                onclick="filtrarTipoValor('todos', this)">Todos</button>
+            <button type="button" class="btn btn-filtro" data-tipo="euros"
+                onclick="filtrarTipoValor('euros', this)">Euros</button>
+            <button type="button" class="btn btn-filtro" data-tipo="puntos"
+                onclick="filtrarTipoValor('puntos', this)">Puntos</button>
+        </div>
+
+        <!-- Describer compra por puntos -->        
+        <div id="mensaje-puntos" class="alert alert-warning text-center my-2"
+            style="display:none; font-weight:600; border-radius:12px;">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            Las compras con puntos no se admiten devoluciones
+        </div>
+        
         <!-- Filtros -->
         <div class="card mb-4 p-3" id="filtros-compras">
             <form id="form-filtros-compras" class="row g-2 align-items-end w-100">
@@ -23,7 +39,8 @@
                 </div>
                 <div class="col-md-4">
                     <label for="filtro-fecha" class="form-label mb-0">Fecha de pago</label>
-                    <input type="date" class="form-control" id="filtro-fecha" name="fecha_pago">
+                    <input type="date" class="form-control" id="filtro-fecha" name="fecha_pago"
+                        max="{{ date('Y-m-d') }}">
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="button" id="btn-limpiar-filtros" class="btn btn-secondary w-100">Limpiar filtros</button>
@@ -45,19 +62,22 @@
                 </thead>
                 <tbody>
                     @forelse ($compras as $compra)
-                        <tr>
-                            <td>{{ $user->nombre }} {{ $user->apellido }}</td>
-                            <td>{{ $compra->producto->titulo ?? 'Producto eliminado' }}</td>
-                            <td>{{ $compra->producto->descripcion ?? '-' }}</td>
-                            <td>
-                                {{ $compra->producto->precio }} {{ $compra->producto->tipo_valor ?? '' }}
-                            </td>
-                            <td>{{ $compra->fecha_pago }}</td>
-                            <td>
-                                <a href="{{ route('compras.factura', $compra->id_pago) }}" class="btn btn-sm btn-primary"
-                                    target="_blank">
-                                    Descargar PDF
-                                </a>
+                        <tr class="fila-compra tipo-{{ $compra->producto->tipo_valor ?? 'todos' }}">
+                            <td data-label="Usuario">{{ $user->nombre }} {{ $user->apellido }}</td>
+                            <td data-label="Producto">{{ $compra->producto->titulo ?? 'Producto eliminado' }}</td>
+                            <td data-label="Descripción">{{ $compra->producto->descripcion ?? '-' }}</td>
+                            <td data-label="Precio">{{ $compra->producto->precio }}
+                                {{ $compra->producto->tipo_valor ?? '' }}</td>
+                            <td data-label="Fecha de pago">{{ $compra->fecha_pago }}</td>
+                            <td data-label="Factura">
+                                @if (($compra->producto->tipo_valor ?? '') === 'puntos')
+                                    {{-- Dejar en blanco si es puntos --}}
+                                @else
+                                    <a href="{{ route('compras.factura', $compra->id_pago) }}"
+                                        class="btn btn-sm btn-primary" target="_blank">
+                                        Descargar PDF
+                                    </a>
+                                @endif
                             </td>
                         </tr>
                     @empty
