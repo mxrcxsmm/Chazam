@@ -123,10 +123,6 @@
                         <li><a class="dropdown-item" href="#" id="sendFriendRequest">
                             <i class="fas fa-user-plus me-2"></i>Enviar solicitud de amistad
                         </a></li>
-                        <li><a class="dropdown-item" href="#" id="viewFriendRequests">
-                            <i class="fas fa-user-friends me-2"></i>Solicitudes pendientes
-                            <span class="badge bg-danger ms-2" id="solicitudesCount">0</span>
-                        </a></li>
                         <li><a class="dropdown-item" href="#" id="reportUser">
                             <i class="fas fa-flag me-2"></i>Reportar usuario
                         </a></li>
@@ -157,22 +153,6 @@
                 <button class="btn btn-primary" type="button" id="enviarMensaje">
                     <i class="fas fa-paper-plane"></i>
                 </button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Modal de Solicitudes de Amistad -->
-<div class="modal fade" id="solicitudesModal" tabindex="-1" aria-labelledby="solicitudesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header bg-purple text-white">
-                <h5 class="modal-title" id="solicitudesModalLabel">Solicitudes de Amistad</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body" id="solicitudesContainer">
-                <div id="noSolicitudes" style="display:none;">No tienes solicitudes pendientes</div>
-                <!-- Aquí se agregan dinámicamente las solicitudes -->
             </div>
         </div>
     </div>

@@ -922,23 +922,37 @@ document.addEventListener('DOMContentLoaded', function() {
     // Intervalo para actualizar el estado del botón skip cada segundo
     setInterval(actualizarBotonSkip, 1000);
 
-    // Configurar el botón de ver solicitudes
-    document.getElementById('viewFriendRequests').addEventListener('click', function(e) {
-        e.preventDefault();
-        const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
-        solicitudesModal.show();
-        cargarSolicitudesAmistad();
-    });
-
+    // Configurar el botón de ver solicitudes SOLO para friendchat
+    const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
+    if (btnSolicitudesPendientes) {
+        btnSolicitudesPendientes.addEventListener('click', function(e) {
+            e.preventDefault();
+            const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
+            solicitudesModal.show();
+            cargarSolicitudesAmistad();
+        });
+        // Actualizar el contador al cargar la página
+        actualizarContadorSolicitudes();
+    }
     // Actualizar solicitudes cada 30 segundos si el modal está abierto
     let solicitudesInterval;
-    document.getElementById('solicitudesModal').addEventListener('show.bs.modal', function () {
-        solicitudesInterval = setInterval(cargarSolicitudesAmistad, 30000);
-    });
+    const solicitudesModalEl = document.getElementById('solicitudesModal');
+    if (solicitudesModalEl) {
+        solicitudesModalEl.addEventListener('show.bs.modal', function () {
+            solicitudesInterval = setInterval(cargarSolicitudesAmistad, 30000);
+        });
+        solicitudesModalEl.addEventListener('hidden.bs.modal', function () {
+            clearInterval(solicitudesInterval);
+        });
+    }
 
-    document.getElementById('solicitudesModal').addEventListener('hidden.bs.modal', function () {
-        clearInterval(solicitudesInterval);
-    });
+    // Al abrir el menú de opciones en el reto, actualizar el estado del botón de enviar solicitud
+    const chatOptionsButton = document.getElementById('chatOptionsButton');
+    if (chatOptionsButton) {
+        chatOptionsButton.addEventListener('click', function() {
+            verificarEstadoSolicitud();
+        });
+    }
 });
 
 // Actualizar estado cuando el usuario cierra la pestaña
@@ -954,4 +968,22 @@ window.addEventListener('beforeunload', () => {
 });
 
 // Actualizar estado inicial
-mantenerEstado(); 
+mantenerEstado();
+
+async function actualizarContadorSolicitudes() {
+    try {
+        const response = await fetch('/solicitudes/pendientes', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        const solicitudesCount = document.getElementById('solicitudesCount');
+        if (solicitudesCount) solicitudesCount.textContent = data.length;
+    } catch (error) {
+        // Silenciar error
+    }
+} 
