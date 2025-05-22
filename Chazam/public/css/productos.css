@@ -103,12 +103,6 @@ tr:hover {
     background-color: rgba(0, 0, 0, 0.4);
 }
 
-.modal-content {
-    background-color: #f9f9f9 !important;
-    border-radius: 10px !important;
-    padding: 20px !important;
-}
-
 .close {
     color: #aaa;
     float: right;
@@ -168,6 +162,99 @@ label {
     margin: 5px auto;
 }
 
+/* --- Estilos de formulario tipo login --- */
+.producto-form-container {
+    background-color: #d092fd;
+    padding: 40px 2vw;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+@media (min-width: 1200px) {
+    .producto-form-container {
+        max-width: 100% !important; /* Ocupa todo el ancho del modal */
+    }
+}
+
+.producto-form-container h5 {
+    text-align: center;
+    color: #222;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+.producto-form .input-field {
+    margin-bottom: 22px;
+    position: relative;
+}
+
+/* --- Inputs estilo login --- */
+.producto-form input,
+.producto-form textarea,
+.producto-form select {
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid #a78bd4;
+    border-radius: 0;
+    color: #222;
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 12px 0 8px 0;
+    margin-bottom: 28px;
+    box-shadow: none;
+    transition: border-color 0.2s;
+}
+
+.producto-form input:focus,
+.producto-form textarea:focus,
+.producto-form select:focus {
+    outline: none;
+    border-bottom: 2px solid #7c1fff;
+    background: transparent;
+}
+
+.producto-form label {
+    color: #a78bd4;
+    font-weight: 400;
+    font-size: 1.05rem;
+    margin-bottom: 0.2rem;
+    margin-left: 2px;
+}
+
+.producto-form .btn,
+.producto-form .btn-custom {
+    background: #a100ff;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    width: 100%;
+    font-size: 1.15rem;
+    padding: 13px 0;
+    margin-top: 18px;
+    box-shadow: 0 2px 8px rgba(130,0,255,0.13);
+    transition: background 0.2s, transform 0.2s;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.producto-form .btn:hover,
+.producto-form .btn-custom:hover {
+    background: #7c1fff;
+    transform: scale(1.03);
+}
+
+/* Haz el fondo del modal y del contenido igual al del formulario */
+.modal-content {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
 /* Estilos responsive */
 @media (max-width: 768px) {
     .navbar-collapse {
@@ -189,69 +276,24 @@ label {
         font-size: 11px !important;
     }
 
-    /* Solo las columnas imprescindibles visibles */
-    table th:not(.th-usuario):not(.th-estado):not(.th-rol):not(.th-acciones),
-    table td:not(.td-usuario):not(.td-estado):not(.td-rol):not(.td-acciones) {
-        display: none;
-    }
-
-    /* Quepa todo en una línea */
-    table th.th-usuario,
-    table th.th-estado,
-    table th.th-rol,
-    table th.th-acciones,
-    table td.td-usuario,
-    table td.td-estado,
-    table td.td-rol,
-    table td.td-acciones {
-        font-size: 11px !important;
-        padding: 2px 2px !important;
-        white-space: nowrap !important;
-        max-width: unset !important;
-    }
-
-    /* Cambia el encabezado solo en móvil */
-    th.th-usuario {
-        position: relative;
-        color: transparent;
-    }
-
     /* Oculta solo la columna ID en móvil */
     table th.th-id,
     table td.td-id {
         display: none;
     }
 
+    /* Oculta todas las columnas excepto título, precio-valor y acciones */
+    table th:not(.th-titulo):not(.th-precio-valor):not(.th-acciones),
+    table td:not(.td-titulo):not(.td-precio-valor):not(.td-acciones) {
+        display: none;
+    }
+
     /* Ajusta el tamaño y evita saltos de línea */
     table th,
     table td {
-        font-size: 11px !important;
+        font-size: 12px !important;
         padding: 2px 2px !important;
         white-space: nowrap !important;
         max-width: unset !important;
     }
-
-    .detalles-usuario {
-        background: #f8f9fa;
-    }
-    .btn-mas {
-        background: none;
-        border: none;
-        color: #333;
-        font-size: 18px;
-        padding: 0 6px;
-        cursor: pointer;
-    }
-    .detalles-usuario {
-        display: none !important;
-    }
-
-    .detalles-usuario:not(.d-none) {
-        display: table-row !important;
-    }
-}
-
-/* Por defecto, oculta la fila de detalles */
-.detalles-usuario {
-    display: none !important;
 }

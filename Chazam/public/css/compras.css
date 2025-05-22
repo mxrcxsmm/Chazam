@@ -1,0 +1,112 @@
+/* Fondo general */
+body {
+    background-color: #e3aee3;
+    font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+/* Título */
+h2 {
+    color: black;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+/* Centrar y expandir el contenedor */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0;
+    margin-left: 5%;
+}
+
+/* Tabla ocupa el 100% del contenedor centrado */
+.table-responsive {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.table {
+    background-color: #fff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(108, 52, 131, 0.08);
+    width: 100%;
+}
+
+.table th {
+    background-color: #6c3483 !important;
+    color: #fff !important;
+    font-weight: 600;
+    text-align: center;
+    font-size: 16px;
+}
+
+.table td {
+    vertical-align: middle;
+    text-align: center;
+    font-size: 15px;
+    color: #333;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) {
+    background-color: #f3eaf7;
+}
+
+.table-hover > tbody > tr:hover {
+    background-color: #e8daef;
+}
+
+/* Estilos para el contenedor de filtros */
+#filtros-compras {
+    width: 100%;
+    max-width: 1000px;
+    margin: 0 auto 24px auto;
+    background: #6c3483;
+    color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(108, 52, 131, 0.08);
+    padding: 18px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch; /* Cambia a stretch para que los hijos ocupen todo el ancho */
+}
+
+#form-filtros-compras {
+    width: 100%;
+    display: flex;
+    gap: 16px;
+}
+
+#form-filtros-compras > div {
+    flex: 1 1 0;
+    min-width: 0;
+}
+
+#form-filtros-compras .btn {
+    width: 100%;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .table th,
+    .table td {
+        font-size: 16px;
+        padding: 8px 2px 8px 18px; /* más margen a la izquierda */
+        white-space: nowrap !important; /* evita saltos de línea */
+    }
+    h2 {
+        font-size: 20px;
+    }
+    .container {
+        padding-left: 18px;
+        padding-right: 2px;
+    }
+    .table-responsive {
+        max-width: 100%;
+    }
+}

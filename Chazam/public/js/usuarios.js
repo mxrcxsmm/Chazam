@@ -44,3 +44,13 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
+
+function toggleDetalles(btn) {
+    // Solo funciona en móvil
+    if (window.innerWidth > 768) return;
+    const tr = btn.closest('tr');
+    const detalles = tr.nextElementSibling;
+    if (detalles && detalles.classList.contains('detalles-usuario')) {
+        detalles.classList.toggle('d-none');
+    }
+}

@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductosAdminController;
 use App\Http\Controllers\MomentmsController;
 use App\Http\Controllers\TiendaController;
 use App\Http\Controllers\PagosAdminController;
+use App\Http\Controllers\CompraController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\StripeController;
@@ -43,12 +44,6 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [AdminController::class, 'destroy'])->name('usuarios.destroy');
         Route::post('/usuarios/filtrar', [AdminController::class, 'filtrar'])->name('usuarios.filtrar');
         Route::post('/usuarios/{id}/ban', [AdminController::class, 'ban'])->name('usuarios.ban');
-
-        // Rutas para retos (administrador)
-        Route::get('retos', [RetoAdminController::class, 'index'])->name('retos.index');
-        Route::post('retos', [RetoAdminController::class, 'store'])->name('retos.store');
-        Route::put('retos/{id}', [RetoAdminController::class, 'update'])->name('retos.update');
-        Route::delete('retos/{id}', [RetoAdminController::class, 'destroy'])->name('retos.destroy');
 
         // Rutas para reportes (administrador)
         Route::get('reportes', [ReporteAdminController::class, 'index'])->name('reportes.index');
@@ -187,14 +182,23 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
 
+    // Rutas para que el usuario vea sus propias compras
+    Route::get('/mis-compras', [CompraController::class, 'historial'])->name('compras.historial');
+    Route::get('/mis-compras/factura/{pagoId}', [CompraController::class, 'descargarFactura'])
+        ->middleware('auth')
+        ->name('compras.factura');
+    Route::post('/mis-compras/filtrar', [CompraController::class, 'filtrarAjax'])
+        ->middleware('auth')
+        ->name('compras.filtrar');
+
     // Rutas para el disclaimer
     Route::get('/retos/verificar-disclaimer', [RetoController::class, 'verificarDisclaimer'])->middleware(['auth']);
     Route::post('/retos/guardar-disclaimer', [RetoController::class, 'guardarDisclaimer'])->middleware(['auth']);
 
     // Rutas de amistades
-    Route::get('/api/amistades', [App\Http\Controllers\AmistadController::class, 'index']);
-    Route::delete('/api/amistades/{idUsuario}', [App\Http\Controllers\AmistadController::class, 'destroy']);
-    Route::post('/api/amistades/{idUsuario}/bloquear', [App\Http\Controllers\AmistadController::class, 'bloquear']);
+    Route::get('/amistades', [AmistadController::class, 'index'])->name('amistades.index');
+    Route::delete('/amistades/{idUsuario}', [AmistadController::class, 'destroy'])->name('amistades.destroy');
+    Route::post('/amistades/{idUsuario}/bloquear', [AmistadController::class, 'bloquear'])->name('amistades.bloquear');
 });
 
 Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');
