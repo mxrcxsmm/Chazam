@@ -37,4 +37,29 @@ document.addEventListener('DOMContentLoaded', function () {
         filtroFecha.value = '';
         aplicarFiltros();
     });
+
+    filtrarTipoValor('todos', document.querySelector('#filtros-tipo-valor .btn-filtro[data-tipo="todos"]'));
 });
+
+function filtrarTipoValor(tipo, btn) {
+    // Cambia el botón activo
+    document.querySelectorAll('#filtros-tipo-valor .btn-filtro').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // Muestra/oculta filas según el filtro
+    document.querySelectorAll('.fila-compra').forEach(row => {
+        if (tipo === 'todos' || row.classList.contains('tipo-' + tipo)) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+
+    // Mostrar mensaje si es puntos o todos
+    const mensaje = document.getElementById('mensaje-puntos');
+    if (tipo === 'puntos' || tipo === 'todos') {
+        mensaje.style.display = '';
+    } else {
+        mensaje.style.display = 'none';
+    }
+}

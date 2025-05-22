@@ -1,4 +1,10 @@
 /* Fondo general */
+html, body {
+    height: auto !important;
+    min-height: 100vh;
+    overflow-y: auto !important;
+}
+
 body {
     background-color: #e3aee3;
     font-family: 'Segoe UI', Arial, sans-serif;
@@ -91,22 +97,101 @@ h2 {
     width: 100%;
 }
 
+.btn-filtro {
+    min-width: 100px;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    background: #e6e6e6;
+    color: #9147ff;
+    border: none;
+}
+.btn-filtro.active, .btn-filtro:active {
+    background: #9147ff !important;
+    color: #fff !important;
+    box-shadow: 0 0 0 2px #9147ff33;
+}
+.btn-filtro:not(.active) {
+    background: #e6e6e6 !important;
+    color: #9147ff !important;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .table th,
     .table td {
         font-size: 16px;
-        padding: 8px 2px 8px 18px; /* más margen a la izquierda */
-        white-space: nowrap !important; /* evita saltos de línea */
+        padding: 8px 2px 8px 18px;
+        white-space: normal !important;
+        word-break: break-word;
     }
     h2 {
         font-size: 20px;
     }
-    .container {
-        padding-left: 18px;
-        padding-right: 2px;
-    }
     .table-responsive {
         max-width: 100%;
+        overflow-x: unset;
     }
+
+    /* Filtros en columna */
+    #form-filtros-compras {
+        flex-direction: column !important;
+        gap: 8px;
+    }
+    #form-filtros-compras > div {
+        width: 100%;
+        min-width: 0;
+    }
+
+    /* Tabla como tarjetas */
+    .table, .table thead, .table tbody, .table tr, .table th, .table td {
+        display: block;
+        width: 100%;
+    }
+    .table thead {
+        display: none;
+    }
+    .table tr {
+        margin-bottom: 18px;
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(108, 52, 131, 0.08);
+        padding: 12px 10px;
+    }
+    .table td {
+        text-align: left;
+        padding: 8px 10px;
+        position: relative;
+        font-size: 15px;
+    }
+    .table td:before {
+        content: attr(data-label);
+        font-weight: bold;
+        color: #6c3483;
+        display: block;
+        margin-bottom: 2px;
+        font-size: 14px;
+    }
+
+    .container {
+        margin-left: 0;
+        padding: 0 2vw;
+        width: 100vw;
+        max-width: 100vw;
+        box-sizing: border-box;
+    }
+    .table-responsive {
+        max-width: 100vw;
+        width: 100vw;
+        margin: 0;
+        padding: 0;
+        overflow-x: unset;
+    }
+}
+
+.text-warning.small {
+    color: #b97cff !important;
+    font-size: 0.95em;
+    font-weight: 500;
+    display: block;
+    margin-top: 4px;
 }

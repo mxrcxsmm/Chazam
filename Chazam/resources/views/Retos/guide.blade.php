@@ -6,7 +6,7 @@
     <div class="button-container">
         <a href="{{ route('retos.reto') }}"><button class="startbutton">Comenzar</button></a>
         <a href="{{ route('user.friendchat') }}"><button class="startbutton">Amigos</button></a>
-        <a href="{{ route('chats.index') }}"><button class="startbutton">Comunidades</button></a>
+        <a href="{{ route('comunidades.index') }}"><button class="startbutton">Comunidades</button></a>
     </div>
 </div>
 

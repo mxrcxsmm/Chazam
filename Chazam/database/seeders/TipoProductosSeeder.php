@@ -17,6 +17,7 @@ class TipoProductosSeeder extends Seeder
             ['tipo_producto' => 'Compras únicas'],
             ['tipo_producto' => 'Packs de puntos'],
             ['tipo_producto' => 'Donaciones'],
+            ['tipo_producto' => 'Comunidad'],
         ]);
     }
 }
