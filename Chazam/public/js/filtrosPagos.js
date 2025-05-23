@@ -46,12 +46,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 tablaPagos.innerHTML = '';
                 data.forEach((pago) => {
                     const row = `<tr>
-                        <td>${pago.id_pago}</td>
-                        <td>${pago.comprador}</td>
-                        <td>${pago.producto}</td>
-                        <td>${pago.cantidad}</td>
-                        <td>${pago.fecha_pago}</td>
-                    </tr>`;
+        <td class="td-id">${pago.id_pago}</td>
+        <td class="td-comprador">${pago.comprador}</td>
+        <td class="td-producto">${pago.producto}</td>
+        <td class="td-cantidad">${pago.cantidad}</td>
+        <td class="td-fecha">${pago.fecha_pago}</td>
+    </tr>`;
                     tablaPagos.innerHTML += row;
                 });
             })

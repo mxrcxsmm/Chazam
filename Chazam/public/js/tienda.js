@@ -36,4 +36,26 @@ document.addEventListener('DOMContentLoaded', function () {
                 });
         });
     });
+
+    const sidebar = document.getElementById('sidebarMenu');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const sidebarClose = document.getElementById('sidebarClose');
+
+    if (sidebarToggle && sidebar) {
+        sidebarToggle.addEventListener('click', function () {
+            sidebar.classList.add('active');
+        });
+    }
+    if (sidebarClose && sidebar) {
+        sidebarClose.addEventListener('click', function () {
+            sidebar.classList.remove('active');
+        });
+    }
+    document.addEventListener('click', function (e) {
+        if (window.innerWidth <= 768 && sidebar.classList.contains('active')) {
+            if (!sidebar.contains(e.target) && !sidebarToggle.contains(e.target)) {
+                sidebar.classList.remove('active');
+            }
+        }
+    });
 });

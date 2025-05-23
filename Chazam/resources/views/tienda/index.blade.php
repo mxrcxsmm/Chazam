@@ -17,21 +17,22 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <img src="{{ asset('img/logo.png') }}" alt="Logo" class="logo"> Chazam
+        <div class="container-fluid align-items-center">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <img src="{{ asset('img/logo.png') }}" alt="Logo" class="logo me-2"> Chazam
             </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                </ul>
-                <div class="d-flex align-items-center ms-3">
-                    <span class="puntos-text me-2">Puntos: {{ Auth::user()->puntos ?? 0 }}</span>
-                    <i class="fas fa-coins puntos-icon"></i>
-                </div>
+            <!-- Puntos SIEMPRE visibles, pero en responsive se colocan entre logo y hamburguesa -->
+            <div class="d-none d-lg-flex align-items-center ms-3">
+                <span class="puntos-text me-2">Puntos: {{ Auth::user()->puntos ?? 0 }}</span>
+                <i class="fas fa-coins puntos-icon"></i>
+            </div>
+            <div class="d-flex d-lg-none align-items-center ms-auto">
+                <span class="puntos-text me-2 puntos-responsive">Puntos: {{ Auth::user()->puntos ?? 0 }}</span>
+                <i class="fas fa-coins puntos-icon puntos-responsive"></i>
+                <button class="navbar-toggler ms-2" type="button" id="sidebarToggle"
+                    aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
             </div>
         </div>
     </nav>
@@ -39,7 +40,7 @@
     <!-- Contenedor principal -->
     <div class="main-container">
         <!-- Sidebar -->
-        <div class="sidebar">
+        <div class="sidebar" id="sidebarMenu">
             <h3>User</h3>
             <ul class="categorias">
                 @foreach ($categorias as $categoria)
