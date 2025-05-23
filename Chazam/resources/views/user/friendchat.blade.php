@@ -155,3 +155,9 @@
     border-radius: 50%;
 }
 </style>
+
+<meta name="user-img" content="{{ Auth::user()->img ? asset(Auth::user()->img) : asset('img/profile_img/avatar-default.png') }}">
+
+<script>
+window.userImg = "{{ $imagen_perfil }}";
+</script>
