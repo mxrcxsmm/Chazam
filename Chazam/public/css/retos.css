@@ -340,8 +340,13 @@ body {
 
 /* Sidebar del perfil (debe sobreponerse) */
 #sidebar {
-    z-index: 1050; /* Mayor que sidebar2 */
-    /* ... otros estilos ... */
+    z-index: 99999 !important;
+    background: rgba(0,0,0,0.7) !important;
+    position: fixed !important;
+    top: 0 !important;
+    right: 0 !important;
+    width: 260px !important;
+    height: 100vh !important;
 }
 
 /* Sidebar del reto */

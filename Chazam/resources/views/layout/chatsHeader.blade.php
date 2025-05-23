@@ -105,9 +105,16 @@
                 </div>
 
                 <script>
-                    function toggleSidebar() {
+                    function toggleSidebar(forceClose = false) {
                         const sidebar = document.getElementById('sidebar');
-                        sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
+                        if (forceClose || sidebar.style.display === 'block') {
+                            sidebar.style.display = 'none';
+                            document.body.style.overflow = '';
+                        } else {
+                            sidebar.style.display = 'block';
+                            sidebar.focus();
+                            document.body.style.overflow = 'hidden';
+                        }
                     }
                 </script>
             </div>
@@ -122,5 +129,16 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/estados.js') }}"></script>
     @stack('scripts')
+
+    <script>
+        document.addEventListener('mousedown', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+            // Si el sidebar está visible y el click es fuera de él
+            if (sidebar.style.display === 'block' && !sidebar.contains(e.target)) {
+                toggleSidebar(true);
+            }
+        });
+    </script>
 </body>
 </html>
