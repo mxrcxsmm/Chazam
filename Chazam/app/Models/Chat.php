@@ -33,8 +33,11 @@ class Chat extends Model
         'fecha_creacion',
         'img',
         'nombre',
+        'tipocomunidad',
+        'codigo',
         'descripcion',
         'id_reto',
+        'creator',
     ];
 
     /**
@@ -70,5 +73,45 @@ class Chat extends Model
     public function mensajes()
     {
         return $this->hasManyThrough(Mensaje::class, ChatUsuario::class, 'id_chat', 'id_chat_usuario', 'id_chat', 'id_chat_usuario');
+    }
+
+    /**
+     * Get the creator of the chat.
+     */
+    public function creador()
+    {
+        return $this->belongsTo(User::class, 'creator', 'id_usuario');
+    }
+
+    /**
+     * Genera un código único para comunidades privadas
+     * @param int $length Longitud inicial del código
+     * @return string Código único generado
+     */
+    public static function generarCodigoUnico($length = 10)
+    {
+        do {
+            $codigo = '';
+            $caracteres = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            
+            for ($i = 0; $i < $length; $i++) {
+                $codigo .= $caracteres[rand(0, strlen($caracteres) - 1)];
+            }
+            
+            // Verificar si el código ya existe
+            $existe = self::where('codigo', $codigo)->exists();
+            
+            // Si no existe, retornar el código
+            if (!$existe) {
+                return $codigo;
+            }
+            
+            // Si existe y hemos intentado todas las combinaciones posibles
+            // (36^length intentos), aumentar la longitud
+            if (self::where('codigo', 'like', str_repeat('_', $length))->count() >= pow(36, $length)) {
+                $length++;
+            }
+            
+        } while (true);
     }
 }

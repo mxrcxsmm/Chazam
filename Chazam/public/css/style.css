@@ -1,6 +1,6 @@
 /* Estilos generales */
 body {
-    background-color: #d8b4d8 !important; /* Color de fondo personalizado */
+    background-color: #e3aee3 !important; /* Color de fondo personalizado */
     font-family: Arial, sans-serif !important;
 }
 
@@ -23,6 +23,7 @@ table {
     border-collapse: collapse !important;
     width: 100% !important;
     margin-top: 20px !important;
+    background-color: #d092fd !important;
 }
 
 table th,
@@ -38,7 +39,7 @@ table th {
 }
 
 tr:hover {
-    background-color: #f5f5f5;
+    background-color: #d092fd !important;
 }
 
 /* Botones */
@@ -170,21 +171,87 @@ label {
 /* Estilos responsive */
 @media (max-width: 768px) {
     .navbar-collapse {
-        background-color: #333; /* Fondo del menú desplegable */
+        background-color: #333;
         padding: 10px;
     }
 
     .navbar-nav {
-        text-align: center; /* Centra los enlaces */
+        text-align: center;
     }
 
     .navbar-nav .nav-item {
-        margin-bottom: 10px; /* Espaciado entre los enlaces */
+        margin-bottom: 10px;
     }
 
+    table {
+        width: 100% !important;
+        min-width: unset !important;
+        font-size: 11px !important;
+    }
+
+    /* Solo las columnas imprescindibles visibles */
+    table th:not(.th-usuario):not(.th-estado):not(.th-rol):not(.th-acciones),
+    table td:not(.td-usuario):not(.td-estado):not(.td-rol):not(.td-acciones) {
+        display: none;
+    }
+
+    /* Quepa todo en una línea */
+    table th.th-usuario,
+    table th.th-estado,
+    table th.th-rol,
+    table th.th-acciones,
+    table td.td-usuario,
+    table td.td-estado,
+    table td.td-rol,
+    table td.td-acciones {
+        font-size: 11px !important;
+        padding: 2px 2px !important;
+        white-space: nowrap !important;
+        max-width: unset !important;
+    }
+
+    /* Cambia el encabezado solo en móvil */
+    th.th-usuario {
+        position: relative;
+        color: transparent;
+    }
+
+    /* Oculta solo la columna ID en móvil */
+    table th.th-id,
+    table td.td-id {
+        display: none;
+    }
+
+    /* Ajusta el tamaño y evita saltos de línea */
     table th,
     table td {
-        font-size: 14px; /* Reduce el tamaño de fuente */
-        padding: 6px;
+        font-size: 11px !important;
+        padding: 2px 2px !important;
+        white-space: nowrap !important;
+        max-width: unset !important;
     }
+
+    .detalles-usuario {
+        background: #f8f9fa;
+    }
+    .btn-mas {
+        background: none;
+        border: none;
+        color: #333;
+        font-size: 18px;
+        padding: 0 6px;
+        cursor: pointer;
+    }
+    .detalles-usuario {
+        display: none !important;
+    }
+
+    .detalles-usuario:not(.d-none) {
+        display: table-row !important;
+    }
+}
+
+/* Por defecto, oculta la fila de detalles */
+.detalles-usuario {
+    display: none !important;
 }

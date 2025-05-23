@@ -16,8 +16,11 @@ return new class extends Migration
             $table->datetime('fecha_creacion');
             $table->string('img')->nullable();
             $table->string('nombre', 100);
+            $table->string('tipocomunidad')->nullable();
+            $table->string('codigo', 10)->nullable()->unique();
             $table->text('descripcion')->nullable();
             $table->bigInteger('id_reto')->nullable()->unsigned();
+            
             $table->timestamps();
 
             $table->foreign('id_reto')->references('id_reto')->on('retos');
@@ -29,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        Schema::dropIfExists('chats');
     }
 };

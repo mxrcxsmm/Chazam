@@ -20,7 +20,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="{{ asset('css/retos.css') }}">
-    @yield('head')
+    @stack('head')
 </head>
 <body>
     <div id="vanta-bg" style="z-index: 0;"></div>
@@ -29,7 +29,7 @@
         <div class="container-fluid d-flex justify-content-between align-items-center">
 
             <!-- Logo o nombre de la app -->
-            <a href="{{ route('retos.guide') }}"><img src="{{ asset('IMG/Logo_Chazam.png') }}" alt="Logo" class="logo">Chazam</a>
+            <a href="{{ route('retos.guide') }}"><img src="{{ asset('img/Logo_Chazam.png') }}" alt="Logo" class="logo">Chazam</a>
 
             <!-- Racha, puntos y perfil -->
             <div class="d-flex align-items-center gap-4">
@@ -47,10 +47,15 @@
                     <span>pts</span>
                 </div>
 
+                <!-- Botón de amistades -->
+                <button class="btn btn-outline-dark" id="btnAmistades" type="button">
+                    <i class="bi bi-people-fill"></i>
+                </button>
+
                 <!-- Botón para abrir el menú -->
                 <button class="btn btn-outline-dark" onclick="toggleSidebar()">
                     @if(isset($imagen_perfil) && $imagen_perfil)
-                    <img src="{{ asset($imagen_perfil) }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
+                    <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
                 @else
                     <i class="bi bi-person-circle"></i>
                 @endif
@@ -61,7 +66,7 @@
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="text-center">
                             @if(isset($imagen_perfil) && $imagen_perfil)
-                            <img src="{{ asset($imagen_perfil) }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #E6E6FA;">
+                            <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #E6E6FA;">
                             @else
                                 <i class="bi bi-person-circle fs-2"></i>
                             @endif
@@ -91,11 +96,12 @@
                     <hr class="border-light">
 
                     <ul class="list-unstyled">
-                        <li class="mb-4"><a href="{{ route('perfil.personalizacion') }}" class="text-white text-decoration-none">Personalizar</a></li>
+                        <li class="mb-4"><a href="{{ route('perfil.personalizacion') }}" class="text-white text-decoration-none">Perfil</a></li>
                         <li class="mb-4"><a href="{{ route('user.friendchat') }}" class="text-white text-decoration-none">Amigos</a></li>
-                        <li class="mb-4"><a href="#" class="text-white text-decoration-none">Comunidades</a></li>
+                        <li class="mb-4"><a href="{{ route('comunidades.index') }}" class="text-white text-decoration-none">Comunidades</a></li>
                         <li class="mb-4"><a href="#" class="text-white text-decoration-none">Reportar</a></li>
                         <li class="mb-4"><a href="{{route('tienda.index')}}" class="text-white text-decoration-none">Tienda</a></li>
+                        <li class="mb-4"><a href="{{ route('compras.historial') }}" class="text-white text-decoration-none">Mis Compras</a></li>
                     </ul>
 
                     <form method="POST" action="{{ route('logout') }}" class="mt-auto">
@@ -116,6 +122,14 @@
                             document.body.style.overflow = 'hidden';
                         }
                     }
+                    document.addEventListener('mousedown', function(e) {
+                        const sidebar = document.getElementById('sidebar');
+                        if (!sidebar) return;
+                        // Si el sidebar está visible y el click es fuera de él
+                        if (sidebar.style.display === 'block' && !sidebar.contains(e.target)) {
+                            toggleSidebar(true);
+                        }
+                    });
                 </script>
             </div>
         </div>
@@ -128,17 +142,27 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/estados.js') }}"></script>
+    <script src="{{ asset('js/hamburger.js') }}"></script>
     @stack('scripts')
 
-    <script>
-        document.addEventListener('mousedown', function(e) {
-            const sidebar = document.getElementById('sidebar');
-            if (!sidebar) return;
-            // Si el sidebar está visible y el click es fuera de él
-            if (sidebar.style.display === 'block' && !sidebar.contains(e.target)) {
-                toggleSidebar(true);
-            }
-        });
-    </script>
+    <!-- Modal de amistades (¡fuera del navbar y de cualquier div!) -->
+    <div class="modal fade" id="modalAmistades" tabindex="-1" aria-labelledby="modalAmistadesLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalAmistadesLabel">Mis Amistades</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="listaAmistades" class="list-group">
+                        <!-- Aquí se cargarán las amistades dinámicamente -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

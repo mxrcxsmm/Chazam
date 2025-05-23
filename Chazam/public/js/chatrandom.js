@@ -292,7 +292,7 @@ function agregarMensaje(mensaje, usuario) {
     userImage.style.objectFit = 'cover';
     userImage.style.borderRadius = '50%';
     userImage.onerror = function() {
-        this.src = '/IMG/profile_img/avatar-default.png';
+        this.src = '/img/profile_img/avatar-default.png';
     };
     
     // Contenedor principal del mensaje (nombre, mensaje, hora)
@@ -467,6 +467,167 @@ async function verificarEstadoSolicitud() {
         }
     } catch (error) {
         console.error('Error al verificar estado de solicitud:', error);
+    }
+}
+
+// Función para cargar las solicitudes de amistad
+async function cargarSolicitudesAmistad() {
+    try {
+        const response = await fetch('/solicitudes/pendientes', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al cargar las solicitudes');
+        }
+
+        const data = await response.json();
+        const container = document.getElementById('solicitudesContainer');
+        const noSolicitudes = document.getElementById('noSolicitudes');
+        const solicitudesCount = document.getElementById('solicitudesCount');
+
+        // Actualizar contador
+        if (solicitudesCount) solicitudesCount.textContent = data.length;
+
+        if (data.length === 0) {
+            if (container && noSolicitudes) {
+                noSolicitudes.style.display = 'block';
+                container.innerHTML = '';
+                container.appendChild(noSolicitudes);
+            }
+            return;
+        }
+
+        if (noSolicitudes) noSolicitudes.style.display = 'none';
+        if (container) container.innerHTML = '';
+
+        data.forEach(solicitud => {
+            if (!container) return;
+            const solicitudDiv = document.createElement('div');
+            solicitudDiv.className = 'solicitud-item d-flex align-items-center justify-content-between p-2 border-bottom';
+            solicitudDiv.id = `solicitud-${solicitud.id_solicitud}`;
+            solicitudDiv.innerHTML = `
+                <div class="solicitud-info d-flex align-items-center gap-2">
+                    <img src="${solicitud.emisor.img || '/img/profile_img/avatar-default.png'}" 
+                         alt="${solicitud.emisor.username}" 
+                         class="rounded-circle"
+                         style="width: 32px; height: 32px; object-fit: cover;"
+                         onerror="this.src='/img/profile_img/avatar-default.png'">
+                    <span class="solicitud-username">${solicitud.emisor.username}</span>
+                </div>
+                <div class="solicitud-actions d-flex gap-2">
+                    <button class="btn btn-sm btn-success" onclick="responderSolicitud(${solicitud.id_solicitud}, 'aceptada')">
+                        <i class="fas fa-check"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="responderSolicitud(${solicitud.id_solicitud}, 'rechazada')">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+            container.appendChild(solicitudDiv);
+        });
+    } catch (error) {
+        console.error('Error al cargar solicitudes:', error);
+        const container = document.getElementById('solicitudesContainer');
+        const noSolicitudes = document.getElementById('noSolicitudes');
+        if (container && noSolicitudes && container.children.length === 0) {
+            noSolicitudes.style.display = 'block';
+            container.innerHTML = '';
+            container.appendChild(noSolicitudes);
+        }
+        // Solo muestra el SweetAlert si realmente no hay contenedor
+        if (!container) {
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudieron cargar las solicitudes de amistad',
+                icon: 'error'
+            });
+        }
+    }
+}
+
+// Función para responder a una solicitud
+async function responderSolicitud(idSolicitud, respuesta) {
+    try {
+        const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
+        if (!solicitudDiv) return;
+
+        // Deshabilitar botones durante la operación
+        const buttons = solicitudDiv.querySelectorAll('button');
+        buttons.forEach(btn => btn.disabled = true);
+
+        const response = await fetch('/solicitudes/responder', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                id_solicitud: idSolicitud,
+                respuesta: respuesta
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Error al procesar la solicitud');
+        }
+
+        const data = await response.json();
+        
+        if (data.success) {
+            if (data.estado === 'rechazada') {
+                // Eliminar el elemento del DOM si fue rechazada
+                solicitudDiv.remove();
+                // Actualizar el contador de solicitudes
+                const solicitudesCount = document.getElementById('solicitudesCount');
+                const count = parseInt(solicitudesCount.textContent);
+                solicitudesCount.textContent = Math.max(0, count - 1);
+                // Si no hay más solicitudes, mostrar el mensaje
+                const container = document.getElementById('solicitudesContainer');
+                if (container.children.length === 0) {
+                    const noSolicitudes = document.getElementById('noSolicitudes');
+                    if (noSolicitudes) {
+                        container.innerHTML = '';
+                        noSolicitudes.style.display = 'block';
+                        container.appendChild(noSolicitudes);
+                    }
+                }
+            } else {
+                // Si fue aceptada, actualizar el badge
+                const actionsDiv = solicitudDiv.querySelector('.solicitud-actions');
+                actionsDiv.innerHTML = `
+                    <span class="badge bg-success">Aceptada</span>
+                `;
+            }
+            // Mostrar mensaje de éxito
+            Swal.fire({
+                title: data.estado === 'aceptada' ? '¡Solicitud aceptada!' : 'Solicitud rechazada',
+                text: data.estado === 'aceptada' ? 'Ahora son amigxs' : 'La solicitud ha sido rechazada',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } else {
+            throw new Error(data.message || 'Error al procesar la solicitud');
+        }
+    } catch (error) {
+        console.error('Error al responder solicitud:', error);
+        Swal.fire({
+            title: 'Error',
+            text: error.message || 'Ocurrió un error al procesar la solicitud',
+            icon: 'error'
+        });
+
+        // Restaurar botones en caso de error
+        const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
+        if (solicitudDiv) {
+            const buttons = solicitudDiv.querySelectorAll('button');
+            buttons.forEach(btn => btn.disabled = false);
+        }
     }
 }
 
@@ -760,6 +921,38 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Intervalo para actualizar el estado del botón skip cada segundo
     setInterval(actualizarBotonSkip, 1000);
+
+    // Configurar el botón de ver solicitudes SOLO para friendchat
+    const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
+    if (btnSolicitudesPendientes) {
+        btnSolicitudesPendientes.addEventListener('click', function(e) {
+            e.preventDefault();
+            const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
+            solicitudesModal.show();
+            cargarSolicitudesAmistad();
+        });
+        // Actualizar el contador al cargar la página
+        actualizarContadorSolicitudes();
+    }
+    // Actualizar solicitudes cada 30 segundos si el modal está abierto
+    let solicitudesInterval;
+    const solicitudesModalEl = document.getElementById('solicitudesModal');
+    if (solicitudesModalEl) {
+        solicitudesModalEl.addEventListener('show.bs.modal', function () {
+            solicitudesInterval = setInterval(cargarSolicitudesAmistad, 30000);
+        });
+        solicitudesModalEl.addEventListener('hidden.bs.modal', function () {
+            clearInterval(solicitudesInterval);
+        });
+    }
+
+    // Al abrir el menú de opciones en el reto, actualizar el estado del botón de enviar solicitud
+    const chatOptionsButton = document.getElementById('chatOptionsButton');
+    if (chatOptionsButton) {
+        chatOptionsButton.addEventListener('click', function() {
+            verificarEstadoSolicitud();
+        });
+    }
 });
 
 // Actualizar estado cuando el usuario cierra la pestaña
@@ -775,4 +968,22 @@ window.addEventListener('beforeunload', () => {
 });
 
 // Actualizar estado inicial
-mantenerEstado(); 
+mantenerEstado();
+
+async function actualizarContadorSolicitudes() {
+    try {
+        const response = await fetch('/solicitudes/pendientes', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+        if (!response.ok) return;
+        const data = await response.json();
+        const solicitudesCount = document.getElementById('solicitudesCount');
+        if (solicitudesCount) solicitudesCount.textContent = data.length;
+    } catch (error) {
+        // Silenciar error
+    }
+} 

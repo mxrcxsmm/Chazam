@@ -46,7 +46,7 @@
                 @if($reto->id_reto == 1)
                     <h5 class="text-center mb-3">Reto de Emojis</h5>
                     <div class="text-center mb-3">
-                        <img src="{{ asset('IMG/instrucciones_reto/reto1.gif') }}" alt="Instrucciones Reto de Emojis" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
+                        <img src="{{ asset('img/instrucciones_reto/reto1.gif') }}" alt="Instrucciones Reto de Emojis" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
                     </div>
                     <p>En este reto:</p>
                     <ul>
@@ -58,7 +58,7 @@
                 @elseif($reto->id_reto == 2)
                     <h5 class="text-center mb-3">Reto de Texto Encriptado</h5>
                     <div class="text-center mb-3">
-                        <img src="{{ asset('IMG/instrucciones_reto/reto2.gif') }}" alt="Instrucciones Reto de Texto Encriptado" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
+                        <img src="{{ asset('img/instrucciones_reto/reto2.gif') }}" alt="Instrucciones Reto de Texto Encriptado" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
                     </div>
                     <p>En este reto:</p>
                     <ul>
@@ -70,20 +70,19 @@
                 @elseif($reto->id_reto == 3)
                     <h5 class="text-center mb-3">Reto de Palabras Desordenadas</h5>
                     <div class="text-center mb-3">
-                        <img src="{{ asset('IMG/instrucciones_reto/reto3.gif') }}" alt="Instrucciones Reto de Palabras Desordenadas" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
+                        <img src="{{ asset('img/instrucciones_reto/reto3.gif') }}" alt="Instrucciones Reto de Palabras Desordenadas" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
                     </div>
                     <p>En este reto:</p>
                     <ul>
                         <li>Tus mensajes se enviarán con las palabras en orden aleatorio</li>
                         <li>Intenta entender lo que tu compañero quiere decir a pesar del desorden</li>
                         <li>Solo ganarás puntos con mensajes que tengan al menos 60 caracteres</li>
-                        <li>El límite máximo es de 500 caracteres por mensaje</li>
                     </ul>
                     <p class="mt-3 text-center"><strong>¡Descifra el desorden y comunícate!</strong></p>
                 @elseif($reto->id_reto == 4)
                     <h5 class="text-center mb-3">Reto de Texto Invertido</h5>
                     <div class="text-center mb-3">
-                        <img src="{{ asset('IMG/instrucciones_reto/reto4.gif') }}" alt="Instrucciones Reto de Texto Invertido" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
+                        <img src="{{ asset('img/instrucciones_reto/reto4.gif') }}" alt="Instrucciones Reto de Texto Invertido" class="img-fluid rounded" style="width: 100%; height: 200px; object-fit: contain;">
                     </div>
                     <p>En este reto:</p>
                     <ul>
@@ -175,6 +174,52 @@
 <script>
     window.userId = {{ Auth::user()->id_usuario }};
     window.retoId = {{ $reto->id_reto }};
+    
+    // Verificar si ya se mostró el disclaimer hoy
+    fetch('/retos/verificar-disclaimer')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.mostrado) {
+                Swal.fire({
+                    title: 'Aviso',
+                    html: `
+                        <div class="text-start">
+                            <p>Por favor, tenga en cuenta que:</p>
+                            <ul>
+                                <li>Si recarga o cierra esta página, perderá el chat actual</li>
+                                <li>El usuario con el que está emparejado también perderá la conexión</li>
+                            </ul>
+                            <div class="form-check mt-3">
+                                <input class="form-check-input" type="checkbox" id="noMostrarHoy">
+                                <label class="form-check-label" for="noMostrarHoy">
+                                    No volver a mostrar el día de hoy
+                                </label>
+                            </div>
+                        </div>
+                    `,
+                    icon: 'warning',
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#4B0082',
+                    showCancelButton: false,
+                    allowOutsideClick: false,
+                    allowEscapeKey: false,
+                    didOpen: () => {
+                        document.getElementById('noMostrarHoy').addEventListener('change', function() {
+                            if (this.checked) {
+                                fetch('/retos/guardar-disclaimer', {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
     console.log('=== INICIO DE LA VISTA RETO ===');
     console.log('User ID:', window.userId);
     console.log('Reto ID:', window.retoId);
@@ -280,3 +325,56 @@
 <script src="{{ asset('js/estados.js') }}"></script>
 <script src="{{ asset('js/chatrandom.js') }}"></script>
 <script src="{{ asset('js/reto' . $reto->id_reto . '.js') }}"></script>
+
+<style>
+.solicitud-item {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.solicitud-item:last-child {
+    border-bottom: none;
+}
+
+.solicitud-info {
+    flex-grow: 1;
+}
+
+.solicitud-username {
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.solicitud-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-aceptar {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-rechazar {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 5px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-aceptar:hover {
+    background-color: #218838;
+}
+
+.btn-rechazar:hover {
+    background-color: #c82333;
+}
+</style>

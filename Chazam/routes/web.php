@@ -15,11 +15,17 @@ use App\Http\Controllers\ProductosAdminController;
 use App\Http\Controllers\MomentmsController;
 use App\Http\Controllers\TiendaController;
 use App\Http\Controllers\PagosAdminController;
+use App\Http\Controllers\CompraController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\SolicitudUserController;
 use App\Http\Controllers\ReporteController;
+use App\Http\Controllers\VistaController;
+use App\Http\Controllers\ComunidadesController;
+use App\Http\Controllers\SolicitudController;
+use App\Http\Controllers\AmistadController;
+
 
 
 Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
@@ -38,12 +44,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [AdminController::class, 'destroy'])->name('usuarios.destroy');
         Route::post('/usuarios/filtrar', [AdminController::class, 'filtrar'])->name('usuarios.filtrar');
         Route::post('/usuarios/{id}/ban', [AdminController::class, 'ban'])->name('usuarios.ban');
-
-        // Rutas para retos (administrador)
-        Route::get('retos', [RetoAdminController::class, 'index'])->name('retos.index');
-        Route::post('retos', [RetoAdminController::class, 'store'])->name('retos.store');
-        Route::put('retos/{id}', [RetoAdminController::class, 'update'])->name('retos.update');
-        Route::delete('retos/{id}', [RetoAdminController::class, 'destroy'])->name('retos.destroy');
+        Route::get('/usuarios/{id}/json', [AdminController::class, 'getUserJson'])->name('usuarios.json');
 
         // Rutas para reportes (administrador)
         Route::get('reportes', [ReporteAdminController::class, 'index'])->name('reportes.index');
@@ -86,10 +87,10 @@ Route::middleware(['auth'])->group(function () {
         Route::prefix('perfil')->name('perfil.')->group(function () {
             Route::get('/dashboard', [PerfilController::class, 'dashboard'])->name('dashboard');
             Route::get('/personalizacion', [PerfilController::class, 'edit'])->name('personalizacion');
+            Route::get('/vista', [VistaController::class, 'show'])->name('vista');
+            Route::post('/marco', [VistaController::class, 'cambiarMarco'])->name('cambiarMarco');
+            Route::post('/glow', [VistaController::class, 'cambiarBrillo'])->name('cambiarBrillo');
             Route::put('/update', [PerfilController::class, 'update'])->name('update');
-            Route::get('/vista', function () {
-                return view('perfil.vista');
-            })->name('vista');
             Route::get('/mejoras', function () {
                 return view('perfil.mejoras');
             })->name('mejoras');
@@ -168,9 +169,37 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/solicitudes/bloquear', [SolicitudUserController::class, 'bloquearUsuario'])->name('solicitudes.bloquear');
     Route::get('/solicitudes/verificar-bloqueo/{id_usuario}', [SolicitudUserController::class, 'verificarBloqueo'])->name('solicitudes.verificar-bloqueo');
     Route::get('/solicitudes/verificar/{id_usuario}', [SolicitudUserController::class, 'verificarSolicitud'])->name('solicitudes.verificar');
+    Route::get('/solicitudes/pendientes', [SolicitudUserController::class, 'getPendientes'])->name('solicitudes.pendientes');
+    Route::post('/solicitudes/responder', [SolicitudUserController::class, 'responderSolicitud'])->name('solicitudes.responder');
     
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
 
+    // Rutas para comunidades
+    Route::get('/comunidades', [ComunidadesController::class, 'index'])->name('comunidades.index');
+    Route::get('/comunidades/create', [ComunidadesController::class, 'create'])->name('comunidades.create');
+    Route::post('/comunidades', [ComunidadesController::class, 'store'])->name('comunidades.store');
+    Route::post('/comunidades/{id}/join', [ComunidadesController::class, 'join'])->name('comunidades.join');
+
     Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
+
+    // Rutas para que el usuario vea sus propias compras
+    Route::get('/mis-compras', [CompraController::class, 'historial'])->name('compras.historial');
+    Route::get('/mis-compras/factura/{pagoId}', [CompraController::class, 'descargarFactura'])
+        ->middleware('auth')
+        ->name('compras.factura');
+    Route::post('/mis-compras/filtrar', [CompraController::class, 'filtrarAjax'])
+        ->middleware('auth')
+        ->name('compras.filtrar');
+
+    // Rutas para el disclaimer
+    Route::get('/retos/verificar-disclaimer', [RetoController::class, 'verificarDisclaimer'])->middleware(['auth']);
+    Route::post('/retos/guardar-disclaimer', [RetoController::class, 'guardarDisclaimer'])->middleware(['auth']);
+
+    // Rutas de amistades
+    Route::get('/amistades', [AmistadController::class, 'index'])->name('amistades.index');
+    Route::delete('/amistades/{idUsuario}', [AmistadController::class, 'destroy'])->name('amistades.destroy');
+    Route::post('/amistades/{idUsuario}/bloquear', [AmistadController::class, 'bloquear'])->name('amistades.bloquear');
 });
+
+Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');

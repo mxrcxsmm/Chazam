@@ -7,7 +7,6 @@ use App\Models\ChatUsuario;
 use App\Models\Mensaje;
 use App\Models\Chat;
 use Illuminate\Support\Facades\Auth;
-use App\Models\Comunidad;
 
 class FriendChatController extends Controller
 {
@@ -43,7 +42,9 @@ class FriendChatController extends Controller
                     'id_chat' => $chat->id_chat,
                     'nombre' => $compaUser ? $compaUser->nombre : 'Desconocido',
                     'username' => $compaUser ? $compaUser->username : 'Desconocido',
-                    'img' => $compaUser && $compaUser->img ? $compaUser->img : $chat->img,
+                    'img' => $compaUser && $compaUser->img
+                        ? asset($compaUser->img)
+                        : asset('img/profile_img/avatar-default.png'),
                     'last_message' => optional($chat->mensajes()->latest('fecha_envio')->first())->contenido,
                     'last_time' => optional($chat->mensajes()->latest('fecha_envio')->first())->fecha_envio?->format('H:i'),
                     'id_estado' => $compaUser ? $compaUser->id_estado : 2, // 2 = desconectado por defecto
@@ -74,6 +75,7 @@ class FriendChatController extends Controller
                     'fecha_envio' => $mensaje->fecha_envio->format('H:i'),
                     'usuario' => $mensaje->chatUsuario->usuario->username,
                     'es_mio' => $mensaje->chatUsuario->id_usuario == Auth::id(),
+                    'img' => $mensaje->usuario->img ? asset($mensaje->usuario->img) : asset('img/profile_img/avatar-default.png'),
                 ];
             });
         return response()->json($mensajes);
@@ -101,7 +103,7 @@ class FriendChatController extends Controller
 
     public function comunidades()
     {
-        $comunidades = Comunidad::all();
-        return view('user.comunidades', compact('comunidades'));
+        $chats = Chat::whereNull('id_reto')->get();
+        return view('user.comunidades', compact('chats'));
     }
 } 
