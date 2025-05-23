@@ -91,6 +91,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/marco', [VistaController::class, 'cambiarMarco'])->name('cambiarMarco');
             Route::post('/glow', [VistaController::class, 'cambiarBrillo'])->name('cambiarBrillo');
             Route::put('/update', [PerfilController::class, 'update'])->name('update');
+            Route::post('/perfil/check-availability', [PerfilController::class, 'checkAvailability'])->name('perfil.checkAvailability');
             Route::get('/mejoras', function () {
                 return view('perfil.mejoras');
             })->name('mejoras');

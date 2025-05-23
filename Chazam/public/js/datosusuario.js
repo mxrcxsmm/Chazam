@@ -100,17 +100,129 @@ document.addEventListener("DOMContentLoaded", () => {
         fileInput.value = '';
     });
 
-    form.addEventListener('submit', function (e) {
-        e.preventDefault();
+// Función reutilizable para mostrar errores
+function mostrarError(campo, mensaje) {
+    const existente = campo.parentElement.querySelector('.error-message');
+    if (existente) existente.remove();
 
+    const error = document.createElement('div');
+    error.className = 'error-message';
+    error.textContent = mensaje;
+    campo.insertAdjacentElement('afterend', error);
+}
+
+// Validación asincrónica de disponibilidad de username
+async function checkUsernameAvailability(username, usernameActual) {
+    if (username === usernameActual) return true;
+
+    try {
+        const response = await fetch('/check-availability', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
+            },
+            body: JSON.stringify({ type: 'username', value: username })
+        });
+        const data = await response.json();
+        return data.available;
+    } catch (error) {
+        console.error('Error al verificar disponibilidad:', error);
+        return true;
+    }
+}
+
+// Validación en tiempo real del campo username
+const usernameInput = form.querySelector('input[name="username"]');
+const usernameActual = document.getElementById('username_actual').value;
+
+usernameInput.addEventListener('blur', async () => {
+    const username = usernameInput.value.trim();
+
+    if (!username || username.length > 30) {
+        mostrarError(usernameInput, 'Username obligatorio y máximo 30 caracteres.');
+        return;
+    }
+
+    const disponible = await checkUsernameAvailability(username, usernameActual);
+    if (!disponible) {
+        mostrarError(usernameInput, 'Este nombre de usuario ya está en uso.');
+    }
+});
+
+usernameInput.addEventListener('input', () => {
+    const existente = usernameInput.parentElement.querySelector('.error-message');
+    if (existente) existente.remove();
+});
+
+// Validación en tiempo real de nombre y apellido
+const nombreInput = form.querySelector('input[name="nombre"]');
+const apellidoInput = form.querySelector('input[name="apellido"]');
+
+function validarTextoAlfanumerico(input, campoNombre) {
+    const valor = input.value.trim();
+    const regex = /^[\p{L}\s\-]+$/u;
+
+    if (valor && !regex.test(valor)) {
+        mostrarError(input, `${campoNombre} inválido. Solo letras, espacios y guiones.`);
+    }
+}
+
+[nombreInput, apellidoInput].forEach((input, i) => {
+    const campoNombre = i === 0 ? 'Nombre' : 'Apellido';
+
+    input.addEventListener('blur', () => validarTextoAlfanumerico(input, campoNombre));
+    input.addEventListener('input', () => {
+        const existente = input.parentElement.querySelector('.error-message');
+        if (existente) existente.remove();
+    });
+});
+
+// Validación en tiempo real de fecha de nacimiento
+const fechaInput = form.querySelector('input[name="fecha_nacimiento"]');
+fechaInput.addEventListener('blur', () => {
+    const fechaNacimiento = fechaInput.value;
+    const hoy = new Date();
+    const fechaMinima = new Date(hoy.getFullYear() - 13, hoy.getMonth(), hoy.getDate());
+
+    if (fechaNacimiento) {
+        const fecha = new Date(fechaNacimiento);
+        if (fecha > fechaMinima) {
+            mostrarError(fechaInput, 'Debes tener al menos 13 años.');
+        }
+    }
+});
+fechaInput.addEventListener('input', () => {
+    const existente = fechaInput.parentElement.querySelector('.error-message');
+    if (existente) existente.remove();
+});
+
+// Validación en tiempo real de descripción
+const descripcionInput = form.querySelector('textarea[name="descripcion"]');
+if (descripcionInput) {
+    descripcionInput.addEventListener('input', () => {
+        const existente = descripcionInput.parentElement.querySelector('.error-message');
+        if (existente) existente.remove();
+
+        if (descripcionInput.value.length > 1000) {
+            mostrarError(descripcionInput, 'Máximo 1000 caracteres.');
+        }
+    });
+}
+
+
+
+    form.addEventListener('submit', async function (e) {
+        e.preventDefault();
+    
         if (form.dataset.skipValidation === 'true') {
             form.dataset.skipValidation = 'false';
             sendFormAjax(form);
             return;
         }
-
+    
         document.querySelectorAll('.error-message').forEach(el => el.remove());
-
+    
         const nombre = form.nombre.value.trim();
         const apellido = form.apellido.value.trim();
         const username = form.username.value.trim();
@@ -118,46 +230,48 @@ document.addEventListener("DOMContentLoaded", () => {
         const descripcion = form.descripcion.value.trim();
         const hoy = new Date();
         const fechaMinima = new Date(hoy.getFullYear() - 13, hoy.getMonth(), hoy.getDate());
-
+    
         let valido = true;
 
-        const mostrarError = (campo, mensaje) => {
-            const error = document.createElement('div');
-            error.className = 'error-message';
-            error.textContent = mensaje;
-            campo.insertAdjacentElement('afterend', error);
+        if (!nombre.match(/^[\p{L}\s\-]+$/u)) {
+            mostrarError(form.nombre, 'Nombre inválido.');
             valido = false;
-        };
-
-        if (!nombre.match(/^[\p{L}\s\-]+$/u)) mostrarError(form.nombre, 'Nombre inválido.');
-        if (!apellido.match(/^[\p{L}\s\-]+$/u)) mostrarError(form.apellido, 'Apellido inválido.');
-        if (!username || username.length > 30) mostrarError(form.username, 'Username obligatorio y máximo 30 caracteres.');
+        }
+        if (!apellido.match(/^[\p{L}\s\-]+$/u)) {
+            mostrarError(form.apellido, 'Apellido inválido.');
+            valido = false;
+        }
+        if (!username || username.length > 30) {
+            mostrarError(form.username, 'Username obligatorio y máximo 30 caracteres.');
+            valido = false;
+        }
         if (fechaNacimiento) {
             const fecha = new Date(fechaNacimiento);
-            if (fecha > fechaMinima) mostrarError(form.fecha_nacimiento, 'Debes tener al menos 13 años.');
+            if (fecha > fechaMinima) {
+                mostrarError(form.fecha_nacimiento, 'Debes tener al menos 13 años.');
+                valido = false;
+            }
         }
-        if (descripcion.length > 1000) mostrarError(form.descripcion, 'Máximo 1000 caracteres.');
-
-        if (!valido) {
-            fetch('/check-availability', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('input[name="_token"]').value
-                },
-                body: JSON.stringify({ type: 'username', value: username })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (!data.available) mostrarError(form.username, 'Este nombre de usuario ya está en uso.');
+        if (descripcion.length > 1000) {
+            mostrarError(form.descripcion, 'Máximo 1000 caracteres.');
+            valido = false;
+        }        
+    
+        // Validación asincrónica del username solo si pasó validaciones anteriores
+        if (valido) {
+            const disponible = await checkUsernameAvailability(username, usernameActual);
+            if (!disponible) {
+                mostrarError(form.username, 'Este nombre de usuario ya está en uso.');
                 Swal.fire({ icon: 'error', title: 'Oops...', text: 'Corrige los errores del formulario.' });
-            });
-
+                return;
+            }
+        } else {
+            Swal.fire({ icon: 'error', title: 'Oops...', text: 'Corrige los errores del formulario.' });
             return;
-        }
-
+        }        
+    
         sendFormAjax(form);
-    });
+    });    
 
     function sendFormAjax(form) {
         const formData = new FormData(form);
