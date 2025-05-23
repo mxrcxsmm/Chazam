@@ -47,6 +47,49 @@ document.addEventListener('DOMContentLoaded', function () {
         .then(data => {
             if (data.html) {
                 tablaUsuarios.innerHTML = data.html;
+                // Reasociar el evento del modal tras recargar la tabla
+                if (window.bootstrap && window.bootstrap.Modal) {
+                    const modal = document.getElementById('modalUsuario');
+                    if (modal) {
+                        const bsModal = window.bootstrap.Modal.getInstance(modal);
+                        if (bsModal) bsModal.hide();
+                    }
+                }
+                // Reasociar el evento show.bs.modal SIN { once: true }
+                const modalUsuario = document.getElementById('modalUsuario');
+                if (modalUsuario) {
+                    // Elimina listeners anteriores para evitar duplicados
+                    modalUsuario.replaceWith(modalUsuario.cloneNode(true));
+                    const nuevoModalUsuario = document.getElementById('modalUsuario');
+                    nuevoModalUsuario.addEventListener('show.bs.modal', function (event) {
+                        var icon = event.relatedTarget;
+                        var userId = icon.getAttribute('data-user-id');
+                        if (userId) {
+                            fetch('/admin/usuarios/' + userId + '/json')
+                                .then(response => response.json())
+                                .then(user => {
+                                    const campos = [
+                                        { label: 'ID', key: 'id_usuario' },
+                                        { label: 'Nombre de Usuario', key: 'username' },
+                                        { label: 'Email', key: 'email' },
+                                        { label: 'Nombre Completo', key: 'nombre_completo' },
+                                        { label: 'Fecha nacimiento', key: 'fecha_nacimiento' },
+                                        { label: 'Género', key: 'genero' },
+                                        { label: 'Descripción', key: 'descripcion' },
+                                        { label: 'Nacionalidad', key: 'nacionalidad' },
+                                        { label: 'Estado', key: 'estado' },
+                                        { label: 'Rol', key: 'rol' }
+                                    ];
+                                    let html = '<ul class="list-group">';
+                                    campos.forEach(campo => {
+                                        html += `<li class="list-group-item"><strong>${campo.label}:</strong> ${user[campo.key] ?? ''}</li>`;
+                                    });
+                                    html += '</ul>';
+                                    document.getElementById('modalUsuarioBody').innerHTML = html;
+                                });
+                        }
+                    });
+                }
             } else if (data.error) {
                 tablaUsuarios.innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
             }
@@ -75,4 +118,7 @@ document.addEventListener('DOMContentLoaded', function () {
     filtroNacionalidad.addEventListener('change', aplicarFiltros);
     filtroRol.addEventListener('change', aplicarFiltros);
     filtroGenero.addEventListener('change', aplicarFiltros); // Evento para el filtro de género
+
+    // Llama a aplicarFiltros al cargar la página
+    aplicarFiltros();
 });
