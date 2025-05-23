@@ -241,3 +241,51 @@ body {
     margin-top: 10px;
     font-weight: bold;
 }
+/* Responsive SOLO para <= 768px */
+@media (max-width: 768px) {
+    .main-container {
+        flex-direction: column;
+        height: auto;
+    }
+    .sidebar {
+        position: fixed;
+        left: -270px;
+        top: 0;
+        width: 250px;
+        max-width: 80vw;
+        height: 100vh;
+        background: #4b0082;
+        z-index: 2000;
+        border-right: 1px solid #ddd;
+        border-bottom: none;
+        padding-top: 60px;
+        transition: left 0.3s;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.15);
+    }
+    .sidebar.active {
+        left: 0;
+    }
+    .main-content {
+        padding: 15px 5px;
+        height: auto;
+    }
+    .productos-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    .navbar-toggler {
+        display: block !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .sidebar {
+        position: relative;
+        left: 0;
+        height: 100%;
+        box-shadow: none;
+        padding-top: 20px;
+        width: 20%;
+        max-width: 250px;
+    }
+}
