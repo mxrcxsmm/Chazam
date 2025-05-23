@@ -20,6 +20,8 @@ document.addEventListener('DOMContentLoaded', function() {
         userId: 1 // Reemplaza con el ID del usuario autenticado
     };
 
+    window.userImg = "{{ Auth::user()->img ? asset(Auth::user()->img) : asset('img/profile_img/avatar-default.png') }}";
+
     function renderChats(chats) {
         const chatsList = document.getElementById('chats-list');
         chatsList.innerHTML = '';
@@ -29,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
             chatItem.dataset.chatId = chat.id_chat;
             chatItem.innerHTML = `
                 <div class="chat-avatar">
-                    <img src="${chat.img ? chat.img : '/img/profile_img/avatar-default.png'}" alt="Avatar">
+                    <img src="${chat.img ? chat.img : '/img/profile_img/avatar-default.png'}" alt="Avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
                 </div>
                 <div class="chat-info">
                     <div class="chat-header">
@@ -53,11 +55,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const messagesContainer = document.getElementById('messages-container');
         messagesContainer.innerHTML = '';
         messages.forEach(msg => {
+            const imgSrc = msg.es_mio ? window.userImg : (msg.img ? msg.img : '/img/profile_img/avatar-default.png');
             const msgDiv = document.createElement('div');
-            msgDiv.className = 'message';
+            msgDiv.className = 'message' + (msg.es_mio ? ' message-own' : '');
             msgDiv.innerHTML = `
                 <div class="message-header">
-                    <img src="/img/profile_img/avatar-default.png" alt="Avatar" class="message-avatar">
+                    <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
                     <span class="message-username">${msg.usuario}</span>
                     <span class="message-time">${msg.fecha_envio}</span>
                 </div>
