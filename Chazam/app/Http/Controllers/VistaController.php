@@ -20,8 +20,14 @@ class VistaController extends Controller
     public function cambiarMarco(Request $request)
     {
         $user = Auth::user();
-        $user->borde_overlay = $request->input('borde_overlay');
-        $user->save();
+
+        // Si no existe la personalización, la creamos
+        $personalizacion = $user->personalizacion ?? new \App\Models\Personalizacion(['id_usuario' => $user->id_usuario]);
+
+        $personalizacion->marco = $request->input('borde_overlay') ?? 'default.svg';
+        $personalizacion->rotacion = $request->input('rotativo_temp') ?? 0;
+
+        $personalizacion->save();
 
         return redirect()->back()->with('success', 'Marco actualizado correctamente.');
     }
@@ -39,9 +45,12 @@ class VistaController extends Controller
     public function cambiarBrillo(Request $request)
     {
         $user = Auth::user();
-        $user->borde_glow_color = $request->input('glow_color');
-        $user->save();
-    
+
+        $personalizacion = $user->personalizacion ?? new \App\Models\Personalizacion(['id_usuario' => $user->id_usuario]);
+        $personalizacion->brillo = $request->input('glow_color');
+
+        $personalizacion->save();
+
         return back()->with('success', 'Color del brillo actualizado.');
-    }    
+    } 
 }
