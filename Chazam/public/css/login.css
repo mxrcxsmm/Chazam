@@ -161,14 +161,6 @@ h4 {
     overflow: hidden;
 }
 
-/* ✨ Fix para autocompletado de Chrome (input background) */
-input:-webkit-autofill,
-input:-webkit-autofill:hover, 
-input:-webkit-autofill:focus, 
-input:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 1000px #d99cec inset !important;
-    -webkit-text-fill-color: #000 !important;
-}
 
 /* SOLUCION DE FLASH PARA QUE NO SE VEA FORMULARIO DE LOGIN Y SIGNUP EN LA MISMA VENTANA */
 #signup {
@@ -380,6 +372,35 @@ input:-webkit-autofill:active {
     .file-field .file-path-wrapper {
         width: calc(100% - 120px);
     }
+    .input-field input:focus + label {
+        color: #703ea3 !important;
+    }
+}
+
+@media (min-width: 601px) {
+    .login-container.wider {
+        max-height: 90vh;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+
+    .login-container.wider input::placeholder {
+        color: #703ea3 !important;
+        opacity: 1;
+    }
+    .login-container.wider label {
+        color: #703ea3 !important;
+    }
+    
+}
+
+/* Cambiar color del label y borde cuando el input es válido (evitar verde confuso) */
+.input-field input.valid {
+    border-bottom: 2px solid #2da046 !important;
+    box-shadow: 0 1px 0 0 #2da046 !important;
+}
+.input-field input.valid + label {
+    color: #2da046 !important;
 }
 
 .swal2-container {
@@ -400,4 +421,17 @@ input:-webkit-autofill:active {
 .login-container::-webkit-scrollbar-thumb {
     background: #703ea3;
     border-radius: 4px;
+}
+
+/* ✨ Fix para autocompletado de Chrome (input background) */
+input:-webkit-autofill,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px #d99cec inset !important;
+    box-shadow: 0 0 0 1000px #d99cec inset !important;
+    background-color: #d99cec !important;
+    -webkit-text-fill-color: #000 !important;
+    caret-color: #703ea3 !important;
+    transition: background-color 5000s ease-in-out 0s !important;
 }

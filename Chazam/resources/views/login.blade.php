@@ -18,7 +18,7 @@
     <div id="vanta-bg"></div>
     <div class="login-outer">
         <div class="login-container">
-            <img src="{{ asset('img/logo.png') }}" alt="" style="" class="logo">
+            <img src="{{ asset('img/Login_Chazam.png') }}" alt="" style="" class="logo">
 
             <div class="row">
                 <div class="col s12">
@@ -172,92 +172,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="{{ asset('js/validations.js') }}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            function closeAllDropdowns() {
-                document.querySelectorAll('.dropdown-content').forEach(el => el.style.display = 'none');
-            }
-
-            @if(session('error'))
-                closeAllDropdowns();
-                Swal.fire({
-                    icon: 'error',
-                    title: '¡Sesión activa!',
-                    text: '{{ session('error') }}',
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#703ea3'
-                });
-            @endif
-
-            @if(session('login_error'))
-                closeAllDropdowns();
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error de acceso',
-                    text: '{{ session('login_error') }}',
-                    confirmButtonText: 'Entendido',
-                    confirmButtonColor: '#703ea3'
-                });
-            @endif
-
-            const loginContainer = document.querySelector('.login-container');
-            
-            // Función para manejar el cambio de ancho
-            function handleWidthChange() {
-                const activeTab = document.querySelector('.tabs .tab a.active');
-                if (window.innerWidth > 600) {
-                    if (activeTab && activeTab.getAttribute('href') === '#signup') {
-                        loginContainer.classList.add('wider');
-                    } else {
-                        loginContainer.classList.remove('wider');
-                    }
-                } else {
-                    loginContainer.classList.remove('wider');
-                }
-            }
-
-            // Inicializar tabs de Materialize
-            const materializeTabs = M.Tabs.init(document.querySelectorAll('.tabs'), {
-                onShow: function(tab) {
-                    handleWidthChange();
-                    
-                    // Reiniciar componentes de Materialize
-                    setTimeout(() => {
-                        M.updateTextFields();
-                        M.FormSelect.init(document.querySelectorAll('select'));
-                    }, 50);
-                }
-            });
-
-            // Manejar cambios de tamaño de ventana
-            window.addEventListener('resize', handleWidthChange);
-
-            // Aplicar el ancho inicial
-            handleWidthChange();
-
-            // Inicializar componentes
-            initDatepicker();
-            M.FormSelect.init(document.querySelectorAll('select'));
-            M.CharacterCounter.init(document.querySelectorAll('textarea'));
-
-            // Inicializar validaciones
-            validateSignUpForm();
-
-            // Inicializar Vanta.js
-            VANTA.WAVES({
-                el: "#vanta-bg",
-                color: 0x703ea3,
-                backgroundColor: 0xaa00ff
-            });
-
-            // Oculta los dropdowns de Materialize cuando sale un SweetAlert
-            const observer = new MutationObserver(function(mutations) {
-                const swalVisible = !!document.querySelector('.swal2-container');
-                document.querySelectorAll('.dropdown-content').forEach(el => {
-                    el.style.display = swalVisible ? 'none' : '';
-                });
-            });
-            observer.observe(document.body, { childList: true, subtree: true });
+    document.addEventListener('DOMContentLoaded', function() {
+        @if(session('error'))
+        closeAllDropdowns();
+        Swal.fire({
+            icon: 'error',
+            title: '¡Sesión activa!',
+            text: '{{ session('error') }}',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#703ea3'
         });
+    @endif
+
+    @if(session('login_error'))
+        closeAllDropdowns();
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de acceso',
+            text: '{{ session('login_error') }}',
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#703ea3'
+        });
+    @endif
+    });
     </script>
 </body>
 </html>

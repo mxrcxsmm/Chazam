@@ -1,4 +1,5 @@
 // Función para validar el formulario de registro
+
 function validateSignUpForm() {
     const formSignup = document.querySelector('.form-signup');
     if (!formSignup) return;
@@ -207,4 +208,84 @@ function initDatepicker() {
 
 // Exportar las funciones para uso global
 window.validateSignUpForm = validateSignUpForm;
-window.initDatepicker = initDatepicker; 
+window.initDatepicker = initDatepicker;
+
+document.addEventListener('DOMContentLoaded', function() {
+    function closeAllDropdowns() {
+        document.querySelectorAll('.dropdown-content').forEach(el => el.style.display = 'none');
+    }
+
+    const loginContainer = document.querySelector('.login-container');
+    
+    // Función para manejar el cambio de ancho
+    function handleWidthChange() {
+        const activeTab = document.querySelector('.tabs .tab a.active');
+        if (window.innerWidth > 600) {
+            if (activeTab && activeTab.getAttribute('href') === '#signup') {
+                loginContainer.classList.add('wider');
+            } else {
+                loginContainer.classList.remove('wider');
+            }
+        } else {
+            loginContainer.classList.remove('wider');
+        }
+    }
+
+    // Inicializar tabs de Materialize
+    const materializeTabs = M.Tabs.init(document.querySelectorAll('.tabs'), {
+        onShow: function(tab) {
+            handleWidthChange();
+            
+            // Reiniciar componentes de Materialize
+            setTimeout(() => {
+                M.updateTextFields();
+                M.FormSelect.init(document.querySelectorAll('select'));
+            }, 50);
+        }
+    });
+
+    // Manejar cambios de tamaño de ventana
+    window.addEventListener('resize', handleWidthChange);
+
+    // Aplicar el ancho inicial
+    handleWidthChange();
+
+    // Inicializar componentes
+    initDatepicker();
+    M.FormSelect.init(document.querySelectorAll('select'));
+    M.CharacterCounter.init(document.querySelectorAll('textarea'));
+
+    // Inicializar validaciones
+    validateSignUpForm();
+
+    // Inicializar Vanta.js
+    VANTA.WAVES({
+        el: "#vanta-bg",
+        color: 0x703ea3,
+        backgroundColor: 0xaa00ff
+    });
+
+    // Oculta los dropdowns de Materialize cuando sale un SweetAlert
+    const observer = new MutationObserver(function(mutations) {
+        const swalVisible = !!document.querySelector('.swal2-container');
+        document.querySelectorAll('.dropdown-content').forEach(el => {
+            el.style.display = swalVisible ? 'none' : '';
+        });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Forzar repaint REAL de autofill al cambiar de tab
+    document.querySelectorAll('.tabs .tab a').forEach(tab => {
+        tab.addEventListener('click', () => {
+            setTimeout(() => {
+                document.querySelectorAll('input').forEach(input => {
+                    // Forzar reflow y trigger de autofill
+                    input.value = input.value; // trigger repaint
+                    
+                    void input.offsetHeight;
+                    input.style.display = '';
+                });
+            }, 100);
+        });
+    });
+});
