@@ -15,7 +15,7 @@ class AuthController extends Controller
 {
     public function showLoginForm()
     {
-        $nacionalidades = Nacionalidad::all();
+        $nacionalidades = Nacionalidad::orderBy('nombre', 'asc')->get();
         return view('login', compact('nacionalidades'));
     }
 
@@ -26,6 +26,14 @@ class AuthController extends Controller
             'email' => 'required|email',
             'password' => 'required|string|min:6',
         ]);
+
+        // Buscar usuario por email
+        $user = \App\Models\User::where('email', $request->email)->first();
+
+        // Si existe y está en estado Activo o Disponible, no dejar entrar
+        if ($user && in_array($user->id_estado, [1, 5])) {
+            return back()->with('error', 'Ya tienes una sesión activa en otro dispositivo. Por favor, cierra la sesión anterior.');
+        }
 
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
@@ -83,7 +91,7 @@ class AuthController extends Controller
             }
         }
 
-        return back()->withErrors(['email' => 'Credenciales incorrectas.']);
+        return back()->with('login_error', 'Credenciales incorrectas.');
     }
 
     public function store(Request $request)

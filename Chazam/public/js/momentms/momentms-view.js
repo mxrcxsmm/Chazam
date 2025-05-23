@@ -383,4 +383,4 @@ document.addEventListener('DOMContentLoaded', function() {
     searchInput.addEventListener('input', buscarMomentms);
     searchFilter.addEventListener('change', buscarMomentms);
     orderSelect.addEventListener('change', buscarMomentms);
-});
+}); 

@@ -111,10 +111,25 @@
                 </div>
 
                 <script>
-                    function toggleSidebar() {
+                    function toggleSidebar(forceClose = false) {
                         const sidebar = document.getElementById('sidebar');
-                        sidebar.style.display = sidebar.style.display === 'none' ? 'block' : 'none';
+                        if (forceClose || sidebar.style.display === 'block') {
+                            sidebar.style.display = 'none';
+                            document.body.style.overflow = '';
+                        } else {
+                            sidebar.style.display = 'block';
+                            sidebar.focus();
+                            document.body.style.overflow = 'hidden';
+                        }
                     }
+                    document.addEventListener('mousedown', function(e) {
+                        const sidebar = document.getElementById('sidebar');
+                        if (!sidebar) return;
+                        // Si el sidebar está visible y el click es fuera de él
+                        if (sidebar.style.display === 'block' && !sidebar.contains(e.target)) {
+                            toggleSidebar(true);
+                        }
+                    });
                 </script>
             </div>
         </div>
