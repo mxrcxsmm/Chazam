@@ -67,7 +67,7 @@ class StripeController extends Controller
                 $user->id_rol = $premiumRole->id_rol; // Asignar el rol Premium
                 $user->save();
             }
-        } elseif ($producto->id_tipo_producto == 4) { // Compra de puntos
+        } elseif ($producto->id_tipo_producto == 3) { // Compra de puntos
             // Sumar los puntos del producto al perfil del usuario
             if (is_numeric($producto->puntos)) {
                 $user->puntos += $producto->puntos;
