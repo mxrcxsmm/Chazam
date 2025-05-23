@@ -146,7 +146,7 @@ class AuthController extends Controller
                 
                 // Guardar la imagen directamente en public/img/profile_img
                 $image->move($directory, $imageName);
-                $imagePath = $imageName;
+                $imagePath = 'img/profile_img/' . $imageName;
                 
             } catch (\Exception $e) {
                 return redirect()->back()
