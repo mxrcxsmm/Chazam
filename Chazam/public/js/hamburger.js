@@ -152,4 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (btnAmistades) btnAmistades.focus();
         });
     }
+
+    window.eliminarAmigo = eliminarAmigo;
+    window.bloquearAmigo = bloquearAmigo;
 });
