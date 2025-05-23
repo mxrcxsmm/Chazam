@@ -329,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     </div>
                     <div class="solicitud-actions">
                         <button class="btn btn-success btn-sm" title="Aceptar" onclick="responderSolicitud(${solicitud.id_solicitud}, 'aceptada')">
-                            <i class="fas fa-check"></i>
+                            <i class="fas fa-check"></i> 
                         </button>
                         <button class="btn btn-danger btn-sm" title="Rechazar" onclick="responderSolicitud(${solicitud.id_solicitud}, 'rechazada')">
                             <i class="fas fa-times"></i>
