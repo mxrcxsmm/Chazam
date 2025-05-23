@@ -149,4 +149,16 @@
     #tablaUsuarios {
         overflow-x: auto;
     }
+
+    .filtros-container .row {
+        flex-direction: column;
+    }
+    .filtro-campo {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .filtros-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }

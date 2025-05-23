@@ -3,13 +3,17 @@
 @section('title', 'Comunidades')
 
 @section('content')
+<!-- SweetAlert2 -->
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <div class="main-container">
     <!-- Sección de comunidades creadas -->
     <div class="section-title">
         <h2>Mis Comunidades</h2>
     </div>
     <div style="margin-bottom: 20px; text-align: right;">
-        <a href="{{ route('comunidades.create') }}" class="create-btn">+ Crear comunidad</a>
+        <a href="{{ route('comunidades.create') }}" class="create-btn" style="padding: 12px 20px;">Crear comunidad</a>
     </div>
     <div class="comunidades-list" id="comunidades-creadas">
         @if($comunidadesCreadas->isEmpty())
@@ -24,14 +28,17 @@
                     </div>
                     <div class="comunidad-info">
                         <h3>{{ $comunidad->nombre }}</h3>
-                        <p>{{ $comunidad->descripcion }}</p>
+                        <p>{{ Str::limit($comunidad->descripcion, 120, '...') }}</p>
                         <div class="comunidad-meta">
-                            <span>{{ $comunidad->chat_usuarios_count }} miembros</span>
-                            <span>Código: {{ $comunidad->codigo }}</span>
+                            <span style="font-size: 1.1em;">{{ $comunidad->chat_usuarios_count }} miembros</span><br>
+                            @if($comunidad->tipocomunidad === 'privada')
+                                <span style="font-size: 1.1em;">Código: <span class="codigo-privado" onclick="toggleCodigo(this, '{{ $comunidad->codigo }}')" style="cursor: pointer;">••••••••••</span></span>
+                            @endif
                         </div>
-                        <div class="comunidad-actions">
-                            <button class="join-btn" data-id="{{ $comunidad->id }}">Gestionar</button>
-                        </div>
+                    </div>
+                    <div class="comunidad-actions">
+                        <button class="join-btn" data-id="{{ $comunidad->id }}">Gestionar</button>
+                        <button class="join-btn" style="margin-top: 10px; background-color: #43b581; width: 100%;" data-id="{{ $comunidad->id }}">Entrar</button>
                     </div>
                 </div>
             @endforeach
@@ -55,14 +62,14 @@
                     </div>
                     <div class="comunidad-info">
                         <h3>{{ $comunidad->nombre }}</h3>
-                        <p>{{ $comunidad->descripcion }}</p>
+                        <p>{{ Str::limit($comunidad->descripcion, 120, '...') }}</p>
                         <div class="comunidad-meta">
-                            <span>{{ $comunidad->chat_usuarios_count }} miembros</span> <br>
-                            <span>Creado por: {{ $comunidad->creador->username }}</span>
+                            <span style="font-size: 1.1em;">{{ $comunidad->chat_usuarios_count }} miembros</span> <br>
+                            <span style="font-size: 1.1em;">Creado por: {{ $comunidad->creador->username }}</span>
                         </div>
-                        <div class="comunidad-actions">
-                            <button class="join-btn" data-id="{{ $comunidad->id }}">Unirse</button>
-                        </div>
+                    </div>
+                    <div class="comunidad-actions">
+                        <button class="join-btn" data-id="{{ $comunidad->id }}">Unirse</button>
                     </div>
                 </div>
             @endforeach
@@ -86,14 +93,14 @@
                     </div>
                     <div class="comunidad-info">
                         <h3>{{ $comunidad->nombre }}</h3>
-                        <p>{{ $comunidad->descripcion }}</p>
+                        <p>{{ Str::limit($comunidad->descripcion, 120, '...') }}</p>
                         <div class="comunidad-meta">
-                            <span>{{ $comunidad->chat_usuarios_count }} miembros</span>
-                            <span>Creado por: {{ $comunidad->creador->username }}</span>
+                            <span style="font-size: 1.1em;">{{ $comunidad->chat_usuarios_count }} miembros</span> <br>
+                            <span style="font-size: 1.1em;">Creado por: {{ $comunidad->creador->username }}</span>
                         </div>
-                        <div class="comunidad-actions">
-                            <button class="join-btn" data-id="{{ $comunidad->id }}">Unirse</button>
-                        </div>
+                    </div>
+                    <div class="comunidad-actions">
+                        <button class="join-btn" data-id="{{ $comunidad->id }}">Unirse</button>
                     </div>
                 </div>
             @endforeach
@@ -108,26 +115,55 @@
 <link rel="stylesheet" href="{{ asset('css/comunidades.css') }}">
 
 <script>
-function unirseComunidad(id) {
-    fetch(`/comunidades/${id}/join`, {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
+    // Mostrar SweetAlert si hay mensaje de éxito
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: '{{ session('success') }}',
+            confirmButtonColor: '#9147ff'
+        });
+    @endif
+
+    function toggleCodigo(element, codigo) {
+        if (element.textContent === '••••••••••') {
+            element.textContent = codigo;
+        } else {
+            element.textContent = '••••••••••';
         }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Te has unido a la comunidad exitosamente');
-            location.reload();
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Hubo un error al unirse a la comunidad');
-    });
-}
+    }
+
+    function unirseComunidad(id) {
+        fetch(`/comunidades/${id}/join`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: 'Te has unido a la comunidad exitosamente',
+                    confirmButtonColor: '#9147ff'
+                }).then(() => {
+                    location.reload();
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Hubo un error al unirse a la comunidad',
+                confirmButtonColor: '#9147ff'
+            });
+        });
+    }
 </script>
 @endsection
