@@ -1,5 +1,9 @@
 @include('layout.chatsHeader')
 
+<!-- Añadir meta tag CSRF -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="user-id" content="{{ Auth::id() }}">
+
 <div class="main-container">
     <div class="chat-sidebar">
         <!-- Header del sidebar -->
@@ -159,5 +163,5 @@
 <meta name="user-img" content="{{ Auth::user()->img ? asset(Auth::user()->img) : asset('img/profile_img/avatar-default.png') }}">
 
 <script>
-window.userImg = "{{ $imagen_perfil }}";
+window.userImg = "{{ Auth::user()->img ? asset(Auth::user()->img) : asset('img/profile_img/avatar-default.png') }}";
 </script>

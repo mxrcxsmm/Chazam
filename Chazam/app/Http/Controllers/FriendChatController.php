@@ -69,13 +69,15 @@ class FriendChatController extends Controller
             ->orderBy('fecha_envio', 'asc')
             ->get()
             ->map(function($mensaje) {
+                $chatUsuario = $mensaje->chatUsuario;
+                $usuario = $chatUsuario ? $chatUsuario->usuario : null;
                 return [
                     'id_mensaje' => $mensaje->id_mensaje,
                     'contenido' => $mensaje->contenido,
                     'fecha_envio' => $mensaje->fecha_envio->format('H:i'),
-                    'usuario' => $mensaje->chatUsuario->usuario->username,
-                    'es_mio' => $mensaje->chatUsuario->id_usuario == Auth::id(),
-                    'img' => $mensaje->usuario->img ? asset($mensaje->usuario->img) : asset('img/profile_img/avatar-default.png'),
+                    'usuario' => $usuario ? $usuario->username : 'Desconocido',
+                    'es_mio' => $chatUsuario && $chatUsuario->id_usuario == Auth::id(),
+                    'img' => $usuario && $usuario->img ? asset($usuario->img) : asset('img/profile_img/avatar-default.png'),
                 ];
             });
         return response()->json($mensajes);
@@ -98,7 +100,7 @@ class FriendChatController extends Controller
             'contenido' => $request->contenido,
             'fecha_envio' => now(),
         ]);
-        return response()->json(['success' => true, 'mensaje' => $mensaje]);
+        return response()->json(['success' => true, 'message' => 'Mensaje enviado']);
     }
 
     public function comunidades()
