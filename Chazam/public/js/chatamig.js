@@ -14,13 +14,11 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastImageUpdate = 0;
 
     window.userChatConfig = {
-        chatsUrl: '/user/chats', // Asegúrate de que esta ruta sea correcta
+        chatsUrl: '/user/chats',
         messagesUrl: function(chatId) { return `/user/chat/${chatId}/messages`; },
         sendUrl: function(chatId) { return `/user/chat/${chatId}/send`; },
-        userId: 1 // Reemplaza con el ID del usuario autenticado
+        userId: 1 // Esto está hardcodeado, debería ser dinámico
     };
-
-    window.userImg = "{{ Auth::user()->img ? asset(Auth::user()->img) : asset('img/profile_img/avatar-default.png') }}";
 
     function renderChats(chats) {
         const chatsList = document.getElementById('chats-list');
@@ -104,6 +102,8 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 renderMessages(data);
+                const messagesContainer = document.getElementById('messages-container');
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
             });
     }
 
@@ -139,6 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function sendMessage() {
         const messageInput = document.querySelector('.message-input-container input');
         const message = messageInput.value.trim();
+        
         if (message.length > 500) {
             Swal.fire({
                 title: 'Mensaje demasiado largo',
@@ -147,7 +148,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
             return;
         }
+
         if (message && currentChatId) {
+            // Deshabilitar el input mientras se envía
+            messageInput.disabled = true;
+
             fetch(window.userChatConfig.sendUrl(currentChatId), {
                 method: 'POST',
                 headers: {
@@ -159,10 +164,22 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    loadMessages(currentChatId);
                     messageInput.value = '';
                     messageInput.dispatchEvent(new Event('input'));
+                    loadMessages(currentChatId);
                 }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'No se pudo enviar el mensaje. Por favor, intenta de nuevo.',
+                    icon: 'error'
+                });
+            })
+            .finally(() => {
+                messageInput.disabled = false;
+                messageInput.focus();
             });
         }
     }
