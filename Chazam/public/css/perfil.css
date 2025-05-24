@@ -402,6 +402,7 @@ input[type="color"]::-webkit-color-swatch {
     border-radius: 9999px;
     transition: all 0.3s ease;
     cursor: pointer;
+    position: relative; /* necesario para posicionar el ::before */
 }
 
 .radio-group .form-check:hover {
@@ -410,11 +411,12 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 .radio-group .form-check-input {
-    display: none;
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
 }
 
-
-.radio-group .form-check-input:checked::before {
+.radio-group .form-check-input:checked + .form-check-label::before {
     content: "";
     position: absolute;
     top: 2px;
