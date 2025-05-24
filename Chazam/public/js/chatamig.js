@@ -520,24 +520,38 @@ class ChatManager {
         if (this.elements.btnSolicitudesPendientes) {
             this.elements.btnSolicitudesPendientes.addEventListener('click', (e) => {
                 e.preventDefault();
+                
+                // Verificar que el modal existe
+                if (!this.elements.solicitudesModal) {
+                    console.error('El modal de solicitudes no existe');
+                    return;
+                }
+
                 // Limpiar cualquier modal anterior
                 const oldModal = bootstrap.Modal.getInstance(this.elements.solicitudesModal);
                 if (oldModal) {
                     oldModal.dispose();
                 }
+
                 // Eliminar cualquier backdrop residual
                 const oldBackdrop = document.querySelector('.modal-backdrop');
                 if (oldBackdrop) {
                     oldBackdrop.remove();
                 }
+
+                // Limpiar clases del body
                 document.body.classList.remove('modal-open');
                 document.body.style.overflow = '';
                 document.body.style.paddingRight = '';
 
                 // Crear nueva instancia del modal
-                const solicitudesModal = new bootstrap.Modal(this.elements.solicitudesModal);
-                solicitudesModal.show();
-                cargarSolicitudesAmistad();
+                try {
+                    const solicitudesModal = new bootstrap.Modal(this.elements.solicitudesModal);
+                    solicitudesModal.show();
+                    cargarSolicitudesAmistad();
+                } catch (error) {
+                    console.error('Error al inicializar el modal:', error);
+                }
             });
             this.actualizarContadorSolicitudes();
         }
