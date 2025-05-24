@@ -40,6 +40,7 @@ class FriendChatController extends Controller
                 $compaUser = $compa ? $compa->usuario : null;
                 return [
                     'id_chat' => $chat->id_chat,
+                    'id_usuario' => $compaUser ? $compaUser->id_usuario : null,
                     'nombre' => $compaUser ? $compaUser->nombre : 'Desconocido',
                     'username' => $compaUser ? $compaUser->username : 'Desconocido',
                     'img' => $compaUser && $compaUser->img
