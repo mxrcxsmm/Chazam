@@ -17,11 +17,14 @@
         ];
     @endphp
 
-    <div class="marco-externo {{ $claseMarco }}" style="
-        --glow-color: {{ $personalizacion->brillo ?? '#FFD700' }};
+    <div class="marco-externo {{ $claseMarco }}"
+    style="
         background-image: url('{{ asset('img/bordes/' . ($personalizacion->marco ?? 'default.svg')) }}');
+        @if($personalizacion->brillo)
+            --glow-color: {{ $personalizacion->brillo }};
+        @endif
     ">
-        <img src="{{ asset($user->imagen_perfil) }}" class="avatar-img">
+    <img src="{{ asset($user->imagen_perfil) }}" class="avatar-img">
     </div>
 
     <form id="personalizacionForm" action="{{ route('perfil.vista.actualizar') }}" method="POST">
@@ -92,7 +95,7 @@
         </div>
 
         <button type="button" id="guardarCambios" class="btn btn-outline-secondary">Guardar Cambios</button>
-        <button type="button" id="restablecerBtn" class="btn btn-outline-danger">Restablecer Personalización</button>
+        <button type="button" id="restablecerBtn" class="btn btn-outline-secondary">Restablecer Personalización</button>
     </form>
 
     <form id="restablecerForm" action="{{ route('perfil.vista.restablecer') }}" method="POST" style="display:none;">

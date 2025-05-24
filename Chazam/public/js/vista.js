@@ -31,6 +31,11 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Inicialmente elimina el brillo si el valor es null
+    if (!hiddenInput.value || hiddenInput.value === "null") {
+        avatarWrapper.style.removeProperty('--glow-color');
+    }
+
     // Color dinámico del brillo
     picker.addEventListener('input', () => {
         const color = picker.value;
@@ -131,12 +136,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         })/*.then(() => location.reload())*/;
     
                         // Actualizar visualmente los valores por defecto sin recargar
-                        avatarWrapper.style.setProperty('--glow-color', '#FFD700');
+                        avatarWrapper.style.removeProperty('--glow-color'); // Elimina visualmente el brillo
                         avatarWrapper.style.backgroundImage = "url('/img/bordes/default.svg')";
                         input.value = 'default.svg';
-                        hiddenInput.value = '#FFD700';
-                        picker.value = '#FFD700';
-                        label.textContent = '#FFD700';
+                        hiddenInput.value = ''; // Indica que no hay brillo activo
+                        picker.value = '#FFD700'; // Color predeterminado que se verá en el input
+                        label.textContent = '#FFD700'; // Muestra el color predefinido en el label
                         sidebarPicker.value = '#4B0082';
                         sidebar.style.backgroundColor = '#4B0082';
                         sidebarLabel.textContent = '#4B0082';
