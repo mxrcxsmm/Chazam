@@ -102,39 +102,41 @@ class AmistadController extends Controller
 
             $usuario = auth()->user();
             
-            // Encontrar la solicitud de amistad
-            $solicitud = Solicitud::where(function($query) use ($usuario, $idUsuario) {
-                $query->where('id_emisor', $usuario->id_usuario)
-                      ->where('id_receptor', $idUsuario)
-                      ->orWhere('id_emisor', $idUsuario)
+            // Encontrar TODAS las solicitudes entre ambos usuarios (en ambas direcciones)
+            $solicitudes = Solicitud::where(function($query) use ($usuario, $idUsuario) {
+                $query->where(function($q) use ($usuario, $idUsuario) {
+                    $q->where('id_emisor', $usuario->id_usuario)
+                      ->where('id_receptor', $idUsuario);
+                })->orWhere(function($q) use ($usuario, $idUsuario) {
+                    $q->where('id_emisor', $idUsuario)
                       ->where('id_receptor', $usuario->id_usuario);
-            })->first();
+                });
+            })->get();
 
-            if ($solicitud) {
-                // Actualizar estado a bloqueado
+            foreach ($solicitudes as $solicitud) {
                 $solicitud->estado = 'blockeada';
                 $solicitud->save();
+            }
 
-                // Eliminar chats relacionados
-                $chats = Chat::whereHas('chatUsuarios', function($query) use ($usuario, $idUsuario) {
-                    $query->where('id_usuario', $usuario->id_usuario)
-                          ->orWhere('id_usuario', $idUsuario);
-                })->get();
+            // Eliminar chats relacionados
+            $chats = Chat::whereHas('chatUsuarios', function($query) use ($usuario, $idUsuario) {
+                $query->where('id_usuario', $usuario->id_usuario)
+                      ->orWhere('id_usuario', $idUsuario);
+            })->get();
 
-                foreach ($chats as $chat) {
-                    // Eliminar mensajes
-                    Mensaje::whereIn('id_chat_usuario', function($query) use ($chat) {
-                        $query->select('id_chat_usuario')
-                              ->from('chat_usuario')
-                              ->where('id_chat', $chat->id_chat);
-                    })->delete();
+            foreach ($chats as $chat) {
+                // Eliminar mensajes
+                Mensaje::whereIn('id_chat_usuario', function($query) use ($chat) {
+                    $query->select('id_chat_usuario')
+                          ->from('chat_usuario')
+                          ->where('id_chat', $chat->id_chat);
+                })->delete();
 
-                    // Eliminar relaciones chat_usuario
-                    ChatUsuario::where('id_chat', $chat->id_chat)->delete();
+                // Eliminar relaciones chat_usuario
+                ChatUsuario::where('id_chat', $chat->id_chat)->delete();
 
-                    // Eliminar el chat
-                    $chat->delete();
-                }
+                // Eliminar el chat
+                $chat->delete();
             }
 
             DB::commit();
