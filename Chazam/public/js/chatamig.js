@@ -1,144 +1,205 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const messageInput = document.querySelector('.message-input-container input');
-    const sendButton = document.querySelector('.message-input-container .fa-paper-plane');
-    const optionsToggle = document.querySelector('.options-toggle');
-    const closeOptions = document.querySelector('.close-options');
-    const optionsSidebar = document.querySelector('.options-sidebar');
-    const chatMain = document.querySelector('.chat-main');
-    const mainContainer = document.querySelector('.main-container');
-    const emojiButton = document.querySelector('.far.fa-smile');
-    const emojiPicker = document.querySelector('emoji-picker');
+// Configuración global del chat
+const CHAT_CONFIG = {
+    chatsUrl: '/user/chats',
+    messagesUrl: (chatId) => `/user/chat/${chatId}/messages`,
+    sendUrl: (chatId) => `/user/chat/${chatId}/send`,
+    pollingInterval: 4000,        // 4 segundos
+    headerRefreshInterval: 30000,  // 30 segundos
+    solicitudesInterval: 60000,    // 1 minuto
+    smartPolling: {
+        enabled: true,
+        idleTimeout: 300000,       // 5 minutos de inactividad
+        idleInterval: 120000,      // 2 minutos cuando está inactivo
+        activeInterval: 4000       // 4 segundos cuando está activo
+    }
+};
 
-    let chats = [];
-    let currentChatId = null;
-    let lastImageUpdate = 0;
+// Clase principal del chat
+class ChatManager {
+    constructor() {
+        this.chats = [];
+        this.currentChatId = null;
+        this.lastImageUpdate = 0;
+        this.lastActivity = Date.now();
+        this.isActive = true;
+        this.initializeElements();
+        this.setupEventListeners();
+        this.startSmartPolling();
+    }
 
-    window.userChatConfig = {
-        chatsUrl: '/user/chats',
-        messagesUrl: function(chatId) { return `/user/chat/${chatId}/messages`; },
-        sendUrl: function(chatId) { return `/user/chat/${chatId}/send`; },
-        userId: 1 // Esto está hardcodeado, debería ser dinámico
-    };
+    // Inicialización de elementos DOM
+    initializeElements() {
+        this.elements = {
+            messageInput: document.querySelector('.message-input-container input'),
+            sendButton: document.querySelector('.message-input-container .fa-paper-plane'),
+            optionsToggle: document.querySelector('.options-toggle'),
+            closeOptions: document.querySelector('.close-options'),
+            optionsSidebar: document.querySelector('.options-sidebar'),
+            chatMain: document.querySelector('.chat-main'),
+            mainContainer: document.querySelector('.main-container'),
+            emojiButton: document.querySelector('.far.fa-smile'),
+            emojiPicker: document.querySelector('emoji-picker'),
+            chatsList: document.getElementById('chats-list'),
+            messagesContainer: document.getElementById('messages-container'),
+            btnSolicitudesPendientes: document.getElementById('btnSolicitudesPendientes'),
+            solicitudesModal: document.getElementById('solicitudesModal')
+        };
+    }
 
-    function renderChats(chats) {
-        const chatsList = document.getElementById('chats-list');
+    // Configuración de event listeners
+    setupEventListeners() {
+        this.elements.sendButton.addEventListener('click', () => this.sendMessage());
+        this.elements.optionsToggle.addEventListener('click', () => this.toggleOptions());
+        this.elements.closeOptions.addEventListener('click', () => this.toggleOptions());
+        this.elements.messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') this.sendMessage();
+        });
+        this.elements.emojiButton.addEventListener('click', () => this.toggleEmojiPicker());
+        this.setupEmojiPicker();
+        this.setupSolicitudesHandlers();
+        this.setupWindowResizeHandler();
+    }
+
+    // Renderizado de chats
+    renderChats(chats) {
+        const chatsList = this.elements.chatsList;
         chatsList.innerHTML = '';
+        
         chats.forEach(chat => {
-            const chatItem = document.createElement('div');
-            chatItem.className = 'chat-item';
-            chatItem.dataset.chatId = chat.id_chat;
-            chatItem.innerHTML = `
-                <div class="chat-avatar">
-                    <img src="${chat.img ? chat.img : '/img/profile_img/avatar-default.png'}" alt="Avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
-                </div>
-                <div class="chat-info">
-                    <div class="chat-header">
-                        <h3>${chat.username ? chat.username : chat.nombre}</h3>
-                        <span class="time">${chat.last_time ? chat.last_time : ''}</span>
-                    </div>
-                    <p class="last-message">${chat.last_message ? chat.last_message : ''}</p>
-                </div>
-            `;
-            chatItem.addEventListener('click', function() {
-                document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
-                chatItem.classList.add('active');
-                loadMessages(chat.id_chat);
-                updateChatHeader(chat);
-            });
+            const chatItem = this.createChatElement(chat);
             chatsList.appendChild(chatItem);
         });
     }
 
-    function renderMessages(messages) {
-        const messagesContainer = document.getElementById('messages-container');
+    // Creación de elemento de chat
+    createChatElement(chat) {
+        const chatItem = document.createElement('div');
+        chatItem.className = 'chat-item';
+        chatItem.dataset.chatId = chat.id_chat;
+        chatItem.innerHTML = `
+            <div class="chat-avatar">
+                <img src="${chat.img || '/img/profile_img/avatar-default.png'}" alt="Avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
+            </div>
+            <div class="chat-info">
+                <div class="chat-header">
+                    <h3>${chat.username || chat.nombre}</h3>
+                    <span class="time">${chat.last_time || ''}</span>
+                </div>
+                <p class="last-message">${chat.last_message || ''}</p>
+            </div>
+        `;
+        
+        chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
+        return chatItem;
+    }
+
+    // Manejo de selección de chat
+    handleChatSelection(chatItem, chat) {
+        document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+        chatItem.classList.add('active');
+        this.loadMessages(chat.id_chat);
+        this.updateChatHeader(chat);
+    }
+
+    // Renderizado de mensajes
+    renderMessages(messages) {
+        const messagesContainer = this.elements.messagesContainer;
+        const currentScroll = messagesContainer.scrollTop;
+        const wasAtBottom = this.isAtBottom(messagesContainer);
+
         messagesContainer.innerHTML = '';
+        
         messages.forEach(msg => {
-            const imgSrc = msg.es_mio ? window.userImg : (msg.img ? msg.img : '/img/profile_img/avatar-default.png');
-            const msgDiv = document.createElement('div');
-            msgDiv.className = 'message' + (msg.es_mio ? ' message-own' : '');
-            msgDiv.innerHTML = `
-                <div class="message-header">
-                    <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
-                    <span class="message-username">${msg.usuario}</span>
-                    <span class="message-time">${msg.fecha_envio}</span>
-                </div>
-                <div class="message-content">
-                    ${msg.contenido}
-                </div>
-            `;
+            const msgDiv = this.createMessageElement(msg);
             messagesContainer.appendChild(msgDiv);
         });
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    }
 
-    function loadChats() {
-        const chatsList = document.getElementById('chats-list');
-        const loader = document.getElementById('chats-loader');
-        loader.style.display = 'block';
-        chatsList.style.display = 'none';
-
-        fetch(window.userChatConfig.chatsUrl)
-            .then(res => res.json())
-            .then(data => {
-                chats = data;
-                renderChats(chats);
-                loader.style.display = 'none';
-                chatsList.style.display = 'block';
-                if (chats.length > 0) {
-                    document.querySelector('.chat-item').classList.add('active');
-                    updateChatHeader(chats[0]);
-                    loadMessages(chats[0].id_chat);
-                }
-            })
-            .catch(error => {
-                loader.innerHTML = 'Error al cargar los chats';
-                console.error('Error al cargar los chats:', error);
-            });
-    }
-
-    function loadMessages(chatId) {
-        currentChatId = chatId;
-        fetch(window.userChatConfig.messagesUrl(chatId))
-            .then(res => res.json())
-            .then(data => {
-                renderMessages(data);
-                const messagesContainer = document.getElementById('messages-container');
-                messagesContainer.scrollTop = messagesContainer.scrollHeight;
-            });
-    }
-
-    // --- NUEVO: Contador y validación de caracteres ---
-    // Crear el contador de caracteres
-    const contadorContainer = document.createElement('div');
-    contadorContainer.id = 'contador-caracteres';
-    contadorContainer.style.fontSize = '12px';
-    contadorContainer.style.color = '#6c757d';
-    contadorContainer.style.marginTop = '5px';
-    contadorContainer.style.textAlign = 'right';
-    // Insertar el contador justo después del input
-    const inputGroup = document.querySelector('.message-input-container');
-    if (inputGroup) {
-        inputGroup.insertAdjacentElement('afterend', contadorContainer);
-    }
-    // Actualizar el contador al escribir
-    messageInput.addEventListener('input', function() {
-        const longitud = this.value.trim().length;
-        const caracteresRestantes = 500 - longitud;
-        let textoContador = `${longitud}/500 caracteres`;
-        if (caracteresRestantes < 50) {
-            contadorContainer.style.color = '#dc3545';
+        // Scroll automático si estaba en el último mensaje o si es un mensaje nuevo
+        if (wasAtBottom || this.isNewMessage(messages)) {
+            this.smoothScrollToBottom(messagesContainer);
         } else {
-            contadorContainer.style.color = '#6c757d';
+            messagesContainer.scrollTop = currentScroll;
         }
-        contadorContainer.textContent = textoContador;
-    });
-    // Inicializar el contador
-    messageInput.dispatchEvent(new Event('input'));
+    }
 
-    // Modificar sendMessage para validar máximo 500 caracteres
-    function sendMessage() {
-        const messageInput = document.querySelector('.message-input-container input');
-        const message = messageInput.value.trim();
+    // Verificar si está en el último mensaje
+    isAtBottom(element) {
+        const threshold = 100; // Margen de 100px para considerar que está "cerca" del final
+        return element.scrollHeight - element.scrollTop - element.clientHeight <= threshold;
+    }
+
+    // Verificar si hay mensajes nuevos
+    isNewMessage(messages) {
+        if (!messages.length) return false;
+        const lastMessage = messages[messages.length - 1];
+        const now = new Date();
+        const messageTime = new Date(lastMessage.fecha_envio);
+        // Considerar como nuevo si el mensaje tiene menos de 5 segundos
+        return (now - messageTime) < 5000;
+    }
+
+    // Creación de elemento de mensaje
+    createMessageElement(msg) {
+        const imgSrc = msg.es_mio ? window.userImg : (msg.img || '/img/profile_img/avatar-default.png');
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
+        msgDiv.innerHTML = `
+            <div class="message-header">
+                <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
+                <span class="message-username">${msg.usuario}</span>
+                <span class="message-time">${msg.fecha_envio}</span>
+            </div>
+            <div class="message-content">
+                ${msg.contenido}
+            </div>
+        `;
+        return msgDiv;
+    }
+
+    // Carga de chats
+    async loadChats() {
+        try {
+            const response = await fetch(CHAT_CONFIG.chatsUrl);
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            
+            const data = await response.json();
+            this.chats = data;
+            this.renderChats(data);
+            
+            if (data.length > 0 && !this.currentChatId) {
+                const firstChat = document.querySelector('.chat-item');
+                if (firstChat) {
+                    firstChat.classList.add('active');
+                    this.updateChatHeader(data[0]);
+                    this.loadMessages(data[0].id_chat);
+                }
+            }
+        } catch (error) {
+            console.error('Error al cargar los chats:', error);
+        }
+    }
+
+    // Carga de mensajes
+    async loadMessages(chatId) {
+        if (!this.isActive && !this.currentChatId) return;
+        
+        this.currentChatId = chatId;
+        try {
+            const response = await fetch(CHAT_CONFIG.messagesUrl(chatId));
+            if (!response.ok) throw new Error('Error en la respuesta del servidor');
+            
+            const data = await response.json();
+            if (data.length > 0) {
+                this.renderMessages(data);
+            }
+        } catch (error) {
+            console.error('Error al cargar mensajes:', error);
+        }
+    }
+
+    // Envío de mensaje
+    async sendMessage() {
+        const message = this.elements.messageInput.value.trim();
         
         if (message.length > 500) {
             Swal.fire({
@@ -149,162 +210,108 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        if (message && currentChatId) {
-            // Deshabilitar el input mientras se envía
-            messageInput.disabled = true;
+        if (message && this.currentChatId) {
+            this.elements.messageInput.disabled = true;
 
-            fetch(window.userChatConfig.sendUrl(currentChatId), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
-                body: JSON.stringify({ contenido: message })
-            })
-            .then(res => res.json())
-            .then(data => {
+            try {
+                const response = await fetch(CHAT_CONFIG.sendUrl(this.currentChatId), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({ contenido: message })
+                });
+                
+                const data = await response.json();
                 if (data.success) {
-                    messageInput.value = '';
-                    messageInput.dispatchEvent(new Event('input'));
-                    loadMessages(currentChatId);
+                    this.elements.messageInput.value = '';
+                    // Cargar mensajes inmediatamente después de enviar
+                    await this.loadMessages(this.currentChatId);
                 }
-            })
-            .catch(error => {
+            } catch (error) {
                 console.error('Error:', error);
                 Swal.fire({
                     title: 'Error',
                     text: 'No se pudo enviar el mensaje. Por favor, intenta de nuevo.',
                     icon: 'error'
                 });
-            })
-            .finally(() => {
-                messageInput.disabled = false;
-                messageInput.focus();
-            });
+            } finally {
+                this.elements.messageInput.disabled = false;
+                this.elements.messageInput.focus();
+            }
         }
     }
 
-    // Función para alternar el menú de opciones
-    function toggleOptions() {
-        optionsSidebar.classList.toggle('active');
-        chatMain.classList.toggle('shifted');
-        
-        // Forzar un reflow para asegurar que las transiciones se apliquen correctamente
-        void mainContainer.offsetWidth;
-    }
-
-    // Event listeners
-    sendButton.addEventListener('click', sendMessage);
-    optionsToggle.addEventListener('click', toggleOptions);
-    closeOptions.addEventListener('click', toggleOptions);
-
-    messageInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
-
-    // Marcar chat como activo al hacer clic
-    const chatItems = document.querySelectorAll('.chat-item');
-    chatItems.forEach(item => {
-        item.addEventListener('click', function() {
-            // Remover clase active de todos los chats
-            chatItems.forEach(chat => chat.classList.remove('active'));
-            // Añadir clase active al chat seleccionado
-            this.classList.add('active');
-        });
-    });
-
-    // Cerrar el menú de opciones al hacer clic fuera
-    document.addEventListener('click', function(e) {
-        if (!optionsSidebar.contains(e.target) && 
-            !optionsToggle.contains(e.target) && 
-            optionsSidebar.classList.contains('active')) {
-            toggleOptions();
-        }
-    });
-
-    // Manejar el redimensionamiento de la ventana
-    window.addEventListener('resize', function() {
-        if (optionsSidebar.classList.contains('active')) {
-            chatMain.style.width = `calc(100% - ${350 + optionsSidebar.offsetWidth}px)`;
-        } else {
-            chatMain.style.width = 'calc(100% - 350px)';
-        }
-    });
- 
-    // Función para actualizar mensajes cada 5 segundos
-    function startMessagePolling() {
-        // setInterval(refreshCurrentChatHeader, 5000);
-    }
-
-    emojiButton.addEventListener('click', () => {
-        emojiPicker.style.display = emojiPicker.style.display === 'none' ? 'block' : 'none';
-    });
-
-    document.querySelector('emoji-picker')
-      .addEventListener('emoji-click', event => {
-        const emoji = event.detail.unicode;
-        // Inserta el emoji en el campo de texto
-        const input = document.querySelector('.message-input-container input');
-        input.value += emoji;
-      });
-
-    function updateChatHeader(companero) {
-        // Actualiza el nombre
+    // Actualización del encabezado del chat
+    updateChatHeader(companero) {
         const chatHeader = document.getElementById('chat-contact-name');
-        chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
-
-        // Actualiza el estado según id_estado
         const chatStatus = document.getElementById('chat-contact-status');
-        if (companero.id_estado == 1 || companero.id_estado == 5) {
-            chatStatus.textContent = 'en línea';
-            chatStatus.style.color = '#9147ff';
-        } else {
-            chatStatus.textContent = 'desconectado';
-            chatStatus.style.color = '#b9bbbe';
-        }
-
-        // Actualiza la imagen de perfil
         const chatImg = document.getElementById('chat-contact-img');
-        chatImg.src = companero.img ? companero.img : '/img/profile_img/avatar-default.png';
+
+        chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
+        chatStatus.textContent = (companero.id_estado == 1 || companero.id_estado == 5) ? 'en línea' : 'desconectado';
+        chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
+        chatImg.src = companero.img || '/img/profile_img/avatar-default.png';
     }
 
-    function refreshCurrentChatHeader() {
-        if (!currentChatId) return;
-        fetch(window.userChatConfig.chatsUrl)
-            .then(res => res.json())
-            .then(data => {
-                const currentChat = data.find(chat => chat.id_chat == currentChatId);
-                if (currentChat) {
-                    // Actualiza el estado
-                    const chatStatus = document.getElementById('chat-contact-status');
-                    if (currentChat.id_estado == 1 || currentChat.id_estado == 5) {
-                        chatStatus.textContent = 'en línea';
-                        chatStatus.style.color = '#9147ff';
-                    } else {
-                        chatStatus.textContent = 'desconectado';
-                        chatStatus.style.color = '#b9bbbe';
-                    }
-                }
+    // Toggle de opciones
+    toggleOptions() {
+        this.elements.optionsSidebar.classList.toggle('active');
+        this.elements.chatMain.classList.toggle('shifted');
+        void this.elements.mainContainer.offsetWidth;
+    }
+
+    // Toggle del emoji picker
+    toggleEmojiPicker() {
+        const display = this.elements.emojiPicker.style.display;
+        this.elements.emojiPicker.style.display = display === 'none' ? 'block' : 'none';
+    }
+
+    // Configuración del emoji picker
+    setupEmojiPicker() {
+        this.elements.emojiPicker.addEventListener('emoji-click', event => {
+            const emoji = event.detail.unicode;
+            this.elements.messageInput.value += emoji;
+        });
+    }
+
+    // Configuración de handlers de solicitudes
+    setupSolicitudesHandlers() {
+        if (this.elements.btnSolicitudesPendientes) {
+            this.elements.btnSolicitudesPendientes.addEventListener('click', (e) => {
+                e.preventDefault();
+                const solicitudesModal = new bootstrap.Modal(this.elements.solicitudesModal);
+                solicitudesModal.show();
+                this.cargarSolicitudesAmistad();
             });
+            this.actualizarContadorSolicitudes();
+        }
+
+        if (this.elements.solicitudesModal) {
+            let solicitudesInterval;
+            this.elements.solicitudesModal.addEventListener('show.bs.modal', () => {
+                solicitudesInterval = setInterval(() => this.cargarSolicitudesAmistad(), CHAT_CONFIG.solicitudesInterval);
+            });
+            this.elements.solicitudesModal.addEventListener('hidden.bs.modal', () => {
+                clearInterval(solicitudesInterval);
+            });
+        }
     }
 
-    // Llama a esta función cada 20 segundos
-    setInterval(refreshCurrentChatHeader, 20000);
-
-    // Refrescar mensajes del chat activo cada 5 segundos
-    setInterval(function() {
-        if (currentChatId) {
-            loadMessages(currentChatId);
-        }
-    }, 5000);
-
-    loadChats();
-    startMessagePolling();
+    // Configuración del handler de redimensionamiento
+    setupWindowResizeHandler() {
+        window.addEventListener('resize', () => {
+            if (this.elements.optionsSidebar.classList.contains('active')) {
+                this.elements.chatMain.style.width = `calc(100% - ${350 + this.elements.optionsSidebar.offsetWidth}px)`;
+            } else {
+                this.elements.chatMain.style.width = 'calc(100% - 350px)';
+            }
+        });
+    }
 
     // --- Solicitudes de amistad (solo para friendchat) ---
-    async function cargarSolicitudesAmistad() {
+    async cargarSolicitudesAmistad() {
         try {
             const response = await fetch('/solicitudes/pendientes', {
                 method: 'GET',
@@ -374,7 +381,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    async function responderSolicitud(idSolicitud, respuesta) {
+    async responderSolicitud(idSolicitud, respuesta) {
         try {
             const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
             if (!solicitudDiv) return;
@@ -416,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <span class="badge bg-success">Aceptada</span>
                     `;
                 }
-                loadChats();
+                this.loadChats();
                 Swal.fire({
                     title: data.estado === 'aceptada' ? '¡Solicitud aceptada!' : 'Solicitud rechazada',
                     text: data.estado === 'aceptada' ? 'Ahora son amigxs' : 'La solicitud ha sido rechazada',
@@ -442,7 +449,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    async function actualizarContadorSolicitudes() {
+    async actualizarContadorSolicitudes() {
         try {
             const response = await fetch('/solicitudes/pendientes', {
                 method: 'GET',
@@ -460,29 +467,143 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Configurar el botón de ver solicitudes SOLO para friendchat
-    const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
-    if (btnSolicitudesPendientes) {
-        btnSolicitudesPendientes.addEventListener('click', function(e) {
-            e.preventDefault();
-            const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
-            solicitudesModal.show();
-            cargarSolicitudesAmistad();
+    // Nuevo: Sistema de polling inteligente
+    startSmartPolling() {
+        // Detectar actividad del usuario
+        const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+        activityEvents.forEach(event => {
+            document.addEventListener(event, () => {
+                this.lastActivity = Date.now();
+                if (!this.isActive) {
+                    this.isActive = true;
+                    this.updatePollingInterval();
+                }
+            });
         });
-        // Actualizar el contador al cargar la página
-        actualizarContadorSolicitudes();
-    }
-    // Actualizar solicitudes cada 30 segundos si el modal está abierto
-    let solicitudesInterval;
-    const solicitudesModalEl = document.getElementById('solicitudesModal');
-    if (solicitudesModalEl) {
-        solicitudesModalEl.addEventListener('show.bs.modal', function () {
-            solicitudesInterval = setInterval(cargarSolicitudesAmistad, 30000);
-        });
-        solicitudesModalEl.addEventListener('hidden.bs.modal', function () {
-            clearInterval(solicitudesInterval);
-        });
+
+        // Verificar inactividad periódicamente
+        setInterval(() => {
+            const now = Date.now();
+            const idleTime = now - this.lastActivity;
+            
+            if (idleTime >= CHAT_CONFIG.smartPolling.idleTimeout && this.isActive) {
+                this.isActive = false;
+                this.updatePollingInterval();
+            }
+        }, 60000); // Verificar cada minuto
+
+        // Iniciar polling con el intervalo inicial
+        this.updatePollingInterval();
     }
 
-    window.responderSolicitud = responderSolicitud;
+    updatePollingInterval() {
+        // Limpiar intervalos existentes
+        if (this.messagePollingInterval) {
+            clearInterval(this.messagePollingInterval);
+        }
+        if (this.headerPollingInterval) {
+            clearInterval(this.headerPollingInterval);
+        }
+
+        // Establecer nuevos intervalos basados en el estado de actividad
+        const interval = this.isActive ? 
+            CHAT_CONFIG.smartPolling.activeInterval : 
+            CHAT_CONFIG.smartPolling.idleInterval;
+
+        // Polling de mensajes
+        this.messagePollingInterval = setInterval(() => {
+            if (this.currentChatId) {
+                this.loadMessages(this.currentChatId);
+            }
+        }, interval);
+
+        // Polling de estado (solo cuando está activo)
+        if (this.isActive) {
+            this.headerPollingInterval = setInterval(() => {
+                this.refreshCurrentChatHeader();
+            }, CHAT_CONFIG.headerRefreshInterval);
+        }
+    }
+
+    refreshCurrentChatHeader() {
+        if (!this.currentChatId) return;
+        fetch(CHAT_CONFIG.chatsUrl)
+            .then(res => res.json())
+            .then(data => {
+                const currentChat = data.find(chat => chat.id_chat == this.currentChatId);
+                if (currentChat) {
+                    // Actualiza el estado
+                    const chatStatus = document.getElementById('chat-contact-status');
+                    if (currentChat.id_estado == 1 || currentChat.id_estado == 5) {
+                        chatStatus.textContent = 'en línea';
+                        chatStatus.style.color = '#9147ff';
+                    } else {
+                        chatStatus.textContent = 'desconectado';
+                        chatStatus.style.color = '#b9bbbe';
+                    }
+                }
+            });
+    }
+
+    // Scroll suave
+    smoothScrollToBottom(element) {
+        const targetScroll = element.scrollHeight;
+        const startScroll = element.scrollTop;
+        const distance = targetScroll - startScroll;
+        const duration = 300;
+        let start = null;
+
+        function animation(currentTime) {
+            if (start === null) start = currentTime;
+            const timeElapsed = currentTime - start;
+            const progress = Math.min(timeElapsed / duration, 1);
+            const easeInOutCubic = progress < 0.5
+                ? 4 * progress * progress * progress
+                : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+
+            element.scrollTop = startScroll + (distance * easeInOutCubic);
+
+            if (timeElapsed < duration) {
+                requestAnimationFrame(animation);
+            }
+        }
+
+        requestAnimationFrame(animation);
+    }
+}
+
+// Inicialización cuando el DOM está listo
+document.addEventListener('DOMContentLoaded', () => {
+    const chatManager = new ChatManager();
+    chatManager.loadChats();
 });
+
+// Añadir estilos CSS para las animaciones
+const style = document.createElement('style');
+style.textContent = `
+    .typing-indicator {
+        padding: 10px;
+        color: #666;
+        font-style: italic;
+        font-size: 0.9em;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeOut {
+        from { opacity: 1; transform: translateY(0); }
+        to { opacity: 0; transform: translateY(10px); }
+    }
+
+    .message {
+        transition: all 0.3s ease;
+    }
+
+    .message:hover {
+        transform: translateX(5px);
+    }
+`;
+document.head.appendChild(style);
