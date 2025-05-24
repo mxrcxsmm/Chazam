@@ -63,15 +63,15 @@
     <!-- Sidebar de opciones optimizado -->
     <div class="options-sidebar">
         <div class="options-header">
-            <i class="fas fa-times close-options"></i>
             <h3>Opciones</h3>
+            <button class="close-options"><i class="fas fa-times"></i></button>
         </div>
         <div class="options-content">
-            <div class="option-item"><i class="fas fa-user"></i><span>Personalizar</span></div>
-            <div class="option-item"><i class="fas fa-users"></i><span>Amigos</span></div>
-            <div class="option-item"><i class="fas fa-flag"></i><span>Reportar</span></div>
-            <div class="option-item"><i class="fas fa-coins"></i><span>Comprar puntos</span></div>
-            <div class="option-item logout"><i class="fas fa-sign-out-alt"></i><span>Cerrar Sesión</span></div>
+            <div class="option-item">
+                <button class="btn btn-warning report-user-btn">
+                    <i class="fas fa-flag"></i> Reportar usuario
+                </button>
+            </div>
         </div>
     </div>
 </div>
