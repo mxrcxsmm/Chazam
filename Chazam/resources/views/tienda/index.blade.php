@@ -1,4 +1,3 @@
-<!-- filepath: c:\wamp64\www\DAW2\MP12\Chazam\Chazam\resources\views\tienda\index.blade.php -->
 <!DOCTYPE html>
 <html lang="es">
 

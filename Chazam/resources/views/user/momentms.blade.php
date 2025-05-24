@@ -58,7 +58,7 @@
                     </div>
                     <div class="momentm-info">
                         <div class="momentm-avatar">
-                            <img src="{{ asset('img/profile_img/' . ($momentm->usuario->img ?? 'default.png')) }}" alt="Avatar de {{ $momentm->usuario->username ?? 'Usuario' }}">
+                            <img src="{{ asset($momentm->usuario->img ?? 'img/profile_img/avatar-default.png') }}" alt="Avatar de {{ $momentm->usuario->username ?? 'Usuario' }}">
                         </div>
                         <p class="momentm-username">{{ $momentm->usuario->id_usuario == Auth::user()->id_usuario ? 'Tú' : ($momentm->usuario->username ?? 'Usuario') }}</p>
                         <p class="momentm-time">{{ $momentm->fecha_inicio->diffForHumans() }}</p>
