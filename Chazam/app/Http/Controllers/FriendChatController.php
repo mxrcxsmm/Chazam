@@ -24,13 +24,15 @@ class FriendChatController extends Controller
     public function getUserChats()
     {
         $userId = Auth::id();
+        $baseUrl = config('app.url'); // Obtener la URL base de la aplicación
+        
         $chats = ChatUsuario::with(['chat', 'usuario'])
             ->where('id_usuario', $userId)
             ->whereHas('chat', function($query) {
                 $query->whereNull('id_reto');
             })
             ->get()
-            ->map(function($chatUsuario) use ($userId) {
+            ->map(function($chatUsuario) use ($userId, $baseUrl) {
                 $chat = $chatUsuario->chat;
                 // Buscar el otro usuario del chat
                 $compa = ChatUsuario::where('id_chat', $chat->id_chat)
@@ -38,14 +40,19 @@ class FriendChatController extends Controller
                     ->with('usuario')
                     ->first();
                 $compaUser = $compa ? $compa->usuario : null;
+                
+                // Construir la URL de la imagen correctamente con la URL base
+                $imgUrl = $baseUrl . '/img/profile_img/avatar-default.png';
+                if ($compaUser && $compaUser->img) {
+                    $imgUrl = $baseUrl . '/img/profile_img/' . $compaUser->img;
+                }
+                
                 return [
                     'id_chat' => $chat->id_chat,
                     'id_usuario' => $compaUser ? $compaUser->id_usuario : null,
                     'nombre' => $compaUser ? $compaUser->nombre : 'Desconocido',
                     'username' => $compaUser ? $compaUser->username : 'Desconocido',
-                    'img' => $compaUser && $compaUser->img
-                        ? asset($compaUser->img)
-                        : asset('img/profile_img/avatar-default.png'),
+                    'img' => $imgUrl,
                     'last_message' => optional($chat->mensajes()->latest('fecha_envio')->first())->contenido,
                     'last_time' => optional($chat->mensajes()->latest('fecha_envio')->first())->fecha_envio?->format('H:i'),
                     'id_estado' => $compaUser ? $compaUser->id_estado : 2, // 2 = desconectado por defecto
@@ -57,6 +64,8 @@ class FriendChatController extends Controller
     public function getChatMessages($chatId)
     {
         $userId = Auth::id();
+        $baseUrl = config('app.url'); // Obtener la URL base de la aplicación
+        
         $chatUsuario = ChatUsuario::where('id_chat', $chatId)
             ->where('id_usuario', $userId)
             ->first();
@@ -69,16 +78,23 @@ class FriendChatController extends Controller
             ->with(['chatUsuario.usuario'])
             ->orderBy('fecha_envio', 'asc')
             ->get()
-            ->map(function($mensaje) {
+            ->map(function($mensaje) use ($baseUrl) {
                 $chatUsuario = $mensaje->chatUsuario;
                 $usuario = $chatUsuario ? $chatUsuario->usuario : null;
+                
+                // Construir la URL de la imagen correctamente con la URL base
+                $imgUrl = $baseUrl . '/img/profile_img/avatar-default.png';
+                if ($usuario && $usuario->img) {
+                    $imgUrl = $baseUrl . '/img/profile_img/' . $usuario->img;
+                }
+                
                 return [
                     'id_mensaje' => $mensaje->id_mensaje,
                     'contenido' => $mensaje->contenido,
                     'fecha_envio' => $mensaje->fecha_envio->format('H:i'),
                     'usuario' => $usuario ? $usuario->username : 'Desconocido',
                     'es_mio' => $chatUsuario && $chatUsuario->id_usuario == Auth::id(),
-                    'img' => $usuario && $usuario->img ? asset($usuario->img) : asset('img/profile_img/avatar-default.png'),
+                    'img' => $imgUrl,
                 ];
             });
         return response()->json($mensajes);
