@@ -103,7 +103,7 @@ canvas {
     height: 80px;
     object-fit: cover;
     border-radius: 50%;
-    border: 3px solid #E6E6FA; /*eliminar, esto es el borde blanco que envuelve al foto de perfil en el sidebar*/
+    /* border: 3px solid #E6E6FA; eliminar, esto es el borde blanco que envuelve al foto de perfil en el sidebar */
     margin-bottom: 0.5rem;
 }
 

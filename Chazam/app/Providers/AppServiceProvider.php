@@ -29,12 +29,16 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             if (Auth::check()) {
                 $user = Auth::user();
+                $view->with('user', $user);
+                $view->with('personalizacion', $user->personalizacion);
                 $view->with('racha', $user->racha);
                 $view->with('puntos', $user->puntos);
                 $view->with('username', $user->username);
                 $view->with('nombre_completo', $user->nombre_completo);
                 $view->with('imagen_perfil', $user->imagen_perfil);
             } else {
+                $view->with('user', null);
+                $view->with('personalizacion', null);
                 $view->with('racha', 0);
                 $view->with('puntos', 0);
                 $view->with('username', '');

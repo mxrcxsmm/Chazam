@@ -360,8 +360,11 @@ if (descripcionInput) {
             }            
 
             if (data.username) {
-                const layoutUsername = document.querySelector('.sidebar div:nth-child(2)');
-                if (layoutUsername) layoutUsername.textContent = data.username;
+                if (data.username !== usernameActual) {
+                    // Si el username ha cambiado, forzamos recarga
+                    window.location.reload();
+                    return;
+                }
             }
 
             if (data.nombre_completo) {
