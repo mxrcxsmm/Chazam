@@ -362,7 +362,7 @@ class ChatManager {
 
     // Verificar si está en el último mensaje
     isAtBottom(element) {
-        const threshold = 100; // Margen de 100px para considerar que está "cerca" del final
+        const threshold = 150; // Margen de 150px para considerar que está "cerca" del final
         return element.scrollHeight - element.scrollTop - element.clientHeight <= threshold;
     }
 
