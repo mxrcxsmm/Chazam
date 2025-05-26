@@ -41,7 +41,7 @@ class FriendChatController extends Controller
                 $compaUser = $compa ? $compa->usuario : null;
                 
                 // Construir la URL de la imagen correctamente
-                $imgUrl = '/img/profile_img/avatar-default.png';
+                $imgUrl = asset('img/profile_img/avatar-default.png');
                 if ($compaUser && $compaUser->img) {
                     $imgUrl = '/img/profile_img/' . $compaUser->img;
                 }
@@ -81,7 +81,7 @@ class FriendChatController extends Controller
                 $usuario = $chatUsuario ? $chatUsuario->usuario : null;
                 
                 // Construir la URL de la imagen correctamente
-                $imgUrl = '/img/profile_img/avatar-default.png';
+                $imgUrl = asset('img/profile_img/avatar-default.png');
                 if ($usuario && $usuario->img) {
                     $imgUrl = '/img/profile_img/' . $usuario->img;
                 }
