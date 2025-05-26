@@ -308,7 +308,7 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
-        console.log('Creando elemento de chat:', chat); // Log para depuración
+        const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
@@ -317,17 +317,11 @@ class ChatManager {
         const userId = chat.id_usuario || chat.usuario_id || chat.user_id;
         if (userId) {
             chatItem.dataset.userId = userId;
-            console.log('ID de usuario guardado:', userId); // Log para depuración
-        } else {
-            console.warn('No se encontró ID de usuario para el chat:', chat); // Log de advertencia
         }
-
-        // Construir la ruta de la imagen correctamente
-        const imgPath = chat.img ? `https://g04.daw2j23.es/${chat.img}` : 'https://g04.daw2j23.es/img/profile_img/avatar-default.png';
 
         chatItem.innerHTML = `
             <div class="chat-avatar">
-                <img src="${imgPath}" alt="Avatar" onerror="this.src='https://g04.daw2j23.es/img/profile_img/avatar-default.png'">
+                <img src="${imgPath}" alt="Avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
             </div>
             <div class="chat-info">
                 <div class="chat-header">
@@ -337,7 +331,6 @@ class ChatManager {
                 <p class="last-message">${chat.last_message || ''}</p>
             </div>
         `;
-    
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
         return chatItem;
     }
@@ -392,15 +385,13 @@ class ChatManager {
 
     // Creación de elemento de mensaje
     createMessageElement(msg) {
-        const imgSrc = msg.es_mio ? 
-            window.userImg : 
-            (msg.img ? `https://g04.daw2j23.es/${msg.img}` : 'https://g04.daw2j23.es/img/profile_img/avatar-default.png');
+        const imgSrc = msg.img ? msg.img : '/img/profile_img/avatar-default.png';
         
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
         msgDiv.innerHTML = `
             <div class="message-header">
-                <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='https://g04.daw2j23.es/img/profile_img/avatar-default.png'">
+                <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
                 <span class="message-username">${msg.usuario}</span>
                 <span class="message-time">${msg.fecha_envio}</span>
             </div>
@@ -510,10 +501,10 @@ class ChatManager {
         chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
         
         // Construir la ruta de la imagen correctamente
-        const imgPath = companero.img ? `https://g04.daw2j23.es/${companero.img}` : 'https://g04.daw2j23.es/img/profile_img/avatar-default.png';
+        const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : '/img/profile_img/avatar-default.png';
         chatImg.src = imgPath;
         chatImg.onerror = function() {
-            this.src = 'https://g04.daw2j23.es/img/profile_img/avatar-default.png';
+            this.src = '/img/profile_img/avatar-default.png';
         };
     }
 

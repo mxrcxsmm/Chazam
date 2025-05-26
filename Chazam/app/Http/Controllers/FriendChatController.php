@@ -24,7 +24,6 @@ class FriendChatController extends Controller
     public function getUserChats()
     {
         $userId = Auth::id();
-        $baseUrl = config('app.url'); // Obtener la URL base de la aplicación
         
         $chats = ChatUsuario::with(['chat', 'usuario'])
             ->where('id_usuario', $userId)
@@ -32,7 +31,7 @@ class FriendChatController extends Controller
                 $query->whereNull('id_reto');
             })
             ->get()
-            ->map(function($chatUsuario) use ($userId, $baseUrl) {
+            ->map(function($chatUsuario) use ($userId) {
                 $chat = $chatUsuario->chat;
                 // Buscar el otro usuario del chat
                 $compa = ChatUsuario::where('id_chat', $chat->id_chat)
@@ -41,10 +40,11 @@ class FriendChatController extends Controller
                     ->first();
                 $compaUser = $compa ? $compa->usuario : null;
                 
-                // Construir la URL de la imagen correctamente con la URL base
-                $imgUrl = $baseUrl . '/img/profile_img/avatar-default.png';
+                // Construir la URL de la imagen correctamente
+                $imgUrl = asset('img/profile_img/avatar-default.png');
                 if ($compaUser && $compaUser->img) {
-                    $imgUrl = $baseUrl . '/img/profile_img/' . $compaUser->img;
+                    $imgPath = basename($compaUser->img);
+                    $imgUrl = asset('img/profile_img/' . $imgPath);
                 }
                 
                 return [
@@ -64,7 +64,6 @@ class FriendChatController extends Controller
     public function getChatMessages($chatId)
     {
         $userId = Auth::id();
-        $baseUrl = config('app.url'); // Obtener la URL base de la aplicación
         
         $chatUsuario = ChatUsuario::where('id_chat', $chatId)
             ->where('id_usuario', $userId)
@@ -78,14 +77,15 @@ class FriendChatController extends Controller
             ->with(['chatUsuario.usuario'])
             ->orderBy('fecha_envio', 'asc')
             ->get()
-            ->map(function($mensaje) use ($baseUrl) {
+            ->map(function($mensaje) {
                 $chatUsuario = $mensaje->chatUsuario;
                 $usuario = $chatUsuario ? $chatUsuario->usuario : null;
                 
-                // Construir la URL de la imagen correctamente con la URL base
-                $imgUrl = $baseUrl . '/img/profile_img/avatar-default.png';
+                // Construir la URL de la imagen correctamente
+                $imgUrl = asset('img/profile_img/avatar-default.png');
                 if ($usuario && $usuario->img) {
-                    $imgUrl = $baseUrl . '/img/profile_img/' . $usuario->img;
+                    $imgPath = basename($usuario->img);
+                    $imgUrl = asset('img/profile_img/' . $imgPath);
                 }
                 
                 return [

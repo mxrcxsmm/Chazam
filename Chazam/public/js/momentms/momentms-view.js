@@ -110,7 +110,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateModalContent(momentm) {
-        document.querySelector('.momentm-user-avatar').src = getAssetUrl(momentm.usuario.img);
+        console.log('Avatar:', momentm.usuario.img);
+        document.querySelector('.momentm-user-avatar').src = momentm.usuario.img || '/img/profile_img/default.png';
         document.querySelector('.momentm-user-name').textContent = momentm.usuario.username;
         document.querySelector('.momentm-time').textContent = momentm.fecha_inicio_diff;
         document.querySelector('.momentm-full-image').src = getAssetUrl(momentm.img);
