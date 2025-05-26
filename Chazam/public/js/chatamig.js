@@ -394,7 +394,7 @@ class ChatManager {
     createMessageElement(msg) {
         const imgSrc = msg.es_mio
             ? window.userImg
-            : (msg.img ? msg.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : '/img/profile_img/avatar-default.png');
+            : (msg.img ? msg.img : '/img/profile_img/avatar-default.png');
         
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
