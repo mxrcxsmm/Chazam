@@ -288,4 +288,53 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 100);
         });
     });
+
+    // Mostrar SweetAlert si hay mensajes de error de sesión
+    if (window.sweetAlertError) {
+        closeAllDropdowns && closeAllDropdowns();
+        Swal.fire({
+            icon: 'error',
+            title: '¡Sesión activa!',
+            text: window.sweetAlertError,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#703ea3'
+        });
+    }
+    if (window.sweetAlertLoginError) {
+        closeAllDropdowns && closeAllDropdowns();
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de acceso',
+            text: window.sweetAlertLoginError,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#703ea3'
+        });
+    }
+
+    const fileInput = document.querySelector('input[type="file"][name="img"]');
+    if (fileInput && formSignup) {
+        formSignup.addEventListener('submit', function(e) {
+            const file = fileInput.files[0];
+            let errorMsg = '';
+            if (file) {
+                const validTypes = ['image/jpeg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    errorMsg = 'La imagen debe ser JPG o PNG.';
+                } else if (file.size > 2 * 1024 * 1024) {
+                    errorMsg = 'La imagen no puede superar los 2MB.';
+                }
+            }
+            if (errorMsg) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Imagen no válida',
+                    text: errorMsg,
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#703ea3'
+                });
+                return false;
+            }
+        });
+    }
 });
