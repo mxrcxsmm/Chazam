@@ -167,8 +167,21 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="listaAmistades" class="list-group">
-                        <!-- Aquí se cargarán las amistades dinámicamente -->
+                    <ul class="nav nav-tabs" id="amistadesTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="amistades-tab" data-bs-toggle="tab" data-bs-target="#amistades" type="button" role="tab">Amistades</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="bloqueados-tab" data-bs-toggle="tab" data-bs-target="#bloqueados" type="button" role="tab">Bloqueados</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="amistades" role="tabpanel">
+                            <div id="listaAmistades" class="list-group"></div>
+                        </div>
+                        <div class="tab-pane fade" id="bloqueados" role="tabpanel">
+                            <div id="listaBloqueados" class="list-group"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
