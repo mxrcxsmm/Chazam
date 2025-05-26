@@ -172,29 +172,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <script src="{{ asset('js/validations.js') }}"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        @if(session('error'))
-        closeAllDropdowns();
-        Swal.fire({
-            icon: 'error',
-            title: '¡Sesión activa!',
-            text: '{{ session('error') }}',
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: '#703ea3'
-        });
-    @endif
-
-    @if(session('login_error'))
-        closeAllDropdowns();
-        Swal.fire({
-            icon: 'error',
-            title: 'Error de acceso',
-            text: '{{ session('login_error') }}',
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: '#703ea3'
-        });
-    @endif
-    });
+    window.sweetAlertError = @json(session('error'));
+    window.sweetAlertLoginError = @json(session('login_error'));
     </script>
 </body>
 </html>

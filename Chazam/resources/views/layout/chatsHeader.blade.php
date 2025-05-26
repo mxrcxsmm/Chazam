@@ -52,6 +52,11 @@
                     <i class="bi bi-people-fill"></i>
                 </button>
 
+                <!-- Botón de búsqueda de usuarios -->
+                <button class="btn btn-outline-dark" id="btnBuscarUsuarios" type="button">
+                    <i class="bi bi-search"></i>
+                </button>
+
                 <!-- Botón para abrir el menú -->
                 <button class="btn btn-outline-dark" onclick="toggleSidebar()">
                     @if(isset($imagen_perfil) && $imagen_perfil)
@@ -145,6 +150,14 @@
     <script src="{{ asset('js/hamburger.js') }}"></script>
     @stack('scripts')
 
+    <script>
+        // Evento para abrir el modal de búsqueda
+        document.getElementById('btnBuscarUsuarios').addEventListener('click', function() {
+            const buscarUsuariosModal = new bootstrap.Modal(document.getElementById('buscarUsuariosModal'));
+            buscarUsuariosModal.show();
+        });
+    </script>
+
     <!-- Modal de amistades (¡fuera del navbar y de cualquier div!) -->
     <div class="modal fade" id="modalAmistades" tabindex="-1" aria-labelledby="modalAmistadesLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -160,6 +173,29 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de búsqueda de usuarios -->
+    <div class="modal fade" id="buscarUsuariosModal" tabindex="-1" aria-labelledby="buscarUsuariosModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#9147ff; color:#fff;">
+                    <h5 class="modal-title" id="buscarUsuariosModalLabel">Buscar Usuarios</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="search-user-container">
+                        <div class="search-box mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchUserInput" placeholder="Buscar por username..." class="form-control">
+                        </div>
+                        <div id="searchResults" class="search-results">
+                            <!-- Los resultados se cargarán aquí -->
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
