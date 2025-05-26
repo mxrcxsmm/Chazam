@@ -1000,11 +1000,13 @@ function cargarBloqueados() {
                 lista.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
             } else {
                 bloqueados.forEach(user => {
+                    // Generar ruta absoluta igual que en el backend
+                    const imgPath = user.img ? `${window.location.origin}/img/profile_img/${user.img.replace('/img/profile_img/', '')}` : '/img/profile_img/avatar-default.png';
                     const item = document.createElement('div');
                     item.className = 'list-group-item d-flex align-items-center justify-content-between';
                     item.innerHTML = `
                         <div class="d-flex align-items-center gap-2">
-                            <img src="${user.img ? '/img/profile_img/' + user.img.replace('/img/profile_img/', '') : '/img/profile_img/avatar-default.png'}" style="width:32px;height:32px;object-fit:cover;border-radius:50%;">
+                            <img src="${imgPath}" style="width:32px;height:32px;object-fit:cover;border-radius:50%;">
                             <span>${user.username}</span>
                         </div>
                         <button class="btn btn-sm btn-danger" onclick="desbloquearUsuario(${user.id_usuario}, this)">Desbloquear</button>
