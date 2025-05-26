@@ -43,9 +43,7 @@ class FriendChatController extends Controller
                 // Construir la URL de la imagen correctamente
                 $imgUrl = asset('img/profile_img/avatar-default.png');
                 if ($compaUser && $compaUser->img) {
-                    // Eliminar cualquier ruta duplicada
-                    $imgPath = str_replace('/img/profile_img/img/profile_img/', '/img/profile_img/', $compaUser->img);
-                    $imgPath = str_replace('/img/profile_img/', '', $imgPath);
+                    $imgPath = basename($compaUser->img);
                     $imgUrl = asset('img/profile_img/' . $imgPath);
                 }
                 
@@ -86,9 +84,7 @@ class FriendChatController extends Controller
                 // Construir la URL de la imagen correctamente
                 $imgUrl = asset('img/profile_img/avatar-default.png');
                 if ($usuario && $usuario->img) {
-                    // Eliminar cualquier ruta duplicada
-                    $imgPath = str_replace('/img/profile_img/img/profile_img/', '/img/profile_img/', $usuario->img);
-                    $imgPath = str_replace('/img/profile_img/', '', $imgPath);
+                    $imgPath = basename($usuario->img);
                     $imgUrl = asset('img/profile_img/' . $imgPath);
                 }
                 
