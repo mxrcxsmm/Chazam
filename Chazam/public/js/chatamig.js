@@ -298,9 +298,9 @@ class ChatManager {
     // Creación de elemento de chat
     createChatElement(chat) {
         console.log('Creando elemento de chat:', chat); // Log para depuración
-        const chatItem = document.createElement('div');
-        chatItem.className = 'chat-item';
-        chatItem.dataset.chatId = chat.id_chat;
+            const chatItem = document.createElement('div');
+            chatItem.className = 'chat-item';
+            chatItem.dataset.chatId = chat.id_chat;
         
         // Guardar el ID del usuario en el elemento
         const userId = chat.id_usuario || chat.usuario_id || chat.user_id;
@@ -311,18 +311,18 @@ class ChatManager {
             console.warn('No se encontró ID de usuario para el chat:', chat); // Log de advertencia
         }
 
-        chatItem.innerHTML = `
-            <div class="chat-avatar">
+            chatItem.innerHTML = `
+                <div class="chat-avatar">
                 <img src="${chat.img || '/img/profile_img/avatar-default.png'}" alt="Avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
-            </div>
-            <div class="chat-info">
-                <div class="chat-header">
+                </div>
+                <div class="chat-info">
+                    <div class="chat-header">
                     <h3>${chat.username || chat.nombre}</h3>
                     <span class="time">${chat.last_time || ''}</span>
                 </div>
                 <p class="last-message">${chat.last_message || ''}</p>
-            </div>
-        `;
+                </div>
+            `;
         
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
         return chatItem;
@@ -331,8 +331,8 @@ class ChatManager {
     // Manejo de selección de chat
     handleChatSelection(chatItem, chat) {
         console.log('Chat seleccionado:', chat); // Log para depuración
-        document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
-        chatItem.classList.add('active');
+                document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+                chatItem.classList.add('active');
         this.loadMessages(chat.id_chat);
         this.updateChatHeader(chat);
         this.currentChatId = chat.id_chat;
@@ -379,18 +379,18 @@ class ChatManager {
     // Creación de elemento de mensaje
     createMessageElement(msg) {
         const imgSrc = msg.es_mio ? window.userImg : (msg.img || '/img/profile_img/avatar-default.png');
-        const msgDiv = document.createElement('div');
+            const msgDiv = document.createElement('div');
         msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
-        msgDiv.innerHTML = `
-            <div class="message-header">
+            msgDiv.innerHTML = `
+                <div class="message-header">
                 <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
-                <span class="message-username">${msg.usuario}</span>
-                <span class="message-time">${msg.fecha_envio}</span>
-            </div>
-            <div class="message-content">
-                ${msg.contenido}
-            </div>
-        `;
+                    <span class="message-username">${msg.usuario}</span>
+                    <span class="message-time">${msg.fecha_envio}</span>
+                </div>
+                <div class="message-content">
+                    ${msg.contenido}
+                </div>
+            `;
         return msgDiv;
     }
 
@@ -414,7 +414,7 @@ class ChatManager {
                 }
             }
         } catch (error) {
-            console.error('Error al cargar los chats:', error);
+                console.error('Error al cargar los chats:', error);
         }
     }
 
@@ -454,12 +454,12 @@ class ChatManager {
 
             try {
                 const response = await fetch(CHAT_CONFIG.sendUrl(this.currentChatId), {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({ contenido: message })
+                },
+                body: JSON.stringify({ contenido: message })
                 });
                 
                 const data = await response.json();

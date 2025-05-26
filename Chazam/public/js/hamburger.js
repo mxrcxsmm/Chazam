@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (hamburgerButton && navbarNav) {
-        hamburgerButton.addEventListener('click', () => {
+    hamburgerButton.addEventListener('click', () => {
             navbarNav.classList.toggle('show');
         });
     }
