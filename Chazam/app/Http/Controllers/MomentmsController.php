@@ -126,7 +126,7 @@ class MomentmsController extends Controller
             'fecha_inicio_diff' => $momentm->fecha_inicio->diffForHumans(),
             'usuario' => [
                 'username' => $momentm->usuario->username,
-                'img' => 'img/profile_img/' . $momentm->usuario->img
+                'img' => $momentm->usuario->img ?? '/img/profile_img/default.png'
             ]
         ]);
     }
