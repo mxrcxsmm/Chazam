@@ -45,9 +45,9 @@ class FriendChatController extends Controller
                 if ($compaUser && $compaUser->img) {
                     // Si la imagen ya incluye la ruta completa, usarla directamente
                     if (str_starts_with($compaUser->img, '/img/profile_img/')) {
-                        $imgUrl = $compaUser->img;
+                        $imgUrl = asset($compaUser->img);
                     } else {
-                        $imgUrl = '/img/profile_img/' . $compaUser->img;
+                        $imgUrl = asset('img/profile_img/' . $compaUser->img);
                     }
                 }
                 
@@ -90,9 +90,9 @@ class FriendChatController extends Controller
                 if ($usuario && $usuario->img) {
                     // Si la imagen ya incluye la ruta completa, usarla directamente
                     if (str_starts_with($usuario->img, '/img/profile_img/')) {
-                        $imgUrl = $usuario->img;
+                        $imgUrl = asset($usuario->img);
                     } else {
-                        $imgUrl = '/img/profile_img/' . $usuario->img;
+                        $imgUrl = asset('img/profile_img/' . $usuario->img);
                     }
                 }
                 

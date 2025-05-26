@@ -3,7 +3,7 @@
 <!-- Meta tags optimizados -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="user-id" content="{{ Auth::id() }}">
-<meta name="user-img" content="{{ Auth::user()->img ? (str_starts_with(Auth::user()->img, '/img/profile_img/') ? Auth::user()->img : '/img/profile_img/' . Auth::user()->img) : asset('img/profile_img/avatar-default.png') }}">
+<meta name="user-img" content="{{ Auth::user()->img ? (str_starts_with(Auth::user()->img, '/img/profile_img/') ? asset(Auth::user()->img) : asset('img/profile_img/' . Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}">
 
 <div class="main-container">
     <!-- Sidebar optimizado -->
@@ -31,7 +31,7 @@
     <div class="chat-main">
         <div class="chat-header">
             <div class="chat-contact">
-                <img id="chat-contact-img" src="{{ Auth::user()->img ? (str_starts_with(Auth::user()->img, '/img/profile_img/') ? Auth::user()->img : '/img/profile_img/' . Auth::user()->img) : asset('img/profile_img/avatar-default.png') }}" alt="Contact Avatar">
+                <img id="chat-contact-img" src="{{ Auth::user()->img ? (str_starts_with(Auth::user()->img, '/img/profile_img/') ? asset(Auth::user()->img) : asset('img/profile_img/' . Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}" alt="Contact Avatar">
                 <div class="contact-info">
                     <h3 id="chat-contact-name">Usuario</h3>
                     <p id="chat-contact-status">Estado</p>
