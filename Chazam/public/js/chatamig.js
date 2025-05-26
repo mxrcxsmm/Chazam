@@ -248,6 +248,7 @@ class ChatManager {
         this.startSmartPolling();
         this.setupSolicitudesHandlers();
         this.setupBlockHandlers();
+        this.setupSearchHandlers();
     }
 
     // Inicialización de elementos DOM
@@ -282,6 +283,52 @@ class ChatManager {
         this.setupSolicitudesHandlers();
         this.setupWindowResizeHandler();
         this.setupReportHandlers();
+        this.setupSearchHandlers();
+        
+        // Añadir evento para abrir el modal de búsqueda
+        const searchButton = document.querySelector('.chat-actions .fa-search');
+        if (searchButton) {
+            searchButton.addEventListener('click', () => {
+                const buscarUsuariosModal = new bootstrap.Modal(document.getElementById('buscarUsuariosModal'));
+                buscarUsuariosModal.show();
+            });
+        }
+
+        // Añadir evento para buscar chats
+        const chatSearchInput = document.querySelector('.search-box input');
+        if (chatSearchInput) {
+            chatSearchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase().trim();
+                const chatItems = document.querySelectorAll('.chat-item');
+                
+                chatItems.forEach(chat => {
+                    const username = chat.querySelector('h3').textContent.toLowerCase();
+                    const lastMessage = chat.querySelector('.last-message').textContent.toLowerCase();
+                    
+                    if (username.includes(searchTerm) || lastMessage.includes(searchTerm)) {
+                        chat.style.display = 'flex';
+                    } else {
+                        chat.style.display = 'none';
+                    }
+                });
+
+                // Si no hay resultados, mostrar mensaje
+                const visibleChats = document.querySelectorAll('.chat-item[style="display: flex"]');
+                const noResultsMessage = document.getElementById('no-results-message');
+                
+                if (visibleChats.length === 0 && searchTerm !== '') {
+                    if (!noResultsMessage) {
+                        const message = document.createElement('div');
+                        message.id = 'no-results-message';
+                        message.className = 'text-center text-muted mt-3';
+                        message.textContent = 'No se encontraron chats';
+                        this.elements.chatsList.appendChild(message);
+                    }
+                } else if (noResultsMessage) {
+                    noResultsMessage.remove();
+                }
+            });
+        }
     }
 
     // Renderizado de chats
@@ -828,6 +875,112 @@ class ChatManager {
                         });
                     }
                 });
+            });
+        }
+    }
+
+    // Configuración de handlers de búsqueda
+    setupSearchHandlers() {
+        const searchInput = document.getElementById('searchUserInput');
+        const searchResults = document.getElementById('searchResults');
+        let searchTimeout;
+
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchTimeout);
+                const query = e.target.value.trim();
+
+                if (query.length < 3) {
+                    searchResults.innerHTML = '<div class="text-center text-muted">Ingresa al menos 3 caracteres para buscar</div>';
+                    return;
+                }
+
+                searchTimeout = setTimeout(() => {
+                    this.searchUsers(query);
+                }, 300);
+            });
+        }
+    }
+
+    // Función para buscar usuarios
+    async searchUsers(query) {
+        try {
+            const response = await fetch(`/buscar-usuarios?q=${encodeURIComponent(query)}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error en la búsqueda');
+            }
+
+            const data = await response.json();
+            const searchResults = document.getElementById('searchResults');
+
+            if (data.length === 0) {
+                searchResults.innerHTML = '<div class="text-center text-muted">No se encontraron usuarios</div>';
+                return;
+            }
+
+            searchResults.innerHTML = data.map(user => `
+                <div class="user-result">
+                    <img src="${user.img}" alt="${user.username}" onerror="this.src='/img/profile_img/avatar-default.png'">
+                    <div class="user-info">
+                        <h6>${user.username}</h6>
+                        <p>${user.nombre_completo}</p>
+                    </div>
+                    <button class="send-request-btn" 
+                            data-user-id="${user.id_usuario}"
+                            onclick="window.chatManager.sendFriendRequest(${user.id_usuario}, this)">
+                        Enviar solicitud
+                    </button>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Error al buscar usuarios:', error);
+            const searchResults = document.getElementById('searchResults');
+            searchResults.innerHTML = '<div class="text-center text-danger">Error al buscar usuarios</div>';
+        }
+    }
+
+    // Función para enviar solicitud de amistad
+    async sendFriendRequest(userId, button) {
+        try {
+            const response = await fetch('/solicitudes/enviar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    id_receptor: userId
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                button.disabled = true;
+                button.textContent = 'Solicitud enviada';
+                button.classList.add('sent');
+                Swal.fire({
+                    title: '¡Solicitud enviada!',
+                    text: 'La solicitud de amistad ha sido enviada correctamente.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                throw new Error(data.message || 'Error al enviar la solicitud');
+            }
+        } catch (error) {
+            console.error('Error al enviar solicitud:', error);
+            Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo enviar la solicitud de amistad',
+                icon: 'error'
             });
         }
     }

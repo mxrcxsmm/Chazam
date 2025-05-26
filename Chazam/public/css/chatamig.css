@@ -135,24 +135,42 @@ body, html {
 }
 
 .search-box {
-    background-color: #2d2d2d;
-    border-radius: 8px;
-    padding: 8px 12px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+    position: relative;
+    margin: 15px;
 }
 
 .search-box input {
-    background: none;
-    border: none;
-    color: white;
     width: 100%;
+    padding: 10px 35px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    background-color: #f5f5f5;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
     outline: none;
+    border-color: #9147ff;
+    background-color: #fff;
+    box-shadow: 0 0 0 2px rgba(145, 71, 255, 0.1);
 }
 
 .search-box i {
-    color: #9147ff;
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+#no-results-message {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    margin: 10px;
 }
 
 .chats-list {
@@ -175,6 +193,10 @@ body, html {
 
 .chat-item.active {
     background-color: #2d2d2d;
+}
+
+.chat-item.hidden {
+    display: none;
 }
 
 .chat-avatar img {
@@ -393,4 +415,156 @@ body, html {
     margin-left: 50px; /* Align with the text after the avatar */
     word-break: break-word;
     white-space: pre-line;
+}
+
+/* Estilos para el modal de búsqueda de usuarios */
+.search-user-container {
+    padding: 1rem;
+}
+
+.search-box {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    padding-left: 2.5rem;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background-color: #f5f5f5;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #9147ff;
+    background-color: #fff;
+    box-shadow: 0 0 0 2px rgba(145, 71, 255, 0.1);
+}
+
+.search-box i {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.search-results {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 0.5rem;
+}
+
+.user-result {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    background-color: #f8f9fa;
+    transition: all 0.2s ease;
+}
+
+.user-result:hover {
+    background-color: #f0f0f0;
+}
+
+.user-result img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 1rem;
+    object-fit: cover;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-info h6 {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #333;
+}
+
+.user-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #666;
+}
+
+.send-request-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    background-color: #9147ff;
+    color: white;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.send-request-btn:hover {
+    background-color: #7c3aed;
+}
+
+.send-request-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.send-request-btn.sent {
+    background-color: #28a745;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.text-muted {
+    color: #6c757d;
+}
+
+.text-danger {
+    color: #dc3545;
+}
+
+/* Estilos para el botón de búsqueda en el header */
+#btnBuscarUsuarios {
+    color: #9147ff;
+    border-color: #9147ff;
+    transition: all 0.2s ease;
+}
+
+#btnBuscarUsuarios:hover {
+    background-color: #9147ff;
+    color: white;
+}
+
+/* Estilos para el modal */
+.modal-content {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    border-bottom: none;
+    padding: 1.5rem;
+}
+
+.modal-body {
+    padding: 1.5rem;
+}
+
+.modal-title {
+    font-weight: 600;
+}
+
+.btn-close-white {
+    filter: brightness(0) invert(1);
 }
