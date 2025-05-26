@@ -177,5 +177,5 @@
 
 <!-- Script de inicialización -->
 <script>
-window.userImg = "{{ Auth::user()->img ? (str_starts_with(Auth::user()->img, '/img/profile_img/') ? Auth::user()->img : '/img/profile_img/' . Auth::user()->img) : asset('img/profile_img/avatar-default.png') }}";
+window.userImg = "{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}";
 </script>
