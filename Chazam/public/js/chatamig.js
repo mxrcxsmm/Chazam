@@ -323,7 +323,7 @@ class ChatManager {
         }
 
         // Construir la ruta de la imagen correctamente
-        const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
+        const imgPath = chat.img ? chat.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : '/img/profile_img/avatar-default.png';
 
         chatItem.innerHTML = `
             <div class="chat-avatar">
@@ -394,7 +394,7 @@ class ChatManager {
     createMessageElement(msg) {
         const imgSrc = msg.es_mio ? 
             window.userImg : 
-            (msg.img ? msg.img : '/img/profile_img/avatar-default.png');
+            (msg.img ? msg.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : '/img/profile_img/avatar-default.png');
         
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
@@ -510,7 +510,7 @@ class ChatManager {
         chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
         
         // Construir la ruta de la imagen correctamente
-        const imgPath = companero.img ? companero.img : '/img/profile_img/avatar-default.png';
+        const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : '/img/profile_img/avatar-default.png';
         chatImg.src = imgPath;
         chatImg.onerror = function() {
             this.src = '/img/profile_img/avatar-default.png';

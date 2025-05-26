@@ -43,12 +43,10 @@ class FriendChatController extends Controller
                 // Construir la URL de la imagen correctamente
                 $imgUrl = asset('img/profile_img/avatar-default.png');
                 if ($compaUser && $compaUser->img) {
-                    // Si la imagen ya incluye la ruta completa, usarla directamente
-                    if (str_starts_with($compaUser->img, '/img/profile_img/')) {
-                        $imgUrl = asset($compaUser->img);
-                    } else {
-                        $imgUrl = asset('img/profile_img/' . $compaUser->img);
-                    }
+                    // Eliminar cualquier ruta duplicada
+                    $imgPath = str_replace('/img/profile_img/img/profile_img/', '/img/profile_img/', $compaUser->img);
+                    $imgPath = str_replace('/img/profile_img/', '', $imgPath);
+                    $imgUrl = asset('img/profile_img/' . $imgPath);
                 }
                 
                 return [
@@ -88,12 +86,10 @@ class FriendChatController extends Controller
                 // Construir la URL de la imagen correctamente
                 $imgUrl = asset('img/profile_img/avatar-default.png');
                 if ($usuario && $usuario->img) {
-                    // Si la imagen ya incluye la ruta completa, usarla directamente
-                    if (str_starts_with($usuario->img, '/img/profile_img/')) {
-                        $imgUrl = asset($usuario->img);
-                    } else {
-                        $imgUrl = asset('img/profile_img/' . $usuario->img);
-                    }
+                    // Eliminar cualquier ruta duplicada
+                    $imgPath = str_replace('/img/profile_img/img/profile_img/', '/img/profile_img/', $usuario->img);
+                    $imgPath = str_replace('/img/profile_img/', '', $imgPath);
+                    $imgUrl = asset('img/profile_img/' . $imgPath);
                 }
                 
                 return [
