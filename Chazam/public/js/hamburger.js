@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     amigoItem.className = 'list-group-item d-flex justify-content-between align-items-center';
                     amigoItem.innerHTML = `
                         <div class="d-flex align-items-center">
-                            <img src="${amigo.img ? amigo.img : '/img/profile_img/avatar-default.png'}" 
+                            <img src="${amigo.img ? (amigo.img.startsWith('http') ? amigo.img : window.location.origin + '/img/profile_img/' + amigo.img.replace(/^.*[\\\/]/, '')) : '/img/profile_img/avatar-default.png'}" 
                                  class="rounded-circle me-2" 
                                  style="width: 40px; height: 40px; object-fit: cover;">
                             <div>

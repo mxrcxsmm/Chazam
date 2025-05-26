@@ -115,29 +115,6 @@
     </div>
 </div>
 
-<!-- Modal de búsqueda de usuarios -->
-<div class="modal fade" id="buscarUsuariosModal" tabindex="-1" aria-labelledby="buscarUsuariosModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header" style="background:#9147ff; color:#fff;">
-                <h5 class="modal-title" id="buscarUsuariosModalLabel">Buscar Usuarios</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="search-user-container">
-                    <div class="search-box mb-3">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchUserInput" placeholder="Buscar por username..." class="form-control">
-                    </div>
-                    <div id="searchResults" class="search-results">
-                        <!-- Los resultados se cargarán aquí -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Estilos optimizados -->
 <style>
 .solicitud-item {
