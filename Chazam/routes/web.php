@@ -207,6 +207,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/amistades', [AmistadController::class, 'index'])->name('amistades.index');
     Route::delete('/amistades/{idUsuario}', [AmistadController::class, 'destroy'])->name('amistades.destroy');
     Route::post('/amistades/{idUsuario}/bloquear', [AmistadController::class, 'bloquear'])->name('amistades.bloquear');
+    Route::get('/amistades/bloqueados', [AmistadController::class, 'getBloqueados'])->name('amistades.bloqueados');
+    Route::post('/amistades/desbloquear', [AmistadController::class, 'desbloquearUsuario'])->name('amistades.desbloquear');
 });
 
 Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');
