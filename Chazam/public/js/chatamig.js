@@ -893,7 +893,7 @@ class ChatManager {
 
             searchResults.innerHTML = data.map(user => `
                 <div class="user-result">
-                    <img src="${user.img}" alt="${user.username}">
+                    <img src="${user.img ? (user.img.startsWith('http') ? user.img : window.location.origin + '/img/profile_img/' + user.img.replace(/^.*[\\\/]/, '')) : '/img/profile_img/avatar-default.png'}" alt="${user.username}">
                     <div class="user-info">
                         <h6>${user.username}</h6>
                         <p>${user.nombre_completo}</p>
