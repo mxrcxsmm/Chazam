@@ -8,6 +8,7 @@ use App\Models\Chat;
 use App\Models\ChatUsuario;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SolicitudUserController extends Controller
 {
@@ -149,23 +150,47 @@ class SolicitudUserController extends Controller
      */
     public function verificarSolicitud($id_usuario)
     {
-        $solicitud = Solicitud::where(function($query) use ($id_usuario) {
-            $query->where('id_emisor', Auth::user()->id_usuario)
-                  ->where('id_receptor', $id_usuario);
-        })->orWhere(function($query) use ($id_usuario) {
-            $query->where('id_emisor', $id_usuario)
-                  ->where('id_receptor', Auth::user()->id_usuario);
-        })->first();
-
-        if ($solicitud) {
-            return response()->json([
-                'estado' => $solicitud->estado
+        try {
+            \Log::info('Verificando solicitud entre usuarios', [
+                'usuario_actual' => Auth::id(),
+                'usuario_destino' => $id_usuario
             ]);
-        }
 
-        return response()->json([
-            'estado' => null
-        ]);
+            $solicitud = Solicitud::where(function($query) use ($id_usuario) {
+                $query->where('id_emisor', Auth::id())
+                      ->where('id_receptor', $id_usuario);
+            })->orWhere(function($query) use ($id_usuario) {
+                $query->where('id_emisor', $id_usuario)
+                      ->where('id_receptor', Auth::id());
+            })->first();
+
+            \Log::info('Resultado de la verificación', [
+                'solicitud_encontrada' => $solicitud ? true : false,
+                'estado' => $solicitud ? $solicitud->estado : null
+            ]);
+
+            if ($solicitud) {
+                return response()->json([
+                    'success' => true,
+                    'estado' => $solicitud->estado
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'estado' => 'no_existe'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error al verificar solicitud', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al verificar el estado de la solicitud'
+            ], 500);
+        }
     }
 
     /**
