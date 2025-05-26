@@ -25,6 +25,7 @@ use App\Http\Controllers\VistaController;
 use App\Http\Controllers\ComunidadesController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\AmistadController;
+use App\Http\Controllers\UserSearchController;
 
 
 
@@ -44,6 +45,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [AdminController::class, 'destroy'])->name('usuarios.destroy');
         Route::post('/usuarios/filtrar', [AdminController::class, 'filtrar'])->name('usuarios.filtrar');
         Route::post('/usuarios/{id}/ban', [AdminController::class, 'ban'])->name('usuarios.ban');
+        Route::get('/usuarios/{id}/json', [AdminController::class, 'getUserJson'])->name('usuarios.json');
 
         // Rutas para reportes (administrador)
         Route::get('reportes', [ReporteAdminController::class, 'index'])->name('reportes.index');
@@ -90,6 +92,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/marco', [VistaController::class, 'cambiarMarco'])->name('cambiarMarco');
             Route::post('/glow', [VistaController::class, 'cambiarBrillo'])->name('cambiarBrillo');
             Route::put('/update', [PerfilController::class, 'update'])->name('update');
+            Route::post('/perfil/check-availability', [PerfilController::class, 'checkAvailability'])->name('perfil.checkAvailability');
             Route::get('/mejoras', function () {
                 return view('perfil.mejoras');
             })->name('mejoras');
@@ -159,9 +162,11 @@ Route::middleware(['auth'])->group(function () {
     
     // Rutas para el chat de amigos
     Route::get('user/chats', [FriendChatController::class, 'getUserChats'])->name('user.chats');
-    Route::get('user/chat/{chatId}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
-    Route::post('user/chat/{chatId}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
+    Route::get('/user/chat/{id}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
+    Route::post('/user/chat/{id}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
 
+    // Ruta para búsqueda de usuarios
+    Route::get('/buscar-usuarios', [UserSearchController::class, 'search'])->name('user.search');
 
     // Rutas para solicitudes y bloqueos
     Route::post('/solicitudes/enviar', [SolicitudUserController::class, 'enviarSolicitud'])->name('solicitudes.enviar');
@@ -170,6 +175,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/solicitudes/verificar/{id_usuario}', [SolicitudUserController::class, 'verificarSolicitud'])->name('solicitudes.verificar');
     Route::get('/solicitudes/pendientes', [SolicitudUserController::class, 'getPendientes'])->name('solicitudes.pendientes');
     Route::post('/solicitudes/responder', [SolicitudUserController::class, 'responderSolicitud'])->name('solicitudes.responder');
+    
+    // Rutas para búsqueda de usuarios
+    Route::get('/user/search', [UserController::class, 'search'])->name('user.search');
     
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
@@ -210,6 +218,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/amistades', [AmistadController::class, 'index'])->name('amistades.index');
     Route::delete('/amistades/{idUsuario}', [AmistadController::class, 'destroy'])->name('amistades.destroy');
     Route::post('/amistades/{idUsuario}/bloquear', [AmistadController::class, 'bloquear'])->name('amistades.bloquear');
+    Route::get('/amistades/bloqueados', [AmistadController::class, 'getBloqueados'])->name('amistades.bloqueados');
+    Route::post('/amistades/desbloquear', [AmistadController::class, 'desbloquearUsuario'])->name('amistades.desbloquear');
 });
 
 Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');

@@ -60,6 +60,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->belongsTo(Rol::class, 'id_rol');
     }
 
+    public function personalizacion()
+    {
+        return $this->hasOne(\App\Models\Personalizacion::class, 'id_usuario');
+    }
+
     public function estado(): BelongsTo
     {
         return $this->belongsTo(Estado::class, 'id_estado');

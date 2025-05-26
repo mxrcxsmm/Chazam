@@ -43,6 +43,38 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
+
+    var modalUsuario = document.getElementById('modalUsuario');
+    if (modalUsuario) {
+        modalUsuario.addEventListener('show.bs.modal', function (event) {
+            var icon = event.relatedTarget;
+            var userId = icon.getAttribute('data-user-id');
+            if (userId) {
+                fetch('/admin/usuarios/' + userId + '/json')
+                    .then(response => response.json())
+                    .then(user => {
+                        const campos = [
+                            { label: 'ID', key: 'id_usuario' },
+                            { label: 'Nombre de Usuario', key: 'username' },
+                            { label: 'Email', key: 'email' },
+                            { label: 'Nombre Completo', key: 'nombre_completo' },
+                            { label: 'Fecha nacimiento', key: 'fecha_nacimiento' },
+                            { label: 'Género', key: 'genero' },
+                            { label: 'Descripción', key: 'descripcion' },
+                            { label: 'Nacionalidad', key: 'nacionalidad' },
+                            { label: 'Estado', key: 'estado' },
+                            { label: 'Rol', key: 'rol' }
+                        ];
+                        let html = '<ul class="list-group">';
+                        campos.forEach(campo => {
+                            html += `<li class="list-group-item"><strong>${campo.label}:</strong> ${user[campo.key] ?? ''}</li>`;
+                        });
+                        html += '</ul>';
+                        document.getElementById('modalUsuarioBody').innerHTML = html;
+                    });
+            }
+        });
+    }
 });
 
 function toggleDetalles(btn) {

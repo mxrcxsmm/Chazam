@@ -20,7 +20,7 @@
     <div class="marco-externo {{ $claseMarco }}" style="
         --glow-color: {{ $user->borde_glow_color ?? '#FFD700' }};
         background-image: url('{{ asset('img/bordes/' . ($user->borde_overlay ?? 'default.png')) }}');
-        {{--background-image: url('{{ $user->borde_overlay ? asset("IMG/bordes/{$user->borde_overlay}") : 'none' }}');--}}
+        {{--background-image: url('{{ $user->borde_overlay ? asset("img/bordes/{$user->borde_overlay}") : 'none' }}');--}}
     ">
     {{--<div class="marco-externo {{ $claseMarco }} marco-{{ $marcoNombre }}">--}}
         <img src="{{ asset($user->img) }}" class="avatar-img">

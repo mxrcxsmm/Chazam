@@ -22,7 +22,7 @@ class UsersSeeder extends Seeder
                 'puntos' => 1000,
                 'id_nacionalidad' => 1,
                 'id_rol' => 1,
-                'id_estado' => 1,
+                'id_estado' => 2,
                 'img' => null,
                 'descripcion' => 'Administrador del sistema'
             ],
@@ -37,7 +37,7 @@ class UsersSeeder extends Seeder
                 'puntos' => 800,
                 'id_nacionalidad' => 1,
                 'id_rol' => 2,
-                'id_estado' => 1,
+                'id_estado' => 2,
                 'img' => null,
                 'descripcion' => 'Moderador del sistema'
             ],
@@ -52,7 +52,7 @@ class UsersSeeder extends Seeder
                 'puntos' => 500,
                 'id_nacionalidad' => 2,
                 'id_rol' => 3,
-                'id_estado' => 1,
+                'id_estado' => 2,
                 'img' => null,
                 'descripcion' => 'Usuario de ejemplo'
             ],
@@ -67,7 +67,7 @@ class UsersSeeder extends Seeder
                 'puntos' => 450,
                 'id_nacionalidad' => 3, // Colombiana
                 'id_rol' => 3,
-                'id_estado' => 1,
+                'id_estado' => 2,
                 'img' => null,
                 'descripcion' => 'Usuario de ejemplo'
             ],
@@ -82,7 +82,7 @@ class UsersSeeder extends Seeder
                 'puntos' => 470,
                 'id_nacionalidad' => 4, // Argentina
                 'id_rol' => 3,
-                'id_estado' => 1,
+                'id_estado' => 2,
                 'img' => null,
                 'descripcion' => 'Usuario de ejemplo'
             ],
@@ -97,7 +97,7 @@ class UsersSeeder extends Seeder
                 'puntos' => 480,
                 'id_nacionalidad' => 5, // Chilena
                 'id_rol' => 3,
-                'id_estado' => 1,
+                'id_estado' => 2,
                 'img' => null,
                 'descripcion' => 'Usuario de ejemplo'
             ],
@@ -112,7 +112,7 @@ class UsersSeeder extends Seeder
                 'puntos' => 490,
                 'id_nacionalidad' => 6, // Peruana
                 'id_rol' => 2,
-                'id_estado' => 1,
+                'id_estado' => 2,
                 'img' => null,
                 'descripcion' => 'Usuario de ejemplo'
             ],
@@ -127,10 +127,10 @@ class UsersSeeder extends Seeder
                 'puntos' => 500,
                 'id_nacionalidad' => 7, // Venezolana
                 'id_rol' => 3,
-                'id_estado' => 1,
+                'id_estado' => 2,
                 'img' => null,
                 'descripcion' => 'Usuario de ejemplo'
             ]
         ]);
     }
-} 
+}

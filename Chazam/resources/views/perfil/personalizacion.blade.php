@@ -3,6 +3,7 @@
 @section('content')
 <div class="form-container">
     <h4 class="titulo">Mis datos</h4>
+    <input type="hidden" id="username_actual" value="{{ Auth::user()->username }}">
     <form action="{{ route('perfil.update') }}" method="POST" enctype="multipart/form-data" class="formulario">
         @csrf
         @method('PUT')

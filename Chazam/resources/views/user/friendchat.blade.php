@@ -1,8 +1,13 @@
 @include('layout.chatsHeader')
 
+<!-- Meta tags optimizados -->
+<meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="user-id" content="{{ Auth::id() }}">
+<meta name="user-img" content="{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}">
+
 <div class="main-container">
+    <!-- Sidebar optimizado -->
     <div class="chat-sidebar">
-        <!-- Header del sidebar -->
         <div class="sidebar-header d-flex justify-content-between align-items-center">
             <div class="header-titles">
                 <h2>Chats</h2>
@@ -18,24 +23,16 @@
             </div>
         </div>
 
-        <!-- Barra de búsqueda -->
-        <div class="search-container">
-            <div class="search-box">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Busca un chat o inicia uno nuevo">
-            </div>
-        </div>
-
-        <!-- Lista de chats -->
-        <div class="chats-list" id="chats-list">
-            <!-- Los chats se cargarán aquí dinámicamente -->
-        </div>
+        <!-- Lista de chats optimizada -->
+        <div class="chats-list" id="chats-list"></div>
     </div>
 
+    <!-- Chat principal optimizado -->
     <div class="chat-main">
         <div class="chat-header">
             <div class="chat-contact">
-                <img id="chat-contact-img" src="{{ asset('img/profile_img/avatar-default.png') }}" alt="Contact Avatar">
+
+                <img id="chat-contact-img" src="{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}" alt="Contact Avatar">
                 <div class="contact-info">
                     <h3 id="chat-contact-name">Usuario</h3>
                     <p id="chat-contact-status">Estado</p>
@@ -47,9 +44,7 @@
             </div>
         </div>
 
-        <div class="messages-container" id="messages-container">
-            <!-- Los mensajes se cargarán aquí dinámicamente -->
-        </div>
+        <div class="messages-container" id="messages-container"></div>
 
         <div class="message-input-container">
             <i class="far fa-smile"></i>
@@ -58,52 +53,36 @@
         </div>
     </div>
 
+    <!-- Sidebar de opciones optimizado -->
     <div class="options-sidebar">
         <div class="options-header">
-            <i class="fas fa-times close-options"></i>
             <h3>Opciones</h3>
+            <button class="close-options"><i class="fas fa-times"></i></button>
         </div>
         <div class="options-content">
             <div class="option-item">
-                <i class="fas fa-user"></i>
-                <span>Personalizar</span>
-            </div>
-            <div class="option-item">
-                <i class="fas fa-users"></i>
-                <span>Amigos</span>
-            </div>
-            <div class="option-item">
-                <i class="fas fa-flag"></i>
-                <span>Reportar</span>
-            </div>
-            <div class="option-item">
-                <i class="fas fa-coins"></i>
-                <span>Comprar puntos</span>
-            </div>
-            <div class="option-item logout">
-                <i class="fas fa-sign-out-alt"></i>
-                <span>Cerrar Sesión</span>
+                <button class="btn btn-warning report-user-btn">
+                    <i class="fas fa-flag"></i> Reportar usuario
+                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Añadir Font Awesome y el CSS personalizado -->
+<!-- Recursos externos optimizados -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <link rel="stylesheet" href="{{ asset('css/chatamig.css') }}">
-
-<!-- Añadir el JavaScript personalizado -->
 <script src="{{ asset('js/chatamig.js') }}"></script>
-
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
+<!-- Componentes adicionales -->
 <emoji-picker style="position: absolute; bottom: 60px; left: 20px; display: none;"></emoji-picker>
 
 <div id="chats-loader" style="text-align:center; padding: 20px;">
     <i class="fas fa-spinner fa-spin"></i> Cargando chats...
 </div>
 
-<!-- Modal de Solicitudes de Amistad -->
+<!-- Modal de Solicitudes optimizado -->
 <div class="modal fade" id="solicitudesModal" tabindex="-1" aria-labelledby="solicitudesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
@@ -113,13 +92,31 @@
             </div>
             <div class="modal-body" id="solicitudesContainer">
                 <div id="noSolicitudes" style="display:none;">No tienes solicitudes pendientes</div>
-                <!-- Las solicitudes se cargarán aquí con AJAX -->
             </div>
         </div>
     </div>
 </div>
 
-<!-- Estilos para las solicitudes -->
+<!-- Modal de confirmación -->
+<div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Confirmar acción</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="confirmMessage"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Estilos optimizados -->
 <style>
 .solicitud-item {
     display: flex;
@@ -155,3 +152,8 @@
     border-radius: 50%;
 }
 </style>
+
+<!-- Script de inicialización -->
+<script>
+window.userImg = "{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}";
+</script>
