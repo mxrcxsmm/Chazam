@@ -25,6 +25,7 @@ use App\Http\Controllers\VistaController;
 use App\Http\Controllers\ComunidadesController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\AmistadController;
+use App\Http\Controllers\UserSearchController;
 
 
 
@@ -164,6 +165,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/chat/{id}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
     Route::post('/user/chat/{id}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
 
+    // Ruta para búsqueda de usuarios
+    Route::get('/buscar-usuarios', [UserSearchController::class, 'search'])->name('user.search');
 
     // Rutas para solicitudes y bloqueos
     Route::post('/solicitudes/enviar', [SolicitudUserController::class, 'enviarSolicitud'])->name('solicitudes.enviar');
@@ -172,6 +175,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/solicitudes/verificar/{id_usuario}', [SolicitudUserController::class, 'verificarSolicitud'])->name('solicitudes.verificar');
     Route::get('/solicitudes/pendientes', [SolicitudUserController::class, 'getPendientes'])->name('solicitudes.pendientes');
     Route::post('/solicitudes/responder', [SolicitudUserController::class, 'responderSolicitud'])->name('solicitudes.responder');
+    
+    // Rutas para búsqueda de usuarios
+    Route::get('/user/search', [UserController::class, 'search'])->name('user.search');
     
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
