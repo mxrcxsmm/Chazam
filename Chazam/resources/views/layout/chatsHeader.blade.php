@@ -20,10 +20,6 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <link rel="stylesheet" href="{{ asset('css/retos.css') }}">
-    <!-- FontAwesome para los iconos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <!-- Estilos del chat y modales -->
-    <link rel="stylesheet" href="{{ asset('css/chatamig.css') }}">
     @stack('head')
 </head>
 <body>
@@ -149,6 +145,19 @@
         @yield('content')
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/estados.js') }}"></script>
+    <script src="{{ asset('js/hamburger.js') }}"></script>
+    @stack('scripts')
+
+    <script>
+        // Evento para abrir el modal de búsqueda
+        document.getElementById('btnBuscarUsuarios').addEventListener('click', function() {
+            const buscarUsuariosModal = new bootstrap.Modal(document.getElementById('buscarUsuariosModal'));
+            buscarUsuariosModal.show();
+        });
+    </script>
+
     <!-- Modal de amistades (¡fuera del navbar y de cualquier div!) -->
     <div class="modal fade" id="modalAmistades" tabindex="-1" aria-labelledby="modalAmistadesLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -191,108 +200,5 @@
             </div>
         </div>
     </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{{ asset('js/estados.js') }}"></script>
-    <script src="{{ asset('js/hamburger.js') }}"></script>
-    @stack('scripts')
-
-    <script>
-        // Evento para abrir el modal de búsqueda
-        document.addEventListener('DOMContentLoaded', function() {
-            const btnBuscarUsuarios = document.getElementById('btnBuscarUsuarios');
-            if (btnBuscarUsuarios) {
-                btnBuscarUsuarios.addEventListener('click', function() {
-                    const buscarUsuariosModal = new bootstrap.Modal(document.getElementById('buscarUsuariosModal'));
-                    buscarUsuariosModal.show();
-                });
-            }
-
-            // Inicializar la funcionalidad de búsqueda de usuarios
-            const searchInput = document.getElementById('searchUserInput');
-            if (searchInput) {
-                searchInput.addEventListener('input', function(e) {
-                    const query = e.target.value.trim();
-                    if (query.length < 3) {
-                        document.getElementById('searchResults').innerHTML = '<div class="text-center text-muted">Ingresa al menos 3 caracteres para buscar</div>';
-                        return;
-                    }
-
-                    fetch(`/buscar-usuarios?q=${encodeURIComponent(query)}`, {
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        const searchResults = document.getElementById('searchResults');
-                        if (data.length === 0) {
-                            searchResults.innerHTML = '<div class="text-center text-muted">No se encontraron usuarios</div>';
-                            return;
-                        }
-
-                        searchResults.innerHTML = data.map(user => `
-                            <div class="user-result">
-                                <img src="${user.img}" alt="${user.username}" onerror="this.src='/img/profile_img/avatar-default.png'">
-                                <div class="user-info">
-                                    <h6>${user.username}</h6>
-                                    <p>${user.nombre_completo}</p>
-                                </div>
-                                <button class="send-request-btn" 
-                                        data-user-id="${user.id_usuario}"
-                                        onclick="sendFriendRequest(${user.id_usuario}, this)">
-                                    Enviar solicitud
-                                </button>
-                            </div>
-                        `).join('');
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        document.getElementById('searchResults').innerHTML = '<div class="text-center text-danger">Error al buscar usuarios</div>';
-                    });
-                });
-            }
-        });
-
-        // Función global para enviar solicitudes de amistad
-        function sendFriendRequest(userId, button) {
-            fetch('/solicitudes/enviar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({
-                    id_receptor: userId
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    button.disabled = true;
-                    button.textContent = 'Solicitud enviada';
-                    button.classList.add('sent');
-                    Swal.fire({
-                        title: '¡Solicitud enviada!',
-                        text: 'La solicitud de amistad ha sido enviada correctamente.',
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                } else {
-                    throw new Error(data.message || 'Error al enviar la solicitud');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: error.message || 'No se pudo enviar la solicitud de amistad',
-                    icon: 'error'
-                });
-            });
-        }
-    </script>
 </body>
 </html>

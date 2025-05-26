@@ -293,42 +293,6 @@ class ChatManager {
                 buscarUsuariosModal.show();
             });
         }
-
-        // Añadir evento para buscar chats
-        const chatSearchInput = document.querySelector('.search-box input');
-        if (chatSearchInput) {
-            chatSearchInput.addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase().trim();
-                const chatItems = document.querySelectorAll('.chat-item');
-                
-                chatItems.forEach(chat => {
-                    const username = chat.querySelector('h3').textContent.toLowerCase();
-                    const lastMessage = chat.querySelector('.last-message').textContent.toLowerCase();
-                    
-                    if (username.includes(searchTerm) || lastMessage.includes(searchTerm)) {
-                        chat.style.display = 'flex';
-                    } else {
-                        chat.style.display = 'none';
-                    }
-                });
-
-                // Si no hay resultados, mostrar mensaje
-                const visibleChats = document.querySelectorAll('.chat-item[style="display: flex"]');
-                const noResultsMessage = document.getElementById('no-results-message');
-                
-                if (visibleChats.length === 0 && searchTerm !== '') {
-                    if (!noResultsMessage) {
-                        const message = document.createElement('div');
-                        message.id = 'no-results-message';
-                        message.className = 'text-center text-muted mt-3';
-                        message.textContent = 'No se encontraron chats';
-                        this.elements.chatsList.appendChild(message);
-                    }
-                } else if (noResultsMessage) {
-                    noResultsMessage.remove();
-                }
-            });
-        }
     }
 
     // Renderizado de chats
@@ -926,7 +890,7 @@ class ChatManager {
 
             searchResults.innerHTML = data.map(user => `
                 <div class="user-result">
-                    <img src="${user.img}" alt="${user.username}" onerror="this.src='/img/profile_img/avatar-default.png'">
+                    <img src="${user.img}" alt="${user.username}">
                     <div class="user-info">
                         <h6>${user.username}</h6>
                         <p>${user.nombre_completo}</p>
