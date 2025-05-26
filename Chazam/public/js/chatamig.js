@@ -308,7 +308,7 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
-        console.log('Creando elemento de chat:', chat); // Log para depuración
+        const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
@@ -317,13 +317,7 @@ class ChatManager {
         const userId = chat.id_usuario || chat.usuario_id || chat.user_id;
         if (userId) {
             chatItem.dataset.userId = userId;
-            console.log('ID de usuario guardado:', userId); // Log para depuración
-        } else {
-            console.warn('No se encontró ID de usuario para el chat:', chat); // Log de advertencia
         }
-
-        // Construir la ruta de la imagen correctamente
-        const imgPath = chat.img ? chat.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : '/img/profile_img/avatar-default.png';
 
         chatItem.innerHTML = `
             <div class="chat-avatar">
@@ -337,7 +331,6 @@ class ChatManager {
                 <p class="last-message">${chat.last_message || ''}</p>
             </div>
         `;
-    
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
         return chatItem;
     }
