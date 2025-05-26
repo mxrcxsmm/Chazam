@@ -187,6 +187,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/comunidades/create', [ComunidadesController::class, 'create'])->name('comunidades.create');
     Route::post('/comunidades', [ComunidadesController::class, 'store'])->name('comunidades.store');
     Route::post('/comunidades/{id}/join', [ComunidadesController::class, 'join'])->name('comunidades.join');
+    Route::get('/comunidades/{id}', [ComunidadesController::class, 'show'])->name('comunidades.show');
+    Route::get('/comunidades/{id}/edit', [ComunidadesController::class, 'edit'])->name('comunidades.edit');
+    Route::get('/comunidades/{id}/edit-form', [ComunidadesController::class, 'editForm'])->name('comunidades.edit-form');
+    Route::put('/comunidades/{id}', [ComunidadesController::class, 'update'])->name('comunidades.update');
+    Route::post('/comunidades/{id}/abandonar', [ComunidadesController::class, 'abandonar'])->name('comunidades.abandonar');
+    Route::post('/comunidades/{id}/eliminar', [ComunidadesController::class, 'eliminar'])->name('comunidades.eliminar');
+
+    // Nuevas rutas para la API de comunidades
+    Route::get('/comunidades/{id}/members', [ComunidadesController::class, 'getMembers'])->name('comunidades.members');
+    Route::get('/comunidades/{id}/messages', [ComunidadesController::class, 'getMessages'])->name('comunidades.messages');
+    Route::post('/comunidades/{id}/send-message', [ComunidadesController::class, 'sendMessage'])->name('comunidades.send-message');
 
     Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
 
