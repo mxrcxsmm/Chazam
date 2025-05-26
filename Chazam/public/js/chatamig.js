@@ -989,3 +989,48 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+
+function cargarBloqueados() {
+    fetch('/amistades/bloqueados')
+        .then(res => res.json())
+        .then(bloqueados => {
+            const lista = document.getElementById('listaBloqueados');
+            lista.innerHTML = '';
+            if (bloqueados.length === 0) {
+                lista.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
+            } else {
+                bloqueados.forEach(user => {
+                    const item = document.createElement('div');
+                    item.className = 'list-group-item d-flex align-items-center justify-content-between';
+                    item.innerHTML = `
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="${user.img ? '/img/profile_img/' + user.img.replace('/img/profile_img/', '') : '/img/profile_img/avatar-default.png'}" style="width:32px;height:32px;object-fit:cover;border-radius:50%;">
+                            <span>${user.username}</span>
+                        </div>
+                        <button class="btn btn-sm btn-danger" onclick="desbloquearUsuario(${user.id_usuario}, this)">Desbloquear</button>
+                    `;
+                    lista.appendChild(item);
+                });
+            }
+        });
+}
+
+function desbloquearUsuario(id, btn) {
+    fetch('/amistades/desbloquear', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content
+        },
+        body: JSON.stringify({id_usuario: id})
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            btn.closest('.list-group-item').remove();
+        }
+    });
+}
+
+// Llama a cargarBloqueados cuando se abre el modal o se cambia de pestaña
+document.getElementById('bloqueados-tab').addEventListener('click', cargarBloqueados);

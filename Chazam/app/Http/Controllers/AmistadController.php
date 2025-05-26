@@ -8,6 +8,7 @@ use App\Models\Chat;
 use App\Models\ChatUsuario;
 use App\Models\Mensaje;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class AmistadController extends Controller
 {
@@ -145,5 +146,38 @@ class AmistadController extends Controller
             DB::rollBack();
             return response()->json(['success' => false, 'message' => $e->getMessage()], 500);
         }
+    }
+
+    public function getBloqueados()
+    {
+        $userId = Auth::id();
+        // Busca solicitudes donde el usuario actual bloqueó a otro
+        $bloqueados = \DB::table('solicitudes')
+            ->join('users', 'users.id_usuario', '=', 'solicitudes.id_receptor')
+            ->where('solicitudes.id_emisor', $userId)
+            ->where('solicitudes.estado', 'blockeada')
+            ->select('users.id_usuario', 'users.username', 'users.img')
+            ->get();
+
+        return response()->json($bloqueados);
+    }
+
+    public function desbloquearUsuario(Request $request)
+    {
+        $userId = Auth::id();
+        $otroId = $request->input('id_usuario');
+
+        // Borra todas las solicitudes de bloqueo entre ambos usuarios
+        \DB::table('solicitudes')
+            ->where(function($q) use ($userId, $otroId) {
+                $q->where('id_emisor', $userId)->where('id_receptor', $otroId);
+            })
+            ->orWhere(function($q) use ($userId, $otroId) {
+                $q->where('id_emisor', $otroId)->where('id_receptor', $userId);
+            })
+            ->where('estado', 'blockeada')
+            ->delete();
+
+        return response()->json(['success' => true]);
     }
 } 
