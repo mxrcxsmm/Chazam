@@ -495,9 +495,9 @@ async function cargarSolicitudesAmistad() {
 
         if (data.length === 0) {
             if (container && noSolicitudes) {
-                noSolicitudes.style.display = 'block';
-                container.innerHTML = '';
-                container.appendChild(noSolicitudes);
+            noSolicitudes.style.display = 'block';
+            container.innerHTML = '';
+            container.appendChild(noSolicitudes);
             }
             return;
         }
@@ -541,11 +541,11 @@ async function cargarSolicitudesAmistad() {
         }
         // Solo muestra el SweetAlert si realmente no hay contenedor
         if (!container) {
-            Swal.fire({
-                title: 'Error',
-                text: 'No se pudieron cargar las solicitudes de amistad',
-                icon: 'error'
-            });
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudieron cargar las solicitudes de amistad',
+            icon: 'error'
+        });
         }
     }
 }
@@ -582,20 +582,20 @@ async function responderSolicitud(idSolicitud, respuesta) {
             if (data.estado === 'rechazada') {
                 // Eliminar el elemento del DOM si fue rechazada
                 solicitudDiv.remove();
-                // Actualizar el contador de solicitudes
-                const solicitudesCount = document.getElementById('solicitudesCount');
-                const count = parseInt(solicitudesCount.textContent);
-                solicitudesCount.textContent = Math.max(0, count - 1);
-                // Si no hay más solicitudes, mostrar el mensaje
+            // Actualizar el contador de solicitudes
+            const solicitudesCount = document.getElementById('solicitudesCount');
+            const count = parseInt(solicitudesCount.textContent);
+            solicitudesCount.textContent = Math.max(0, count - 1);
+            // Si no hay más solicitudes, mostrar el mensaje
                 const container = document.getElementById('solicitudesContainer');
                 if (container.children.length === 0) {
-                    const noSolicitudes = document.getElementById('noSolicitudes');
+                const noSolicitudes = document.getElementById('noSolicitudes');
                     if (noSolicitudes) {
-                        container.innerHTML = '';
-                        noSolicitudes.style.display = 'block';
-                        container.appendChild(noSolicitudes);
-                    }
+                    container.innerHTML = '';
+                    noSolicitudes.style.display = 'block';
+                    container.appendChild(noSolicitudes);
                 }
+            }
             } else {
                 // Si fue aceptada, actualizar el badge
                 const actionsDiv = solicitudDiv.querySelector('.solicitud-actions');
@@ -926,11 +926,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
     if (btnSolicitudesPendientes) {
         btnSolicitudesPendientes.addEventListener('click', function(e) {
-            e.preventDefault();
-            const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
-            solicitudesModal.show();
-            cargarSolicitudesAmistad();
-        });
+        e.preventDefault();
+        const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
+        solicitudesModal.show();
+        cargarSolicitudesAmistad();
+    });
         // Actualizar el contador al cargar la página
         actualizarContadorSolicitudes();
     }
@@ -939,11 +939,11 @@ document.addEventListener('DOMContentLoaded', function() {
     const solicitudesModalEl = document.getElementById('solicitudesModal');
     if (solicitudesModalEl) {
         solicitudesModalEl.addEventListener('show.bs.modal', function () {
-            solicitudesInterval = setInterval(cargarSolicitudesAmistad, 30000);
-        });
+        solicitudesInterval = setInterval(cargarSolicitudesAmistad, 30000);
+    });
         solicitudesModalEl.addEventListener('hidden.bs.modal', function () {
-            clearInterval(solicitudesInterval);
-        });
+        clearInterval(solicitudesInterval);
+    });
     }
 
     // Al abrir el menú de opciones en el reto, actualizar el estado del botón de enviar solicitud
@@ -968,7 +968,7 @@ window.addEventListener('beforeunload', () => {
 });
 
 // Actualizar estado inicial
-mantenerEstado();
+mantenerEstado(); 
 
 async function actualizarContadorSolicitudes() {
     try {
