@@ -3,7 +3,7 @@
 <!-- Meta tags optimizados -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="user-id" content="{{ Auth::id() }}">
-<meta name="user-img" content="{{ Auth::user()->img ? 'https://g04.daw2j23.es' . Auth::user()->img : 'https://g04.daw2j23.es/img/profile_img/avatar-default.png' }}">
+<meta name="user-img" content="{{ Auth::user()->img ? '/img/profile_img/' . Auth::user()->img : '/img/profile_img/avatar-default.png' }}">
 
 <div class="main-container">
     <!-- Sidebar optimizado -->
@@ -177,5 +177,5 @@
 
 <!-- Script de inicialización -->
 <script>
-window.userImg = "{{ Auth::user()->img ? 'https://g04.daw2j23.es' . Auth::user()->img : 'https://g04.daw2j23.es/img/profile_img/avatar-default.png' }}";
+window.userImg = "{{ Auth::user()->img ? '/img/profile_img/' . Auth::user()->img : '/img/profile_img/avatar-default.png' }}";
 </script>
