@@ -163,7 +163,7 @@ async function buscarCompaneroAutomatico() {
                     if (window.actualizarUltimoMensaje) {
                         window.actualizarUltimoMensaje();
                     }
-                }, 8000);
+                }, 15000);
             }
             break;
             
