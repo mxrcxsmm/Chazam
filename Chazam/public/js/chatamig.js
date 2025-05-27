@@ -315,7 +315,9 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
-        const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
+        const imgPath = chat.img
+            ? `${window.location.origin}/img/profile_img/${chat.img}`
+            : `${window.location.origin}/img/profile_img/avatar-default.png`;
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
@@ -392,7 +394,9 @@ class ChatManager {
 
     // Creación de elemento de mensaje
     createMessageElement(msg) {
-        const imgSrc = msg.img ? msg.img : '/img/profile_img/avatar-default.png';
+        const imgSrc = msg.img
+            ? `${window.location.origin}/img/profile_img/${msg.img}`
+            : `${window.location.origin}/img/profile_img/avatar-default.png`;
         
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
@@ -508,7 +512,9 @@ class ChatManager {
         chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
         
         // Construir la ruta de la imagen correctamente
-        const imgPath = companero.img ? companero.img : '/img/profile_img/avatar-default.png';
+        const imgPath = companero.img
+            ? `${window.location.origin}/img/profile_img/${companero.img}`
+            : `${window.location.origin}/img/profile_img/avatar-default.png`;
         chatImg.src = imgPath;
         chatImg.onerror = function() {
             this.src = '/img/profile_img/avatar-default.png';
@@ -1008,7 +1014,9 @@ function cargarBloqueados() {
             } else {
                 bloqueados.forEach(user => {
                     // Generar ruta absoluta igual que en el backend
-                    const imgPath = user.img ? user.img : '/img/profile_img/avatar-default.png';
+                    const imgPath = user.img
+                        ? `${window.location.origin}/img/profile_img/${user.img}`
+                        : `${window.location.origin}/img/profile_img/avatar-default.png`;
                     const item = document.createElement('div');
                     item.className = 'list-group-item d-flex align-items-center justify-content-between';
                     item.innerHTML = `
@@ -1023,7 +1031,6 @@ function cargarBloqueados() {
             }
         });
 }
-
 function desbloquearUsuario(id, btn) {
     fetch('/amistades/desbloquear', {
         method: 'POST',
