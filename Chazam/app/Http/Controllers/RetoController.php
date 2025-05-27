@@ -596,8 +596,16 @@ class RetoController extends Controller
             $user = Auth::user();
             Log::info('Activando skip para usuario: ' . $user->id_usuario);
             
-            // Establecer el tiempo de skip a 10 minutos desde ahora
-            $tiempoSkip = Carbon::now()->addMinutes(10);
+            // Determinar el tiempo de cooldown según el rol del usuario
+            $tiempoCooldown = 10; // Tiempo por defecto en minutos
+            if ($user->id_rol == 3) {
+                $tiempoCooldown = 5; // 5 minutos para rol 3
+            } elseif ($user->id_rol == 2) {
+                $tiempoCooldown = 7.5; // 7.5 minutos para miembros (rol 2)
+            }
+            
+            // Establecer el tiempo de skip según el cooldown determinado
+            $tiempoSkip = Carbon::now()->addMinutes($tiempoCooldown);
             Log::info('Nuevo tiempo de skip: ' . $tiempoSkip->format('H:i:s'));
             
             // Actualizar usando Query Builder

@@ -674,7 +674,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const result = await Swal.fire({
                 title: '¿Estás seguro?',
-                text: 'Saltarás a este usuario y buscarás uno nuevo. Deberás esperar 10 minutos antes de poder usar el skip nuevamente.',
+                text: 'Saltarás a este usuario y buscarás uno nuevo. Deberás esperar antes de poder usar el skip nuevamente.',
                 icon: 'question',
                 showCancelButton: true,
                 confirmButtonText: 'Sí, saltar',
