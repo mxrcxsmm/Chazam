@@ -64,7 +64,7 @@ class UsersSeeder extends Seeder
                 'genero' => 'hombre',
                 'email' => 'carlos@example.com',
                 'password' => Hash::make('qweQWE123'),
-                'puntos' => 450,
+                'puntos' => 100000000,
                 'id_nacionalidad' => 3, // Colombiana
                 'id_rol' => 3,
                 'id_estado' => 2,
@@ -79,7 +79,7 @@ class UsersSeeder extends Seeder
                 'genero' => 'mujer',
                 'email' => 'ana@example.com',
                 'password' => Hash::make('qweQWE123'),
-                'puntos' => 470,
+                'puntos' => 100000000,
                 'id_nacionalidad' => 4, // Argentina
                 'id_rol' => 3,
                 'id_estado' => 2,
