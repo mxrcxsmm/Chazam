@@ -31,6 +31,7 @@
     <div class="chat-main">
         <div class="chat-header">
             <div class="chat-contact">
+
                 <img id="chat-contact-img" src="{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}" alt="Contact Avatar">
                 <div class="contact-info">
                     <h3 id="chat-contact-name">Usuario</h3>

@@ -52,7 +52,9 @@ class FriendChatController extends Controller
                     'id_usuario' => $compaUser ? $compaUser->id_usuario : null,
                     'nombre' => $compaUser ? $compaUser->nombre : 'Desconocido',
                     'username' => $compaUser ? $compaUser->username : 'Desconocido',
+
                     'img' => $imgUrl,
+
                     'last_message' => optional($chat->mensajes()->latest('fecha_envio')->first())->contenido,
                     'last_time' => optional($chat->mensajes()->latest('fecha_envio')->first())->fecha_envio?->format('H:i'),
                     'id_estado' => $compaUser ? $compaUser->id_estado : 2, // 2 = desconectado por defecto

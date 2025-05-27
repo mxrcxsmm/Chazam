@@ -49,10 +49,11 @@ async function cargarSolicitudesAmistad() {
             solicitudDiv.id = `solicitud-${solicitud.id_solicitud}`;
             solicitudDiv.innerHTML = `
                 <div class="solicitud-info">
-                    <img src="${solicitud.emisor.img || '/img/profile_img/avatar-default.png'}" 
+                    <img src="${solicitud.emisor.img}" 
                          alt="${solicitud.emisor.username}" 
                          class="rounded-circle"
-                         style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #ccc;">
+                         style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #ccc;"
+                         onerror="this.src='/img/profile_img/avatar-default.png'">
                     <span class="solicitud-username">${solicitud.emisor.username}</span>
                 </div>
                 <div class="solicitud-actions">
