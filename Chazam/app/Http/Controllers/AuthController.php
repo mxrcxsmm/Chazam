@@ -97,7 +97,7 @@ class AuthController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required|unique:users|max:10',
+            'username' => 'required|unique:users|max:15',
             'nombre' => ['required', 'max:100', 'regex:/^[\p{L}\s\-]+$/u'],
             'apellido' => ['required', 'max:100', 'regex:/^[\p{L}\s\-]+$/u'],
             'fecha_nacimiento' => 'required|date|before_or_equal:' . Carbon::now()->subYears(13)->format('Y-m-d'),
