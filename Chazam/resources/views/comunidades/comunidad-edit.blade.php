@@ -823,6 +823,9 @@
     {{-- Para que se vean bien los estados --}}
     <script src="{{ asset('js/estados.js') }}"></script>
     <script>
+        // Definir el ID de la comunidad
+        const communityId = {{ $comunidad->id_chat }};
+        
         // Inicializar Vanta
         VANTA.WAVES({
             el: "#vanta-bg",
@@ -841,8 +844,10 @@
             // Función para cargar los miembros
             async function loadMembers() {
                 try {
+                    console.log('Cargando miembros para comunidad:', communityId);
                     const response = await fetch(`/comunidades/${communityId}/members`);
                     const data = await response.json();
+                    console.log('Datos de miembros recibidos:', data);
                     
                     // Combinar creador y miembros
                     allMembers = [
@@ -861,14 +866,21 @@
                     });
                 } catch (error) {
                     console.error('Error al cargar miembros:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'No se pudieron cargar los miembros de la comunidad',
+                        confirmButtonColor: '#9147ff'
+                    });
                 }
             }
 
             // Función para renderizar los miembros
             function renderMembers(members) {
+                console.log('Renderizando miembros:', members);
                 membersList.innerHTML = members.map(member => `
                     <div class="member-card">
-                        <img src="${member.img}" alt="${member.username}" class="member-avatar">
+                        <img src="${member.img ? '/img/profile_img/' + member.img : '/img/default-avatar.png'}" alt="${member.username}" class="member-avatar">
                         <div class="member-info">
                             <h3 class="member-name">${member.username}</h3>
                             <p class="member-role">${member.isCreator ? 'Creador' : 'Miembro'}</p>
