@@ -37,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Inicialmente elimina el brillo si el valor es null
         if (!hiddenInput.value || hiddenInput.value === "null") {
             avatarWrapper.style.removeProperty('--glow-color');
+            hiddenInput.value = '';
         }
 
         // Color dinámico del brillo
@@ -67,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
     guardarBtn.addEventListener('click', async () => {
         const csrfToken = document.querySelector('input[name="_token"]').value;
         const marco = input.value;
-        const brillo = hiddenInput.value;
+        const brillo = hiddenInput.value || null;
         const rotacion = document.querySelector('input[name="rotacion"]:checked')?.value || '0';
         const sidebarColor = sidebarPicker.value;
 
@@ -96,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     confirmButtonColor: '#4B0082'
                 });
 
-                // 🔄 Actualizar el sidebar visualmente sin recargar
+                // Actualizar el sidebar visualmente sin recargar
                 const sidebarAvatar = document.getElementById('sidebarAvatar');
                 if (sidebarAvatar && avatarWrapper) {
                     // Marco
@@ -175,6 +176,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             hiddenInput.value = '';
                             picker.value = '#FFD700';
                             label.textContent = '#FFD700';
+
+                            const sidebarAvatar = document.getElementById('sidebarAvatar');
+                            if (sidebarAvatar) {
+                                sidebarAvatar.style.backgroundImage = "url('/img/bordes/default.svg')";
+                                sidebarAvatar.style.removeProperty('--glow-color');
+                                sidebarAvatar.classList.remove('marco-rotate');
+                            }
 
                             // Sidebar
                             sidebarPicker.value = '#4B0082';

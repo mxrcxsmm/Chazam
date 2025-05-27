@@ -72,5 +72,4 @@ class VistaController extends Controller
 
         return response()->json(['message' => 'Personalización restablecida.']);
     }
-
 }
