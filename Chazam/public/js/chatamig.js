@@ -50,8 +50,8 @@ async function cargarSolicitudesAmistad() {
             
             // Construir la ruta de la imagen correctamente
             const imgPath = solicitud.emisor.img ? 
-                `${window.location.origin}/img/profile_img/${solicitud.emisor.img.replace('/img/profile_img/', '')}` : 
-                `${window.location.origin}/img/profile_img/avatar-default.png`;
+                solicitud.emisor.img : 
+                '/img/profile_img/avatar-default.png';
 
             solicitudDiv.innerHTML = `
                 <div class="solicitud-info">
@@ -59,7 +59,7 @@ async function cargarSolicitudesAmistad() {
                          alt="${solicitud.emisor.username}" 
                          class="rounded-circle"
                          style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #ccc;"
-                         onerror="this.src='${window.location.origin}/img/profile_img/avatar-default.png'">
+                         onerror="this.src='${imgPath}'">
                     <span class="solicitud-username">${solicitud.emisor.username}</span>
                 </div>
                 <div class="solicitud-actions">
@@ -315,7 +315,7 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
-        const imgPath = chat.img ? `${window.location.origin}/img/profile_img/${chat.img.replace('/img/profile_img/', '')}` : '/img/profile_img/avatar-default.png';
+        const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
@@ -392,7 +392,7 @@ class ChatManager {
 
     // Creación de elemento de mensaje
     createMessageElement(msg) {
-        const imgSrc = msg.img ? `${window.location.origin}/img/profile_img/${msg.img.replace('/img/profile_img/', '')}` : '/img/profile_img/avatar-default.png';
+        const imgSrc = msg.img ? msg.img : '/img/profile_img/avatar-default.png';
         
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
@@ -508,7 +508,7 @@ class ChatManager {
         chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
         
         // Construir la ruta de la imagen correctamente
-        const imgPath = companero.img ? `${window.location.origin}/img/profile_img/${companero.img.replace('/img/profile_img/', '')}` : '/img/profile_img/avatar-default.png';
+        const imgPath = companero.img ? companero.img : '/img/profile_img/avatar-default.png';
         chatImg.src = imgPath;
         chatImg.onerror = function() {
             this.src = '/img/profile_img/avatar-default.png';
@@ -900,7 +900,7 @@ class ChatManager {
 
             searchResults.innerHTML = data.map(user => `
                 <div class="user-result">
-                    <img src="${user.img ? `${window.location.origin}/img/profile_img/${user.img.replace('/img/profile_img/', '')}` : '/img/profile_img/avatar-default.png'}" alt="${user.username}">
+                    <img src="${user.img ? user.img : '/img/profile_img/avatar-default.png'}" alt="${user.username}">
                     <div class="user-info">
                         <h6>${user.username}</h6>
                         <p>${user.nombre_completo}</p>
@@ -1008,7 +1008,7 @@ function cargarBloqueados() {
             } else {
                 bloqueados.forEach(user => {
                     // Generar ruta absoluta igual que en el backend
-                    const imgPath = user.img ? `${window.location.origin}/img/profile_img/${user.img.replace('/img/profile_img/', '')}` : '/img/profile_img/avatar-default.png';
+                    const imgPath = user.img ? user.img : '/img/profile_img/avatar-default.png';
                     const item = document.createElement('div');
                     item.className = 'list-group-item d-flex align-items-center justify-content-between';
                     item.innerHTML = `
