@@ -321,6 +321,78 @@ h4 {
     font-size: 24px;
 }
 
+
+/* CSS MODAL CAMERA */
+.modal {
+    background: transparent !important;
+    box-shadow: none !important;
+    max-width: 500px !important;
+    width: 90% !important;
+    overflow: visible !important;
+    max-height: 95vh !important;
+}
+
+.modal .modal-content {
+    background-color: #d99cec;
+    padding: 24px;
+    border-radius: 15px;
+    overflow: visible !important;
+    max-height: 90vh;
+}
+
+.camera-container {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    overflow: visible !important;
+}
+
+#video {
+    background-color: #000;
+    border: 2px solid #703ea3;
+    max-height: 350px;
+    width: auto;
+    display: block;
+    margin: 0 auto;
+}
+
+.camera-controls .btn {
+    border-radius: 20px;
+    padding: 0 20px;
+}
+
+.camera-controls .btn i {
+    margin-right: 5px;
+}
+
+.image-upload-container {
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 15px;
+    border-radius: 10px;
+}
+
+.image-upload-container .btn {
+    border-radius: 20px;
+    padding: 0 20px;
+}
+
+.image-upload-container .btn i {
+    margin-right: 5px;
+}
+
+.file-path-wrapper {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+
+.file-path-wrapper input {
+    margin: 0;
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
+
+/* RESPONSIVE */
 @media (max-width: 600px) {
     html, body {
         height: 100%;
@@ -377,6 +449,7 @@ h4 {
     }
 }
 
+/* RESPONSIVE (Escritorio) */
 @media (min-width: 601px) {
     .login-container.wider {
         max-height: 90vh;
