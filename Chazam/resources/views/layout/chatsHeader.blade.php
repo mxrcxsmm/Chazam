@@ -55,7 +55,7 @@
                 </button>
 
                 <!-- Botón para abrir el menú -->
-                <button class="btn btn-outline-dark" onclick="toggleSidebar()">
+                <button class="btn btn-outline-dark" id="btnMenu" onclick="toggleSidebar()">
                     @if(isset($imagen_perfil) && $imagen_perfil)
                     <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
                     @else
