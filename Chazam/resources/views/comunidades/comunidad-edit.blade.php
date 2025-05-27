@@ -5,6 +5,132 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Detalles de {{ $comunidad->nombre }}</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Script para funciones globales -->
+    <script>
+        window.confirmarAbandono = function(id) {
+            console.log('Iniciando confirmarAbandono con id:', id);
+            Swal.fire({
+                title: '¿Abandonar comunidad?',
+                text: "¿Estás seguro de que quieres abandonar esta comunidad?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#9147ff',
+                confirmButtonText: 'Sí, abandonar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    console.log('Usuario confirmó abandonar comunidad');
+                    const token = document.querySelector('meta[name="csrf-token"]').content;
+                    console.log('Token CSRF:', token);
+                    
+                    fetch(`/comunidades/${id}/abandonar`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        console.log('Respuesta del servidor:', response);
+                        if (!response.ok) {
+                            throw new Error(`Error HTTP: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Datos recibidos:', data);
+                        if (data.success) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: '¡Abandonada!',
+                                text: data.message,
+                                confirmButtonColor: '#9147ff'
+                            }).then(() => {
+                                window.location.href = '/comunidades';
+                            });
+                        } else {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: data.message || 'No se pudo abandonar la comunidad',
+                                confirmButtonColor: '#9147ff'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error completo:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Hubo un error al abandonar la comunidad: ' + error.message,
+                            confirmButtonColor: '#9147ff'
+                        });
+                    });
+                }
+            });
+        };
+
+        window.confirmarEliminacion = function(id) {
+            Swal.fire({
+                title: '¿Estás seguro?',
+                text: "Esta acción eliminará la comunidad y todos sus mensajes. No se puede deshacer.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#9147ff',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const token = document.querySelector('meta[name="csrf-token"]').content;
+                    
+                    fetch(`/comunidades/${id}/eliminar`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': token,
+                            'Accept': 'application/json'
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Error en la respuesta del servidor');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            Swal.fire({
+                                title: '¡Eliminada!',
+                                text: data.message,
+                                icon: 'success'
+                            }).then(() => {
+                                window.location.href = '/comunidades';
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: data.message || 'No se pudo eliminar la comunidad',
+                                icon: 'error'
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Hubo un error al eliminar la comunidad',
+                            icon: 'error'
+                        });
+                    });
+                }
+            });
+        };
+    </script>
     <!-- Materialize CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
     <!-- Material Icons -->
@@ -13,8 +139,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- SweetAlert2 -->
-    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/comunidades-form.css') }}">
     <style>
         .comunidad-container {
@@ -694,13 +818,12 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vanta/dist/vanta.waves.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Bootstrap JS (incluye Popper) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     {{-- Para que se vean bien los estados --}}
     <script src="{{ asset('js/estados.js') }}"></script>
     <script>
+        // Inicializar Vanta
         VANTA.WAVES({
             el: "#vanta-bg",
             color: 0x703ea3,
@@ -710,67 +833,10 @@
             zoom: 0.8
         });
 
-        // Función para confirmar eliminación de comunidad
-        function confirmarEliminacion(id) {
-            Swal.fire({
-                title: '¿Estás seguro?',
-                text: "Esta acción eliminará la comunidad y todos sus mensajes. No se puede deshacer.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#9147ff',
-                confirmButtonText: 'Sí, eliminar',
-                cancelButtonText: 'Cancelar'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    fetch(`/comunidades/${id}/eliminar`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Error en la respuesta del servidor');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data.success) {
-                            Swal.fire({
-                                title: '¡Eliminada!',
-                                text: data.message,
-                                icon: 'success'
-                            }).then(() => {
-                                window.location.href = '/comunidades';
-                            });
-                        } else {
-                            Swal.fire({
-                                title: 'Error',
-                                text: data.message || 'No se pudo eliminar la comunidad',
-                                icon: 'error'
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'Hubo un error al eliminar la comunidad',
-                            icon: 'error'
-                        });
-                    });
-                }
-            });
-        }
-
         document.addEventListener('DOMContentLoaded', function() {
             const memberSearch = document.getElementById('memberSearch');
             const membersList = document.getElementById('membersList');
             let allMembers = [];
-            const communityId = {{ $comunidad->id_chat }};
 
             // Función para cargar los miembros
             async function loadMembers() {
@@ -1042,69 +1108,7 @@
                     }
                 });
             };
-
-            function confirmarAbandono(id) {
-                Swal.fire({
-                    title: '¿Abandonar comunidad?',
-                    text: "¿Estás seguro de que quieres abandonar esta comunidad?",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#9147ff',
-                    confirmButtonText: 'Sí, abandonar',
-                    cancelButtonText: 'Cancelar'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        console.log('Enviando petición para abandonar comunidad:', id);
-                        
-                        fetch(`/comunidades/${id}/abandonar`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                                'Accept': 'application/json'
-                            },
-                            body: JSON.stringify({ _token: document.querySelector('meta[name="csrf-token"]').content })
-                        })
-                        .then(response => {
-                            console.log('Respuesta recibida:', response);
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Datos recibidos:', data);
-                            if (data.success) {
-                                Swal.fire({
-                                    icon: 'success',
-                                    title: '¡Abandonada!',
-                                    text: data.message,
-                                    confirmButtonColor: '#9147ff'
-                                }).then(() => {
-                                    window.location.href = '/comunidades';
-                                });
-                            } else {
-                                Swal.fire({
-                                    icon: 'error',
-                                    title: 'Error',
-                                    text: data.message || 'No se pudo abandonar la comunidad',
-                                    confirmButtonColor: '#9147ff'
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error en la petición:', error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Error',
-                                text: 'Hubo un error al abandonar la comunidad',
-                                confirmButtonColor: '#9147ff'
-                            });
-                        });
-                    }
-                });
-            }
         });
     </script>
 </body>
 </html>
-
-
