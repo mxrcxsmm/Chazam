@@ -126,7 +126,7 @@ class MomentmsController extends Controller
             'fecha_inicio_diff' => $momentm->fecha_inicio->diffForHumans(),
             'usuario' => [
                 'username' => $momentm->usuario->username,
-                'img' => $momentm->usuario->img ?? '/img/profile_img/avatar-default.png'
+                'img' => $momentm->usuario->img ? basename($momentm->usuario->img) : null
             ]
         ]);
     }
@@ -238,13 +238,13 @@ class MomentmsController extends Controller
         return response()->json($momentms->map(function($m) {
             return [
                 'id' => $m->id_historia,
-                'img' => asset($m->img),
+                'img' => $m->img,
                 'fecha_inicio' => $m->fecha_inicio->diffForHumans(),
                 'usuario' => [
                     'username' => $m->usuario->username,
                     'nombre' => $m->usuario->nombre,
                     'apellido' => $m->usuario->apellido,
-                    'img' => $m->usuario->img ? asset($m->usuario->img) : asset('/img/profile_img/avatar-default.png'),
+                    'img' => $m->usuario->img ? basename($m->usuario->img) : null,
                     'id_usuario' => $m->usuario->id_usuario,
                 ]
             ];

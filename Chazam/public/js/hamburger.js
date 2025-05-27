@@ -25,9 +25,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 amistades.forEach(amigo => {
                     const amigoItem = document.createElement('div');
                     amigoItem.className = 'list-group-item d-flex justify-content-between align-items-center';
+                    const imgPath = getProfileImgPath(amigo.img);
                     amigoItem.innerHTML = `
                         <div class="d-flex align-items-center">
-                            <img src="${amigo.img ? (amigo.img.startsWith('http') ? amigo.img : window.location.origin + '/img/profile_img/' + amigo.img.replace(/^.*[\\\/]/, '')) : '/img/profile_img/avatar-default.png'}" 
+                            <img src="${imgPath}" 
                                  class="rounded-circle me-2" 
                                  style="width: 40px; height: 40px; object-fit: cover;">
                             <div>
@@ -155,4 +156,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.eliminarAmigo = eliminarAmigo;
     window.bloquearAmigo = bloquearAmigo;
+
+    function getProfileImgPath(img) {
+        if (!img || img === 'avatar-default.png' || img === '/img/profile_img/avatar-default.png') {
+            return `${window.location.origin}/img/profile_img/avatar-default.png`;
+        }
+        if (img.startsWith('http')) {
+            return img;
+        }
+        const cleanImg = img.replace(/^\/?img\/profile_img\//, '');
+        return `${window.location.origin}/img/profile_img/${cleanImg}`;
+    }
 });

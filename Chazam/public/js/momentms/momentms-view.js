@@ -31,6 +31,17 @@ document.addEventListener('DOMContentLoaded', function() {
         return '/' + path;
     }
 
+    function getProfileImgPath(img) {
+        if (!img || img === 'avatar-default.png' || img === '/img/profile_img/avatar-default.png') {
+            return `${window.location.origin}/img/profile_img/avatar-default.png`;
+        }
+        if (img.startsWith('http')) {
+            return img;
+        }
+        const cleanImg = img.replace(/^\/?img\/profile_img\//, '');
+        return `${window.location.origin}/img/profile_img/${cleanImg}`;
+    }
+
     // Obtener todos los momentms al cargar
     function getAllMomentms() {
         const cards = document.querySelectorAll('.momentm-card');
@@ -110,8 +121,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateModalContent(momentm) {
-        console.log('Avatar:', momentm.usuario.img);
-        document.querySelector('.momentm-user-avatar').src = momentm.usuario.img || '/img/profile_img/default.png';
+        document.querySelector('.momentm-user-avatar').src = getProfileImgPath(momentm.usuario.img);
         document.querySelector('.momentm-user-name').textContent = momentm.usuario.username;
         document.querySelector('.momentm-time').textContent = momentm.fecha_inicio_diff;
         document.querySelector('.momentm-full-image').src = getAssetUrl(momentm.img);
@@ -255,11 +265,11 @@ document.addEventListener('DOMContentLoaded', function() {
             section.innerHTML += `
                 <div class="momentm-card" data-momentm-id="${m.id}">
                     <div class="momentm-preview">
-                        <img src="${m.img}" alt="Momentm de ${m.usuario.username}">
+                        <img src="${getAssetUrl(m.img)}" alt="Momentm de ${m.usuario.username}">
                     </div>
                     <div class="momentm-info">
                         <div class="momentm-avatar">
-                            <img src="${m.usuario.img}" alt="Avatar de ${m.usuario.username}">
+                            <img src="${getProfileImgPath(m.usuario.img)}" alt="Avatar de ${m.usuario.username}">
                         </div>
                         <p class="momentm-username">${m.usuario.username}</p>
                         <p class="momentm-time">${m.fecha_inicio}</p>

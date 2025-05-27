@@ -307,7 +307,7 @@ class ComunidadesController extends Controller
                 return [
                     'id_usuario' => $chatUsuario->usuario->id_usuario,
                     'username' => $chatUsuario->usuario->username,
-                    'img' => $chatUsuario->usuario->img ? asset('img/profile_img/' . $chatUsuario->usuario->img) : asset('img/profile_img/avatar-default.png'),
+                    'img' => $chatUsuario->usuario->img ? basename($chatUsuario->usuario->img) : null,
                     'status' => $chatUsuario->usuario->id_estado == 1 ? 'online' : 'offline'
                 ];
             });
@@ -316,7 +316,7 @@ class ComunidadesController extends Controller
             'creator' => [
                 'id_usuario' => $comunidad->creador->id_usuario,
                 'username' => $comunidad->creador->username,
-                'img' => $comunidad->creador->img ? asset('img/profile_img/' . $comunidad->creador->img) : asset('img/profile_img/avatar-default.png'),
+                'img' => $comunidad->creador->img ? basename($comunidad->creador->img) : null,
                 'status' => $comunidad->creador->id_estado == 1 ? 'online' : 'offline'
             ],
             'members' => $members
@@ -346,7 +346,7 @@ class ComunidadesController extends Controller
                     'contenido' => $mensaje->contenido,
                     'fecha_envio' => $mensaje->fecha_envio->format('H:i'),
                     'usuario' => $mensaje->chatUsuario->usuario->username,
-                    'img' => $mensaje->chatUsuario->usuario->img ? asset('img/profile_img/' . $mensaje->chatUsuario->usuario->img) : asset('img/profile_img/avatar-default.png'),
+                    'img' => $mensaje->chatUsuario->usuario->img ? basename($mensaje->chatUsuario->usuario->img) : null,
                     'es_mio' => $mensaje->chatUsuario->id_usuario == Auth::id(),
                 ];
             });
@@ -702,7 +702,7 @@ class ComunidadesController extends Controller
                         'emisor' => [
                             'id' => $solicitud->emisor->id_usuario,
                             'username' => $solicitud->emisor->username,
-                            'img' => $solicitud->emisor->img ? asset('img/profile_img/' . $solicitud->emisor->img) : asset('img/profile_img/avatar-default.png')
+                            'img' => $solicitud->emisor->img ? basename($solicitud->emisor->img) : null
                         ]
                     ];
                 });
