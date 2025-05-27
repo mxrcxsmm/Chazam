@@ -211,7 +211,7 @@ class SolicitudUserController extends Controller
                     'emisor' => [
                         'id_usuario' => $solicitud->emisor->id_usuario,
                         'username' => $solicitud->emisor->username,
-                        'img' => $solicitud->emisor->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', $solicitud->emisor->img)) : asset('img/profile_img/avatar-default.png')
+                        'img' => $solicitud->emisor->img ? basename($solicitud->emisor->img) : null
                     ]
                 ];
             });
