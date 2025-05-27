@@ -41,25 +41,23 @@ class FriendChatController extends Controller
                 $compaUser = $compa ? $compa->usuario : null;
                 
                 // Construir la URL de la imagen correctamente
-                $imgUrl = asset('img/profile_img/avatar-default.png');
+                $imgPath = null;
                 if ($compaUser && $compaUser->img) {
                     $imgPath = basename($compaUser->img);
-                    $imgUrl = asset('img/profile_img/' . $imgPath);
                 }
                 
                 return [
                     'id_chat' => $chat->id_chat,
+                    'username' => $compaUser ? $compaUser->username : 'Usuario',
+                    'nombre' => $compaUser ? $compaUser->nombre . ' ' . $compaUser->apellido : '',
+                    'img' => $imgPath,
                     'id_usuario' => $compaUser ? $compaUser->id_usuario : null,
-                    'nombre' => $compaUser ? $compaUser->nombre : 'Desconocido',
-                    'username' => $compaUser ? $compaUser->username : 'Desconocido',
-
-                    'img' => $imgUrl,
-
-                    'last_message' => optional($chat->mensajes()->latest('fecha_envio')->first())->contenido,
-                    'last_time' => optional($chat->mensajes()->latest('fecha_envio')->first())->fecha_envio?->format('H:i'),
-                    'id_estado' => $compaUser ? $compaUser->id_estado : 2, // 2 = desconectado por defecto
+                    'id_estado' => $compaUser ? $compaUser->id_estado : null,
+                    'last_message' => $chat->last_message,
+                    'last_time' => $chat->last_time
                 ];
             });
+
         return response()->json($chats);
     }
 

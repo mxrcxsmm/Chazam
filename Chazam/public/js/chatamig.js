@@ -309,7 +309,7 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
-        const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
+        const imgPath = chat.img ? `${window.location.origin}/img/profile_img/${chat.img.replace('/img/profile_img/', '')}` : '/img/profile_img/avatar-default.png';
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
@@ -386,7 +386,7 @@ class ChatManager {
 
     // Creación de elemento de mensaje
     createMessageElement(msg) {
-        const imgSrc = msg.img ? msg.img : '/img/profile_img/avatar-default.png';
+        const imgSrc = msg.img ? `${window.location.origin}/img/profile_img/${msg.img.replace('/img/profile_img/', '')}` : '/img/profile_img/avatar-default.png';
         
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
@@ -502,7 +502,7 @@ class ChatManager {
         chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
         
         // Construir la ruta de la imagen correctamente
-        const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : '/img/profile_img/avatar-default.png';
+        const imgPath = companero.img ? `${window.location.origin}/img/profile_img/${companero.img.replace('/img/profile_img/', '')}` : '/img/profile_img/avatar-default.png';
         chatImg.src = imgPath;
         chatImg.onerror = function() {
             this.src = '/img/profile_img/avatar-default.png';
@@ -894,7 +894,7 @@ class ChatManager {
 
             searchResults.innerHTML = data.map(user => `
                 <div class="user-result">
-                    <img src="${user.img}" alt="${user.username}">
+                    <img src="${user.img ? `${window.location.origin}/img/profile_img/${user.img.replace('/img/profile_img/', '')}` : '/img/profile_img/avatar-default.png'}" alt="${user.username}">
                     <div class="user-info">
                         <h6>${user.username}</h6>
                         <p>${user.nombre_completo}</p>

@@ -35,11 +35,12 @@ class UserSearchController extends Controller
             ->limit(10)
             ->get()
             ->map(function($user) {
+                $imgPath = $user->img ? basename($user->img) : null;
                 return [
                     'id_usuario' => $user->id_usuario,
                     'username' => $user->username,
                     'nombre_completo' => $user->nombre . ' ' . $user->apellido,
-                    'img' => $user->img ? asset('img/profile_img/' . basename($user->img)) : asset('img/profile_img/avatar-default.png')
+                    'img' => $imgPath
                 ];
             });
 
