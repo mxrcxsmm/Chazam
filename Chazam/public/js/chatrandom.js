@@ -692,8 +692,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
 
                     if (data.success) {
-                         console.log('Skip activado exitosamente.');
-                         // Resetear variables de chat
+                        // Obtener el tiempo de cooldown según el rol del usuario
+                        const userRole = document.querySelector('meta[name="user-role"]')?.content;
+                        let tiempoCooldown = '10 minutos';
+                        if (userRole === '3') {
+                            tiempoCooldown = '5 minutos';
+                        } else if (userRole === '2') {
+                            tiempoCooldown = '7.5 minutos';
+                        }
+
+                        Swal.fire({
+                            title: 'Skip activado',
+                            text: `Has saltado al siguiente usuario. Deberás esperar ${tiempoCooldown} antes de poder usar el skip nuevamente.`,
+                            icon: 'success'
+                        });
+                        // Resetear variables de chat
                         chatId = null;
                         companero = null;
                         buscandoCompanero = true;

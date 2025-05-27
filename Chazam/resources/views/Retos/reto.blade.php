@@ -1,6 +1,7 @@
 @include('layout.chatsHeader')
 
 <meta name="user-id" content="{{ Auth::user()->id_usuario }}">
+<meta name="user-role" content="{{ Auth::user()->id_rol }}">
 
 <!-- Sidebar del reto-->
 <div id="sidebar2" class="bg-purple text-white p-4">
