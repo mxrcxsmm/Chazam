@@ -29,13 +29,21 @@ class AppServiceProvider extends ServiceProvider
         View::composer('*', function ($view) {
             if (Auth::check()) {
                 $user = Auth::user();
+                $personalizacion = $user->personalizacion;
+        
                 $view->with('user', $user);
-                $view->with('personalizacion', $user->personalizacion);
+                $view->with('personalizacion', $personalizacion);
                 $view->with('racha', $user->racha);
                 $view->with('puntos', $user->puntos);
                 $view->with('username', $user->username);
                 $view->with('nombre_completo', $user->nombre_completo);
                 $view->with('imagen_perfil', $user->imagen_perfil);
+        
+                // Desglosar campos por separado
+                $view->with('marco', optional($personalizacion)->marco ?? 'default.svg');
+                $view->with('brillo', optional($personalizacion)->brillo ?? null);
+                $view->with('rotacion', optional($personalizacion)->rotacion ?? false);
+                $view->with('sidebar', optional($personalizacion)->sidebar ?? '#4B0082');
             } else {
                 $view->with('user', null);
                 $view->with('personalizacion', null);
@@ -44,7 +52,13 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('username', '');
                 $view->with('nombre_completo', '');
                 $view->with('imagen_perfil', asset('images/avatar-default.png'));
+        
+                // Defaults seguros
+                $view->with('marco', 'default.svg');
+                $view->with('brillo', null);
+                $view->with('rotacion', false);
+                $view->with('sidebar', '#4B0082');
             }
-        });
+        });        
     }
 }

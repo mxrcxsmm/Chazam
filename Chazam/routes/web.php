@@ -126,6 +126,7 @@ Route::middleware(['auth'])->group(function () {
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {
         Route::get('reto', [RetoController::class, 'show'])->name('reto');
+        // Route::view('guide', 'Retos.guide')->name('guide');
         Route::get('guide', function () {
             $user = Auth::user();
             return view('Retos.guide', [

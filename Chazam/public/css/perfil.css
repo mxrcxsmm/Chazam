@@ -330,10 +330,7 @@ canvas {
 }
 
 .marco-externo {
-    width: 130px;
-    height: 130px;
     border-radius: 50%;
-    padding: 5px;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -342,11 +339,54 @@ canvas {
     justify-content: center;
 }
 
+/* Estilos específicos solo para el avatar de vista.blade */
+#previewAvatar {
+    width: 130px;
+    height: 130px;
+    padding: 5px;
+}
+
+#sidebarAvatar {
+    width: 90px;
+    height: 90px;
+    padding: 3px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#sidebarAvatar .avatar-img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    position: relative;
+    top: 3.9px;
+    left: 0.1px;
+}
+
 .avatar-img {
     width: 100%;
     height: 100%;
     border-radius: 50%;
     object-fit: cover;
+}
+
+/* Avatar del sidebar (más pequeño y bien proporcionado) */
+#sidebarGeneral {
+    width: 80px;
+    height: 80px;
+    padding: 3px;
 }
 
 .marco-glow {
@@ -433,7 +473,6 @@ input[type="color"]::-webkit-color-swatch {
     cursor: pointer;
 }
 
-
 /*.marco-default {
     background-image: url('/IMG/bordes/default.svg');
 }
@@ -467,3 +506,4 @@ input[type="color"]::-webkit-color-swatch {
 .marco-estrellas-haikei {
     background-image: url('/IMG/bordes/estrellas-haikei.svg');
 }*/
+

@@ -4,20 +4,7 @@
 <div class="perfil-container">
     <h1 class="titulo">Personalizar</h1>
 
-    @php
-        $claseMarco = 'marco-glow';
-        $presets = [
-            '#FFD700' => 'Dorado',
-            '#FF0000' => 'Rojo Demonio',
-            '#00FFFF' => 'Cian Eléctrico',
-            '#9400D3' => 'Violeta Oscuro',
-            '#00FF00' => 'Verde Alien',
-            '#FF69B4' => 'Rosa Neon',
-            '#00BFFF' => 'Azul Intenso'
-        ];
-    @endphp
-
-    <div class="marco-externo {{ $claseMarco }}"
+    <div id="previewAvatar" class="marco-externo marco-glow"
     style="
         background-image: url('{{ asset('img/bordes/' . ($personalizacion->marco ?? 'default.svg')) }}');
         @if($personalizacion->brillo)
