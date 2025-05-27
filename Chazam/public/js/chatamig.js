@@ -48,10 +48,10 @@ async function cargarSolicitudesAmistad() {
             solicitudDiv.className = 'solicitud-item';
             solicitudDiv.id = `solicitud-${solicitud.id_solicitud}`;
             
-            // Construir la ruta de la imagen correctamente
-            const imgPath = solicitud.emisor.img ? 
-                solicitud.emisor.img : 
-                '/img/profile_img/avatar-default.png';
+            // SOLO aquí construimos la ruta completa
+            const imgPath = solicitud.emisor.img
+                ? `${window.location.origin}/img/profile_img/${solicitud.emisor.img}`
+                : `${window.location.origin}/img/profile_img/avatar-default.png`;
 
             solicitudDiv.innerHTML = `
                 <div class="solicitud-info">
@@ -59,7 +59,7 @@ async function cargarSolicitudesAmistad() {
                          alt="${solicitud.emisor.username}" 
                          class="rounded-circle"
                          style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #ccc;"
-                         onerror="this.src='${imgPath}'">
+                         onerror="this.src='${window.location.origin}/img/profile_img/avatar-default.png'">
                     <span class="solicitud-username">${solicitud.emisor.username}</span>
                 </div>
                 <div class="solicitud-actions">
