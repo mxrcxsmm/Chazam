@@ -33,12 +33,12 @@
                     <form action="{{ route('auth.login') }}" method="POST">
                         @csrf
                         <div class="input-field">
-                            <input id="email" name="email" type="email" class="validate" required autocomplete="email">
+                            <input id="email" name="email" type="email" class="validate">
                             <label for="email">Email</label>
                         </div>
 
                         <div class="input-field">
-                            <input id="password" name="password" type="password" class="validate" required autocomplete="current-password">
+                            <input id="password" name="password" type="password" class="validate">
                             <label for="password">Password</label>
                         </div>
 
@@ -133,13 +133,42 @@
                         <!-- Cuarta fila -->
                         <div class="row">
                             <!-- Imagen -->
-                            <div class="file-field input-field col s12">
-                                <div class="btn btn-small purple">
-                                    <span>Foto</span>
-                                    <input type="file" name="img" accept="image/jpeg,image/png">
+                            <div class="input-field col s12">
+                                <div class="image-upload-container" style="display: flex; flex-direction: column; gap: 10px;">
+                                    <div style="display: flex; gap: 10px;">
+                                        <button type="button" class="btn purple" id="uploadBtn">
+                                            <i class="material-icons left">upload_file</i>
+                                            Subir foto
+                                        </button>
+                                        <button type="button" class="btn purple" id="cameraBtn">
+                                            <i class="material-icons left">camera_alt</i>
+                                            Tomar foto
+                                        </button>
+                                    </div>
+                                    <input type="file" id="imageInput" name="img" accept="image/jpeg,image/png" style="display: none;">
+                                    <div id="preview-container" style="margin-top: 10px; text-align: center;">
+                                        <img id="preview-img" src="" style="max-width: 120px; display: none; border-radius: 10px; border: 2px solid #703ea3;">
+                                    </div>
                                 </div>
-                                <div class="file-path-wrapper">
-                                    <input class="file-path validate" type="text">
+                            </div>
+                        </div>
+
+                        <!-- Modal de cámara -->
+                        <div id="cameraModal" class="modal">
+                            <div class="modal-content">
+                                <h4 style="color: #703ea3; text-align: center;">Tomar foto</h4>
+                                <div class="camera-container" style="display: flex; flex-direction: column; align-items: center;">
+                                    <video id="video" autoplay playsinline style="width: 100%; max-width: 400px; border-radius: 10px;"></video>
+                                    <div class="camera-controls" style="margin-top: 20px; display: flex; gap: 10px;">
+                                        <button type="button" id="captureBtn" class="btn purple">
+                                            <i class="material-icons left">camera_alt</i>
+                                            Capturar
+                                        </button>
+                                        <button type="button" id="closeCamera" class="btn grey">
+                                            <i class="material-icons left">close</i>
+                                            Cerrar
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
