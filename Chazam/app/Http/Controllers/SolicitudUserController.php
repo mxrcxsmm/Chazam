@@ -204,7 +204,17 @@ class SolicitudUserController extends Controller
             }])
             ->where('id_receptor', Auth::id())
             ->where('estado', 'pendiente')
-            ->get();
+            ->get()
+            ->map(function($solicitud) {
+                return [
+                    'id_solicitud' => $solicitud->id_solicitud,
+                    'emisor' => [
+                        'id_usuario' => $solicitud->emisor->id_usuario,
+                        'username' => $solicitud->emisor->username,
+                        'img' => $solicitud->emisor->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', $solicitud->emisor->img)) : asset('img/profile_img/avatar-default.png')
+                    ]
+                ];
+            });
 
             return response()->json($solicitudes);
         } catch (\Exception $e) {
