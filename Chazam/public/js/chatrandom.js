@@ -15,6 +15,8 @@ async function safeFetch(url, options = {}) {
     try {
         const response = await fetch(url, options);
         if (!response.ok) {
+             const errorBody = await response.text();
+             console.error(`Error HTTP! estado: ${response.status} URL: ${url} Cuerpo: ${errorBody}`);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return await response.json();
@@ -30,23 +32,35 @@ let companero = null;
 let buscandoCompanero = true;
 let usuarioReportadoId = null;
 let ultimoSkip = null;
-let pollingIntervalId = null;
-let solicitudesIntervalId = null;
-let estadoIntervalId = null;
+let pollingIntervalId = null; // Intervalo principal para cargar mensajes y estado del chat
+let solicitudesIntervalId = null; // Intervalo para solicitudes (manejado en estados.js o chatamig.js?) - Mantener si se usa aquí
+let estadoIntervalId = null; // Intervalo para estado general (manejado en estados.js) - Mantener si se usa aquí
+let lastMessageId = 0; // Para rastrear el último mensaje cargado
+
+// Definir intervalos de polling en un solo lugar para fácil ajuste
+const INTERVALO_POLLING_CHAT = 5000; // Aumentado a 5 segundos para el chat
 
 // Función para limpiar todos los intervalos
 function limpiarIntervalos() {
     if (pollingIntervalId) {
         clearInterval(pollingIntervalId);
         pollingIntervalId = null;
+         console.log('Intervalo de polling del chat detenido.');
     }
-    if (solicitudesIntervalId) {
+    // Deberías detener también los intervalos de solicitudes y estado si se inician aquí
+    if (solicitudesIntervalId) { // Asumiendo que podrías tener uno aquí o en otro archivo
         clearInterval(solicitudesIntervalId);
         solicitudesIntervalId = null;
+         console.log('Intervalo de solicitudes detenido.');
     }
-    if (estadoIntervalId) {
+     if (estadoIntervalId) { // Asumiendo que podrías tener uno aquí o en otro archivo
         clearInterval(estadoIntervalId);
         estadoIntervalId = null;
+         console.log('Intervalo de estado detenido.');
+     }
+    // Llama a detenerControlInactividad de estados.js si existe
+    if (window.detenerControlInactividad) {
+        window.detenerControlInactividad();
     }
 }
 
@@ -111,12 +125,33 @@ async function actualizarBotonSkip() {
 async function buscarCompaneroAutomatico() {
     if (chatId) return;
 
-    if (window.detenerControlInactividad) {
-        window.detenerControlInactividad();
-    }
-    
+    // Limpiar intervalos existentes antes de buscar
     limpiarIntervalos();
 
+    const chatHeader = document.getElementById('chatHeader');
+    const chatOptions = document.getElementById('chatOptions');
+    const mensajesContainer = document.getElementById('mensajesContainer');
+
+     // Mostrar estado de búsqueda
+    if (chatHeader) {
+         chatHeader.innerHTML = `
+             <div class="d-flex align-items-center">
+                 <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                     <span class="visually-hidden">Cargando...</span>
+                 </div>
+                 Buscando usuarios disponibles...
+             </div>
+         `;
+    }
+     if (chatOptions) {
+         chatOptions.style.display = 'none';
+     }
+     if (mensajesContainer) {
+         mensajesContainer.innerHTML = ''; // Limpiar mensajes anteriores
+     }
+    lastMessageId = 0; // Resetear el último ID de mensaje
+
+    buscandoCompanero = true;
     while (buscandoCompanero) {
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]');
@@ -124,6 +159,7 @@ async function buscarCompaneroAutomatico() {
                 throw new Error('No se encontró el token CSRF');
             }
 
+            console.log('Intentando buscar compañero...');
             const data = await safeFetch('/retos/buscar-companero', {
                 method: 'POST',
                 headers: {
@@ -132,60 +168,75 @@ async function buscarCompaneroAutomatico() {
                 }
             });
 
-            chatId = data.chat_id;
-            companero = data.companero;
-            usuarioReportadoId = companero.id;
-            
-            const chatHeader = document.getElementById('chatHeader');
-            const chatOptions = document.getElementById('chatOptions');
-            
-            if (chatHeader && chatOptions) {
-                chatHeader.innerHTML = `Chat con ${companero.username}`;
-                chatOptions.style.display = 'block';
-                verificarEstadoSolicitud();
-            }
-            
-            buscandoCompanero = false;
-            cargarMensajes();
-            
-            // Iniciar polling solo cuando se encuentra un compañero
-            pollingIntervalId = setInterval(() => {
-                if (chatId) {
-                    cargarMensajes();
-                    verificarEstadoChat();
-                    actualizarPuntosDiarios();
+            // Si se encuentra un compañero
+            if (data.chat_id && data.companero) {
+                chatId = data.chat_id;
+                companero = data.companero;
+                usuarioReportadoId = companero.id; // Asumo que el ID del usuario reportado es el ID del compañero
+
+                console.log('Compañero encontrado:', companero.username, 'Chat ID:', chatId);
+
+                if (chatHeader && chatOptions) {
+                    chatHeader.innerHTML = `Chat con ${companero.username}`;
+                    chatOptions.style.display = 'block';
+                    verificarEstadoSolicitud(); // Verificar si ya hay solicitud
                 }
-            }, 3000);
-            
-            if (window.iniciarControlInactividad) {
-                setTimeout(() => {
-                    window.iniciarControlInactividad();
-                    if (window.actualizarUltimoMensaje) {
-                        window.actualizarUltimoMensaje();
+
+                buscandoCompanero = false;
+                cargarMensajes(); // Cargar mensajes iniciales
+
+                // Iniciar polling solo cuando se encuentra un compañero
+                // El intervalo se aumentó aquí
+                pollingIntervalId = setInterval(() => {
+                    if (chatId) {
+                        cargarMensajes(); // Carga solo mensajes nuevos
+                        verificarEstadoChat(); // Verifica si el chat sigue activo
+                        actualizarPuntosDiarios(); // Actualiza puntos
                     }
-                }, 15000);
+                }, INTERVALO_POLLING_CHAT); // Usa el intervalo optimizado
+
+                // Iniciar control de inactividad de estados.js si está disponible
+                // El setTimeout inicial ya fue ajustado en estados.js
+                if (window.iniciarControlInactividad) {
+                     // Llama iniciarControlInactividad con el tiempo de espera definido en estados.js
+                     window.iniciarControlInactividad();
+                }
+
+                break; // Salir del bucle while una vez que se encuentra un compañero
+
+            } else {
+                 // Si no se encuentra compañero pero no hubo error (ej. no hay disponibles)
+                 console.log('No se encontró compañero, reintentando en 3 segundos...');
+                 await new Promise(resolve => setTimeout(resolve, 3000)); // Esperar antes de reintentar
             }
-            break;
-            
+
         } catch (error) {
             console.error('Error al buscar compañero:', error);
-            await new Promise(resolve => setTimeout(resolve, 3000));
+            // Si hay un error HTTP o de conexión, espera antes de reintentar
+             // Solo mostramos un mensaje de error si no estamos buscando activamente (buscandoCompanero = true)
+             if (buscandoCompanero) {
+                 console.log('Error buscando compañero, reintentando en 3 segundos...');
+                 await new Promise(resolve => setTimeout(resolve, 3000));
+             } else {
+                  // Si el error ocurre después de haber encontrado compañero, el verificarEstadoChat lo manejará
+                 break; // Salir del bucle si ya no estamos buscando activamente
+             }
         }
     }
 }
 
 // Función para mostrar la animación de puntos ganados
 function mostrarPuntosGanados(puntos) {
-    if (!puntos) return;
-    
+    if (!puntos || puntos <= 0) return;
+
     const puntosContainer = document.querySelector('.puntos-container');
     if (!puntosContainer) return;
-    
+
     const animacion = document.createElement('span');
     animacion.className = 'puntos-animacion';
     animacion.textContent = `+${puntos}`;
     puntosContainer.appendChild(animacion);
-    
+
     setTimeout(() => animacion.remove(), 1500);
 }
 
@@ -204,7 +255,7 @@ async function enviarMensaje() {
     const mensaje = mensajeInput.value.trim();
 
     if (!mensaje) return;
-    
+
     if (mensaje.length > 500) {
         Swal.fire({
             title: 'Mensaje demasiado largo',
@@ -213,7 +264,7 @@ async function enviarMensaje() {
         });
         return;
     }
-    
+
     let mensajeProcesado;
     try {
         mensajeProcesado = window.procesarMensaje ? window.procesarMensaje(mensaje) : mensaje;
@@ -221,13 +272,13 @@ async function enviarMensaje() {
         console.error('Error al procesar mensaje:', error);
         mensajeProcesado = mensaje;
     }
-    
+
     if (mensajeProcesado === null) return;
 
     let contenidoMensaje;
     let tieneEmojis = false;
     let sumarPuntos = true;
-    
+
     if (typeof mensajeProcesado === 'object' && mensajeProcesado !== null) {
         contenidoMensaje = mensajeProcesado.texto;
         tieneEmojis = mensajeProcesado.tieneEmojis || false;
@@ -253,28 +304,40 @@ async function enviarMensaje() {
             })
         });
 
-        if (data.mensaje) {
+        // El backend en enviarMensaje ya devuelve el mensaje recién creado y el usuario
+        if (data.mensaje && data.usuario) {
             mensajeInput.value = '';
+            // Ahora llamamos a agregarMensaje para AÑADIR el nuevo mensaje, no recargar todo
             agregarMensaje(data.mensaje, data.usuario);
-            
+
             if (data.puntos_ganados > 0) {
                 const puntosDiariosActuales = document.getElementById('puntos-diarios-actuales');
                 const puntosActuales = document.getElementById('puntos-actuales');
-                
+
                 if (puntosDiariosActuales && puntosActuales) {
-                    const puntosDiariosNum = parseInt(puntosDiariosActuales.textContent);
-                    const puntosTotalNum = parseInt(puntosActuales.textContent);
-                    
+                    const puntosDiariosNum = parseInt(puntosDiariosActuales.textContent || '0');
+                    const puntosTotalNum = parseInt(puntosActuales.textContent || '0');
+
                     puntosDiariosActuales.textContent = puntosDiariosNum + data.puntos_ganados;
                     puntosActuales.textContent = puntosTotalNum + data.puntos_ganados;
                 }
-                
+
                 mostrarPuntosGanados(data.puntos_ganados);
             }
-            
+
+            // Actualizar el tiempo del último mensaje para el control de inactividad
             if (window.actualizarUltimoMensaje) {
                 window.actualizarUltimoMensaje();
             }
+             // Actualizar el lastMessageId al enviar un mensaje propio
+            lastMessageId = data.mensaje.id; // Asumiendo que el mensaje tiene un ID
+        } else {
+             console.error('Respuesta inesperada al enviar mensaje:', data);
+             Swal.fire({
+                 title: 'Error',
+                 text: 'No se pudo enviar el mensaje (respuesta inesperada)',
+                 icon: 'error'
+             });
         }
     } catch (error) {
         console.error('Error al enviar mensaje:', error);
@@ -286,72 +349,117 @@ async function enviarMensaje() {
     }
 }
 
-// Función para cargar mensajes
+// Función para cargar mensajes (OPTIMIZADA: solo carga mensajes nuevos)
 async function cargarMensajes() {
     if (!chatId) return;
 
     try {
-        const mensajes = await safeFetch(`/retos/mensajes/${chatId}`);
+        // Solo pedir mensajes con ID mayor que el último mensaje cargado
+        const mensajes = await safeFetch(`/retos/mensajes/${chatId}?last_id=${lastMessageId}`);
         const container = document.getElementById('mensajesContainer');
         if (!container) return;
-        
-        container.innerHTML = '';
-        
-        mensajes.forEach(mensaje => {
-            agregarMensaje(mensaje, mensaje.chat_usuario.usuario);
-        });
+
+        if (mensajes && mensajes.length > 0) {
+             console.log('Nuevos mensajes recibidos:', mensajes.length);
+            mensajes.forEach(mensaje => {
+                agregarMensaje(mensaje, mensaje.chat_usuario.usuario);
+            });
+             // Actualizar lastMessageId al ID del último mensaje recibido
+            lastMessageId = mensajes[mensajes.length - 1].id; // Asumiendo que el mensaje tiene un ID
+
+             // Hacer scroll al último mensaje solo si se agregaron nuevos
+             container.scrollTop = container.scrollHeight;
+        } else {
+             console.log('No hay mensajes nuevos.');
+        }
+
     } catch (error) {
         console.error('Error al cargar mensajes:', error);
+         // No mostramos SweetAlert aquí para evitar saturar si el polling falla temporalmente
     }
 }
 
-// Función para agregar un mensaje al contenedor
+// Función para agregar un mensaje al contenedor (sin cambios significativos)
 function agregarMensaje(mensaje, usuario) {
     const container = document.getElementById('mensajesContainer');
     if (!container) return;
 
+    // Evitar agregar mensajes duplicados si ya están en el DOM (seguro adicional)
+     if (document.getElementById(`message-${mensaje.id}`)) { // Asumiendo que cada mensaje tiene un ID único
+         // console.log('Mensaje duplicado, ignorando:', mensaje.id);
+         return;
+     }
+
     const metaUserId = document.querySelector('meta[name="user-id"]');
     const esMio = metaUserId ? usuario.id === parseInt(metaUserId.content) : false;
-    
+
     const mensajeDiv = document.createElement('div');
     mensajeDiv.className = `reto-message ${esMio ? 'sent' : 'received'}`;
+    mensajeDiv.id = `message-${mensaje.id}`; // Añadir ID al elemento del mensaje
     mensajeDiv.style.cssText = 'display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;';
-    
+
     const userImage = document.createElement('img');
-    userImage.src = getProfileImgPath(usuario.imagen);
+    // Usar la función getProfileImgPath para la imagen del usuario del mensaje
+    userImage.src = getProfileImgPath(usuario.imagen); // Asegúrate de que el backend envía la imagen como 'imagen' o ajusta aquí
     userImage.alt = usuario.username;
     userImage.className = 'reto-message-user-image';
     userImage.style.cssText = 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
-    
+     // Añadir manejo de error para la imagen por si acaso
+     userImage.onerror = function() {
+         this.src = getProfileImgPath(null); // Carga la imagen por defecto si falla
+     };
+
+
     const mensajeWrapper = document.createElement('div');
     mensajeWrapper.className = 'reto-message-wrapper';
     mensajeWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-start;';
-    
+
     const userName = document.createElement('span');
     userName.className = 'reto-message-username';
     userName.textContent = usuario.username;
     userName.style.cssText = 'font-weight: bold; color: ' + (esMio ? '#4B0082' : '#6c757d') + '; font-size: 15px; margin-bottom: 2px;';
-    
+
     const contenido = document.createElement('div');
     contenido.className = 'reto-message-content';
     contenido.textContent = mensaje.contenido;
     contenido.style.cssText = 'background: ' + (esMio ? '#4B0082' : '#f3e6ff') + '; color: ' + (esMio ? 'white' : '#222') + '; padding: 10px 18px; border-radius: 14px; margin-bottom: 2px; max-width: 600px; font-size: 16px; word-break: break-word;';
-    
+
     const fecha = document.createElement('div');
     fecha.className = 'reto-message-time';
+    // Parsear la fecha correctamente (puede ser string de ISO 8601)
     const fechaMensaje = new Date(mensaje.fecha_envio);
+    // Formatear hora localmente (puede requerir polyfill si no es soportado)
     fecha.textContent = fechaMensaje.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     fecha.style.cssText = 'font-size: 12px; color: #888; margin-left: 2px;';
-    
+
     mensajeWrapper.appendChild(userName);
     mensajeWrapper.appendChild(contenido);
     mensajeWrapper.appendChild(fecha);
-    
-    mensajeDiv.appendChild(userImage);
-    mensajeDiv.appendChild(mensajeWrapper);
+
+    // Asegurarse de que la imagen esté a la izquierda para mensajes recibidos y a la derecha para enviados
+    if (esMio) {
+         mensajeDiv.style.flexDirection = 'row-reverse'; // Invierte el orden para mensajes enviados
+         mensajeWrapper.style.alignItems = 'flex-end'; // Alinea texto a la derecha
+         userName.style.textAlign = 'right';
+         contenido.style.textAlign = 'right';
+         fecha.style.textAlign = 'right';
+         fecha.style.marginRight = '2px'; // Ajustar margen
+         fecha.style.marginLeft = '0';
+         mensajeDiv.appendChild(mensajeWrapper); // Añadir primero el wrapper para invertir el orden
+         mensajeDiv.appendChild(userImage);
+    } else {
+         mensajeDiv.appendChild(userImage);
+         mensajeDiv.appendChild(mensajeWrapper);
+    }
+
+
+    // Añadir el mensaje al final del contenedor
     container.appendChild(mensajeDiv);
-    
-    container.scrollTop = container.scrollHeight;
+
+    // Hacer scroll al último mensaje si el usuario estaba cerca del final
+     // (Opcional: lógica para detectar si el usuario estaba haciendo scroll hacia arriba)
+     // Por ahora, siempre hacemos scroll al final si se añade un nuevo mensaje
+     container.scrollTop = container.scrollHeight;
 }
 
 // Función para verificar el estado del chat
@@ -359,7 +467,7 @@ async function verificarEstadoChat() {
     if (!chatId) return;
 
     try {
-        const chatResponse = await fetch(`/retos/verificar-chat/${chatId}`, {
+        const chatResponse = await safeFetch(`/retos/verificar-chat/${chatId}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -367,18 +475,22 @@ async function verificarEstadoChat() {
             }
         });
 
-        if (!chatResponse.ok) {
+        // Si la respuesta no es OK (por ejemplo, 404 porque el chat terminó)
+        if (!chatResponse.status || chatResponse.status === 'ended') { // Asumo que el backend puede enviar status 'ended' o un error HTTP como 404
+            console.log('El chat ha terminado o no es válido.');
+            // Restablecer el estado del chat en el frontend
             chatId = null;
             companero = null;
             buscandoCompanero = true;
-            
-            if (window.detenerControlInactividad) {
-                window.detenerControlInactividad();
-            }
-            
+
+            // Limpiar intervalos y detener control de inactividad
             limpiarIntervalos();
-            
+
+            // Actualizar la UI para mostrar que está buscando compañero nuevamente
             const chatHeader = document.getElementById('chatHeader');
+            const chatOptions = document.getElementById('chatOptions');
+            const mensajesContainer = document.getElementById('mensajesContainer');
+
             if (chatHeader) {
                 chatHeader.innerHTML = `
                     <div class="d-flex align-items-center">
@@ -389,272 +501,164 @@ async function verificarEstadoChat() {
                     </div>
                 `;
             }
-            
-            const chatOptions = document.getElementById('chatOptions');
+
             if (chatOptions) {
                 chatOptions.style.display = 'none';
             }
-            
-            const mensajesContainer = document.getElementById('mensajesContainer');
+
             if (mensajesContainer) {
-                mensajesContainer.innerHTML = '';
+                mensajesContainer.innerHTML = ''; // Limpiar mensajes
             }
-            
+             lastMessageId = 0; // Resetear el último ID de mensaje
+
+            // Iniciar la búsqueda de un nuevo compañero
             buscarCompaneroAutomatico();
+
+        } else {
+            console.log('El chat sigue activo.');
+             // Si el chat sigue activo, no hacer nada (el polling de mensajes ya se encarga)
         }
     } catch (error) {
         console.error('Error al verificar estado del chat:', error);
+        // Si hay un error al verificar el estado, asumimos que el chat pudo haber terminado
+        // y reiniciamos la búsqueda para mayor seguridad
+        console.log('Error al verificar estado, asumiendo fin del chat y reiniciando búsqueda.');
         chatId = null;
         companero = null;
         buscandoCompanero = true;
-        
-        if (window.detenerControlInactividad) {
-            window.detenerControlInactividad();
-        }
-        
+
         limpiarIntervalos();
-        
+
         const chatHeader = document.getElementById('chatHeader');
-        if (chatHeader) {
-            chatHeader.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
-                        <span class="visually-hidden">Cargando...</span>
-                    </div>
-                    Buscando usuarios disponibles...
-                </div>
-            `;
-        }
-        buscarCompaneroAutomatico();
+        const chatOptions = document.getElementById('chatOptions');
+        const mensajesContainer = document.getElementById('mensajesContainer');
+
+         if (chatHeader) {
+             chatHeader.innerHTML = `
+                 <div class="d-flex align-items-center">
+                     <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                         <span class="visually-hidden">Cargando...</span>
+                     </div>
+                     Buscando usuarios disponibles...
+                 </div>
+             `;
+         }
+
+         if (chatOptions) {
+             chatOptions.style.display = 'none';
+         }
+
+         if (mensajesContainer) {
+             mensajesContainer.innerHTML = ''; // Limpiar mensajes
+         }
+        lastMessageId = 0; // Resetear el último ID de mensaje
+
+
+        buscarCompaneroAutomatico(); // Reiniciar la búsqueda
     }
 }
 
 // Función para actualizar el contador de puntos diarios
 async function actualizarPuntosDiarios() {
+    // Esta función ya es bastante ligera, solo hace un fetch y actualiza un texto
+    // No requiere optimización adicional aquí, a menos que el backend sea muy lento.
     try {
-        const response = await fetch('/retos/puntos-diarios', {
+        const response = await safeFetch('/retos/puntos-diarios', {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             }
         });
-        
-        if (response.ok) {
-            const data = await response.json();
+
+        if (response) { // safeFetch ya verifica response.ok
+            const data = response;
             const puntosDiariosElement = document.getElementById('puntos-diarios-actuales');
             if (puntosDiariosElement) {
-                // Solo actualizar si el valor es mayor que el actual
-                const puntosActuales = parseInt(puntosDiariosElement.textContent);
+                // Solo actualizar si el valor es mayor que el actual (para evitar regresiones visuales si hay latencia)
+                const puntosActuales = parseInt(puntosDiariosElement.textContent || '0');
                 if (data.puntos_diarios > puntosActuales) {
                     puntosDiariosElement.textContent = data.puntos_diarios;
                 }
             }
         }
     } catch (error) {
-        // Error silencioso
+        // Error silencioso - no molestar al usuario si falla la actualización de puntos
+        console.error('Error al actualizar puntos diarios:', error);
     }
 }
 
-// Función para verificar el estado de la solicitud
+// Función para verificar el estado de la solicitud de amistad con el compañero actual
 async function verificarEstadoSolicitud() {
+    // Esta función solo se llama una vez al encontrar compañero y una vez al abrir el modal de opciones
+    // No requiere optimización de polling aquí.
     if (!companero) return;
-    
+
     try {
-        const response = await fetch(`/solicitudes/verificar/${companero.id}`, {
+        const response = await safeFetch(`/solicitudes/verificar/${companero.id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             }
         });
-        
-        if (response.ok) {
-            const data = await response.json();
+
+        if (response) { // safeFetch ya verifica response.ok
+            const data = response;
             const sendFriendRequestBtn = document.getElementById('sendFriendRequest');
-            
-            if (data.estado === 'pendiente') {
-                sendFriendRequestBtn.innerHTML = '<i class="fas fa-clock me-2"></i>Solicitud pendiente';
-                sendFriendRequestBtn.classList.add('disabled');
-                sendFriendRequestBtn.style.pointerEvents = 'none';
-                sendFriendRequestBtn.style.opacity = '0.7';
-            } else if (data.estado === 'aceptada') {
-                sendFriendRequestBtn.parentElement.style.display = 'none';
+
+            if (sendFriendRequestBtn) {
+                if (data.estado === 'pendiente') {
+                    sendFriendRequestBtn.innerHTML = '<i class="fas fa-clock me-2"></i>Solicitud pendiente';
+                    sendFriendRequestBtn.classList.add('disabled');
+                    sendFriendRequestBtn.style.pointerEvents = 'none';
+                    sendFriendRequestBtn.style.opacity = '0.7';
+                } else if (data.estado === 'aceptada') {
+                     // Ocultar el botón si ya son amigos
+                    if(sendFriendRequestBtn.parentElement) {
+                        sendFriendRequestBtn.parentElement.style.display = 'none';
+                    }
+                } else {
+                    // Si el estado no es pendiente ni aceptada, asegurar que el botón esté visible y activo
+                    sendFriendRequestBtn.innerHTML = '<i class="fas fa-user-plus me-2"></i>Añadir amigo'; // Texto por defecto
+                    sendFriendRequestBtn.classList.remove('disabled');
+                    sendFriendRequestBtn.style.pointerEvents = 'auto';
+                    sendFriendRequestBtn.style.opacity = '1';
+                     if(sendFriendRequestBtn.parentElement) {
+                        sendFriendRequestBtn.parentElement.style.display = 'block';
+                    }
+                }
             }
         }
     } catch (error) {
         console.error('Error al verificar estado de solicitud:', error);
+         // Error silencioso
     }
 }
 
-// Función para cargar las solicitudes de amistad
-async function cargarSolicitudesAmistad() {
-    try {
-        const response = await fetch('/solicitudes/pendientes', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        });
 
-        if (!response.ok) {
-            throw new Error('Error al cargar las solicitudes');
-        }
+// >>> Las funciones cargarSolicitudesAmistad, responderSolicitud,
+// actualizarContadorSolicitudes son parte del modal de solicitudes y
+// deberían manejarse preferiblemente en chatamig.js o en un script separado para modals.
+// Si se mantienen aquí, asegúrate de que sus intervalos (si los tienen)
+// sean independientes del polling principal del chat y con una frecuencia baja.
+// No las incluyo en esta optimización para enfocarme en el chat principal.
 
-        const data = await response.json();
-        const container = document.getElementById('solicitudesContainer');
-        const noSolicitudes = document.getElementById('noSolicitudes');
-        const solicitudesCount = document.getElementById('solicitudesCount');
-
-        // Actualizar contador
-        if (solicitudesCount) solicitudesCount.textContent = data.length;
-
-        if (data.length === 0) {
-            if (container && noSolicitudes) {
-            noSolicitudes.style.display = 'block';
-            container.innerHTML = '';
-            container.appendChild(noSolicitudes);
-            }
-            return;
-        }
-
-        if (noSolicitudes) noSolicitudes.style.display = 'none';
-        if (container) container.innerHTML = '';
-
-        data.forEach(solicitud => {
-            if (!container) return;
-            const solicitudDiv = document.createElement('div');
-            solicitudDiv.className = 'solicitud-item d-flex align-items-center justify-content-between p-2 border-bottom';
-            solicitudDiv.id = `solicitud-${solicitud.id_solicitud}`;
-            solicitudDiv.innerHTML = `
-                <div class="solicitud-info d-flex align-items-center gap-2">
-                    <img src="${solicitud.emisor.img || '/img/profile_img/avatar-default.png'}" 
-                         alt="${solicitud.emisor.username}" 
-                         class="rounded-circle"
-                         style="width: 32px; height: 32px; object-fit: cover;"
-                         onerror="this.src='/img/profile_img/avatar-default.png'">
-                    <span class="solicitud-username">${solicitud.emisor.username}</span>
-                </div>
-                <div class="solicitud-actions d-flex gap-2">
-                    <button class="btn btn-sm btn-success" onclick="responderSolicitud(${solicitud.id_solicitud}, 'aceptada')">
-                        <i class="fas fa-check"></i>
-                    </button>
-                    <button class="btn btn-sm btn-danger" onclick="responderSolicitud(${solicitud.id_solicitud}, 'rechazada')">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `;
-            container.appendChild(solicitudDiv);
-        });
-    } catch (error) {
-        console.error('Error al cargar solicitudes:', error);
-        const container = document.getElementById('solicitudesContainer');
-        const noSolicitudes = document.getElementById('noSolicitudes');
-        if (container && noSolicitudes && container.children.length === 0) {
-            noSolicitudes.style.display = 'block';
-            container.innerHTML = '';
-            container.appendChild(noSolicitudes);
-        }
-        // Solo muestra el SweetAlert si realmente no hay contenedor
-        if (!container) {
-        Swal.fire({
-            title: 'Error',
-            text: 'No se pudieron cargar las solicitudes de amistad',
-            icon: 'error'
-        });
-        }
-    }
-}
-
-// Función para responder a una solicitud
-async function responderSolicitud(idSolicitud, respuesta) {
-    try {
-        const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
-        if (!solicitudDiv) return;
-
-        // Deshabilitar botones durante la operación
-        const buttons = solicitudDiv.querySelectorAll('button');
-        buttons.forEach(btn => btn.disabled = true);
-
-        const response = await fetch('/solicitudes/responder', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({
-                id_solicitud: idSolicitud,
-                respuesta: respuesta
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Error al procesar la solicitud');
-        }
-
-        const data = await response.json();
-        
-        if (data.success) {
-            if (data.estado === 'rechazada') {
-                // Eliminar el elemento del DOM si fue rechazada
-                solicitudDiv.remove();
-            // Actualizar el contador de solicitudes
-            const solicitudesCount = document.getElementById('solicitudesCount');
-            const count = parseInt(solicitudesCount.textContent);
-            solicitudesCount.textContent = Math.max(0, count - 1);
-            // Si no hay más solicitudes, mostrar el mensaje
-                const container = document.getElementById('solicitudesContainer');
-                if (container.children.length === 0) {
-                const noSolicitudes = document.getElementById('noSolicitudes');
-                    if (noSolicitudes) {
-                    container.innerHTML = '';
-                    noSolicitudes.style.display = 'block';
-                    container.appendChild(noSolicitudes);
-                }
-            }
-            } else {
-                // Si fue aceptada, actualizar el badge
-                const actionsDiv = solicitudDiv.querySelector('.solicitud-actions');
-                actionsDiv.innerHTML = `
-                    <span class="badge bg-success">Aceptada</span>
-                `;
-            }
-            // Mostrar mensaje de éxito
-            Swal.fire({
-                title: data.estado === 'aceptada' ? '¡Solicitud aceptada!' : 'Solicitud rechazada',
-                text: data.estado === 'aceptada' ? 'Ahora son amigxs' : 'La solicitud ha sido rechazada',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
-            });
-        } else {
-            throw new Error(data.message || 'Error al procesar la solicitud');
-        }
-    } catch (error) {
-        console.error('Error al responder solicitud:', error);
-        Swal.fire({
-            title: 'Error',
-            text: error.message || 'Ocurrió un error al procesar la solicitud',
-            icon: 'error'
-        });
-
-        // Restaurar botones en caso de error
-        const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
-        if (solicitudDiv) {
-            const buttons = solicitudDiv.querySelectorAll('button');
-            buttons.forEach(btn => btn.disabled = false);
-        }
-    }
-}
 
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
+     console.log('DOMContentLoaded en chatrandom.js');
+    // Iniciar la búsqueda del compañero automáticamente al cargar la página
     buscarCompaneroAutomatico();
+    // Actualizar puntos diarios al cargar
     actualizarPuntosDiarios();
-    
+    // actualizarBotonSkip() no es necesario en DOMContentLoaded si solo se usa para el skip del reto
+
     const skipBtn = document.querySelector('.skip-btn');
     if (skipBtn) {
+        // Actualizar el estado inicial del botón skip
+        actualizarBotonSkip(); // Llamar aquí para el estado inicial
+
         skipBtn.addEventListener('click', async function() {
             if (await skipEnCooldown()) {
                 const tiempoRestante = await getTiempoRestanteCooldown();
@@ -686,75 +690,97 @@ document.addEventListener('DOMContentLoaded', function() {
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                         }
                     });
-                    
-                    chatId = null;
-                    companero = null;
-                    buscandoCompanero = true;
-                    
-                    if (window.detenerControlInactividad) {
-                        window.detenerControlInactividad();
+
+                    if (data.success) {
+                         console.log('Skip activado exitosamente.');
+                         // Resetear variables de chat
+                        chatId = null;
+                        companero = null;
+                        buscandoCompanero = true;
+                        lastMessageId = 0; // Resetear ID del último mensaje
+
+                         // Limpiar intervalos y detener control de inactividad
+                        limpiarIntervalos();
+
+                         // Actualizar la UI para mostrar estado de búsqueda
+                         const chatHeader = document.getElementById('chatHeader');
+                         const chatOptions = document.getElementById('chatOptions');
+                         const mensajesContainer = document.getElementById('mensajesContainer');
+
+                         if (chatHeader) {
+                             chatHeader.innerHTML = `
+                                 <div class="d-flex align-items-center">
+                                     <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                                         <span class="visually-hidden">Cargando...</span>
+                                     </div>
+                                     Buscando usuarios disponibles...
+                                 </div>
+                             `;
+                         }
+
+                         if (chatOptions) {
+                             chatOptions.style.display = 'none';
+                         }
+
+                         if (mensajesContainer) {
+                             mensajesContainer.innerHTML = ''; // Limpiar mensajes
+                         }
+
+                        // Actualizar el estado del botón skip (mostrará el cooldown)
+                        actualizarBotonSkip();
+                        // Iniciar la búsqueda de un nuevo compañero
+                        buscarCompaneroAutomatico();
+                    } else {
+                        throw new Error(data.error || 'Error desconocido al activar skip');
                     }
-                    
-                    limpiarIntervalos();
-                    
-                    const chatHeader = document.getElementById('chatHeader');
-                    if (chatHeader) {
-                        chatHeader.innerHTML = `
-                            <div class="d-flex align-items-center">
-                                <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
-                                    <span class="visually-hidden">Cargando...</span>
-                                </div>
-                                Buscando usuarios disponibles...
-                            </div>
-                        `;
-                    }
-                    
-                    const chatOptions = document.getElementById('chatOptions');
-                    if (chatOptions) {
-                        chatOptions.style.display = 'none';
-                    }
-                    
-                    const mensajesContainer = document.getElementById('mensajesContainer');
-                    if (mensajesContainer) {
-                        mensajesContainer.innerHTML = '';
-                    }
-                    
-                    actualizarBotonSkip();
-                    buscarCompaneroAutomatico();
+
                 } catch (error) {
                     console.error('Error al activar skip:', error);
                     Swal.fire({
                         title: 'Error',
-                        text: 'Ocurrió un error al intentar saltar al siguiente usuario',
+                        text: error.message || 'Ocurrió un error al intentar saltar al siguiente usuario',
                         icon: 'error'
                     });
                 }
             }
         });
+
+        // Intervalo para actualizar el tiempo del cooldown del botón skip cada segundo
+        // Mantenemos 1 segundo para que el contador regresivo se vea en tiempo real en el botón
+        setInterval(actualizarBotonSkip, 1000);
     }
+
 
     const enviarMensajeBtn = document.getElementById('enviarMensaje');
     if (enviarMensajeBtn) {
         enviarMensajeBtn.addEventListener('click', enviarMensaje);
     }
-    
+
     const mensajeInput = document.getElementById('mensajeInput');
     if (mensajeInput) {
         mensajeInput.addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
+                e.preventDefault(); // Prevenir el salto de línea por defecto en textarea
                 enviarMensaje();
             }
         });
     }
 
-    estadoIntervalId = setInterval(mantenerEstado, 120000);
+    // El intervalo de estado general (mantenerEstado) se maneja en estados.js
+    // estadoIntervalId = setInterval(mantenerEstado, 120000); // Eliminar si se maneja centralmente
 
     const sendFriendRequestBtn = document.getElementById('sendFriendRequest');
     if (sendFriendRequestBtn) {
         sendFriendRequestBtn.addEventListener('click', async function(e) {
             e.preventDefault();
             if (!companero) return;
-            
+
+            // Deshabilitar el botón temporalmente para evitar clics múltiples
+             sendFriendRequestBtn.disabled = true;
+             sendFriendRequestBtn.style.pointerEvents = 'none';
+             sendFriendRequestBtn.style.opacity = '0.7';
+
+
             try {
                 const data = await safeFetch('/solicitudes/enviar', {
                     method: 'POST',
@@ -772,20 +798,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     sendFriendRequestBtn.classList.add('disabled');
                     sendFriendRequestBtn.style.pointerEvents = 'none';
                     sendFriendRequestBtn.style.opacity = '0.7';
-                    
+
                     Swal.fire({
                         title: '¡Solicitud enviada!',
                         text: 'La solicitud de amistad ha sido enviada correctamente.',
                         icon: 'success'
                     });
+                } else {
+                     throw new Error(data.message || 'Error desconocido al enviar solicitud');
                 }
             } catch (error) {
                 console.error('Error al enviar solicitud:', error);
                 Swal.fire({
                     title: 'Error',
-                    text: 'No se pudo enviar la solicitud de amistad.',
+                    text: error.message || 'No se pudo enviar la solicitud de amistad.',
                     icon: 'error'
                 });
+                 // Re-habilitar botón si hubo un error
+                 sendFriendRequestBtn.disabled = false;
+                 sendFriendRequestBtn.style.pointerEvents = 'auto';
+                 sendFriendRequestBtn.style.opacity = '1';
             }
         });
     }
@@ -794,7 +826,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (reportUserBtn) {
         reportUserBtn.addEventListener('click', async function(e) {
             e.preventDefault();
-            
+
             if (!usuarioReportadoId) {
                 Swal.fire({
                     title: 'Error',
@@ -851,12 +883,14 @@ document.addEventListener('DOMContentLoaded', function() {
                             text: 'El reporte ha sido enviado correctamente.',
                             icon: 'success'
                         });
+                    } else {
+                         throw new Error(data.message || 'Error desconocido al enviar reporte');
                     }
                 } catch (error) {
                     console.error('Error al enviar reporte:', error);
                     Swal.fire({
                         title: 'Error',
-                        text: 'Ocurrió un error al enviar el reporte.',
+                        text: error.message || 'Ocurrió un error al enviar el reporte.',
                         icon: 'error'
                     });
                 }
@@ -898,14 +932,17 @@ document.addEventListener('DOMContentLoaded', function() {
                             text: 'El usuario ha sido bloqueado correctamente.',
                             icon: 'success'
                         }).then(() => {
+                             // Redirigir o actualizar la UI después de bloquear
                             window.location.reload();
                         });
+                    } else {
+                         throw new Error(data.message || 'Error desconocido al bloquear usuario');
                     }
                 } catch (error) {
                     console.error('Error al bloquear usuario:', error);
                     Swal.fire({
                         title: 'Error',
-                        text: 'Ocurrió un error al bloquear al usuario.',
+                        text: error.message || 'Ocurrió un error al bloquear al usuario.',
                         icon: 'error'
                     });
                 }
@@ -913,71 +950,64 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Configurar el botón de ver solicitudes
+    // Configurar el botón de ver solicitudes - Si este modal se maneja aquí,
+    // considera moverlo a chatamig.js o a un script separado para modals.
+    // Si se queda aquí, asegura que el intervalo de carga sea bajo.
     const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
     if (btnSolicitudesPendientes) {
         btnSolicitudesPendientes.addEventListener('click', function(e) {
             e.preventDefault();
             const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
             solicitudesModal.show();
-            cargarSolicitudesAmistad();
+            // cargarSolicitudesAmistad(); // Llama a cargar al abrir
         });
-        actualizarContadorSolicitudes();
+        // actualizarContadorSolicitudes(); // Llama al cargar la página
     }
 
-    // Gestionar el modal de solicitudes
+    // Gestionar el modal de solicitudes - Mover si se centraliza en otro script
     const solicitudesModalEl = document.getElementById('solicitudesModal');
     if (solicitudesModalEl) {
         solicitudesModalEl.addEventListener('show.bs.modal', function () {
-            solicitudesIntervalId = setInterval(cargarSolicitudesAmistad, 30000);
+            // Iniciar polling de solicitudes solo cuando el modal está abierto
+             // solicitudesIntervalId = setInterval(cargarSolicitudesAmistad, 30000); // Intervalo de 30s
         });
         solicitudesModalEl.addEventListener('hidden.bs.modal', function () {
+            // Limpiar polling de solicitudes al cerrar el modal
             if (solicitudesIntervalId) {
                 clearInterval(solicitudesIntervalId);
                 solicitudesIntervalId = null;
+                 console.log('Intervalo de solicitudes detenido al cerrar modal.');
             }
         });
     }
+
 
     // Configurar el botón de opciones del chat
     const chatOptionsButton = document.getElementById('chatOptionsButton');
     if (chatOptionsButton) {
         chatOptionsButton.addEventListener('click', function() {
+            // Verificar estado de solicitud solo al abrir opciones del chat
             verificarEstadoSolicitud();
         });
     }
 });
 
 // Limpiar intervalos y actualizar estado al cerrar la página
-window.addEventListener('beforeunload', () => {
+window.addEventListener('beforeunload', async () => {
+    console.log('Usuario cerrando página - Limpiando intervalos de chatrandom.');
+    // Asegurarse de detener los intervalos de este script
     limpiarIntervalos();
-    fetch('/estado/actualizar', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: JSON.stringify({ estado: 2 })
-    });
+
+    // El estado general (inactivo) y la limpieza del estado del reto
+    // se manejan mejor en estados.js usando sendBeacon.
+    // No duplicar la lógica aquí.
 });
 
-// Actualizar estado inicial
-mantenerEstado();
+// Actualizar estado inicial (esto se maneja en estados.js)
+// mantenerEstado(); // Eliminar si se maneja centralmente
 
-async function actualizarContadorSolicitudes() {
-    try {
-        const response = await fetch('/solicitudes/pendientes', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        });
-        if (!response.ok) return;
-        const data = await response.json();
-        const solicitudesCount = document.getElementById('solicitudesCount');
-        if (solicitudesCount) solicitudesCount.textContent = data.length;
-    } catch (error) {
-        // Silenciar error
-    }
-} 
+// Hacer las funciones relevantes disponibles globalmente si otros scripts las necesitan
+// window.enviarMensaje = enviarMensaje; // Ejemplo si el botón está fuera del alcance global
+
+// Exponer tiempoInicialEspera globalmente también si chatrandom.js lo necesita para el setTimeout inicial
+// window.tiempoInicialEspera = tiempoInicialEspera; // (Ya lo ajustamos directamente en chatrandom.js)
