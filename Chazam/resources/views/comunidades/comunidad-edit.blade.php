@@ -823,8 +823,9 @@
     {{-- Para que se vean bien los estados --}}
     <script src="{{ asset('js/estados.js') }}"></script>
     <script>
-        // Definir el ID de la comunidad
+        // Definir el ID de la comunidad y el usuario actual
         const communityId = {{ $comunidad->id_chat }};
+        const currentUserId = {{ Auth::id() }};
         
         // Inicializar Vanta
         VANTA.WAVES({
@@ -860,7 +861,7 @@
                     
                     // Verificar estado de solicitudes para cada miembro
                     allMembers.forEach(member => {
-                        if (!member.isCreator) {
+                        if (member.id_usuario !== currentUserId) {
                             verificarEstadoSolicitud(member.id_usuario);
                         }
                     });
@@ -886,7 +887,7 @@
                             <p class="member-role">${member.isCreator ? 'Creador' : 'Miembro'}</p>
                         </div>
                         <div class="member-status ${member.status}"></div>
-                        ${!member.isCreator ? `
+                        ${member.id_usuario !== currentUserId ? `
                             <div class="member-actions">
                                 <div class="dropdown">
                                     <button class="member-action-btn" type="button" data-bs-toggle="dropdown" aria-expanded="false">
