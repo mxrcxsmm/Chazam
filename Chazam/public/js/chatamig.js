@@ -49,19 +49,34 @@ async function cargarSolicitudesAmistad() {
             solicitudDiv.id = `solicitud-${solicitud.id_solicitud}`;
             solicitudDiv.innerHTML = `
                 <div class="solicitud-info">
-                    <img src="${solicitud.emisor.img}" 
-                         alt="${solicitud.emisor.username}" 
-                         class="rounded-circle"
-                         style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #ccc;"
-                         onerror="this.src='/img/profile_img/avatar-default.png'">
+                    <div
+                    class="marco-externo marco-glow ${solicitud.emisor.rotacion ? 'marco-rotate' : ''}"
+                    style="
+                        --glow-color: ${solicitud.emisor.brillo || '#fff'};
+                        background-image: url('/img/bordes/${solicitud.emisor.marco ?? 'default.svg'}');
+                        width: 40px;
+                        height: 40px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    "
+                    >
+                    <img
+                        src="${solicitud.emisor.img}"
+                        alt="${solicitud.emisor.username}"
+                        class="rounded-circle"
+                        style="width: 32px; height: 32px; object-fit: cover;"
+                        onerror="this.src='/img/profile_img/avatar-default.png'"
+                    />
+                    </div>
                     <span class="solicitud-username">${solicitud.emisor.username}</span>
                 </div>
                 <div class="solicitud-actions">
                     <button class="btn btn-success btn-sm" title="Aceptar" onclick="responderSolicitud(${solicitud.id_solicitud}, 'aceptada')">
-                        <i class="fas fa-check"></i> 
+                    <i class="fas fa-check"></i>
                     </button>
                     <button class="btn btn-danger btn-sm" title="Rechazar" onclick="responderSolicitud(${solicitud.id_solicitud}, 'rechazada')">
-                        <i class="fas fa-times"></i>
+                    <i class="fas fa-times"></i>
                     </button>
                 </div>
             `;
@@ -492,22 +507,56 @@ class ChatManager {
     }
 
     // Actualización del encabezado del chat
-    updateChatHeader(companero) {
-        const chatHeader = document.getElementById('chat-contact-name');
-        const chatStatus = document.getElementById('chat-contact-status');
-        const chatImg = document.getElementById('chat-contact-img');
+// Dentro de tu clase ChatManager:
+updateChatHeader(companero) {
+    // 1) Actualiza nombre y estado
+    const chatHeader = document.getElementById('chat-contact-name');
+    const chatStatus = document.getElementById('chat-contact-status');
+    chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
+    const online = (companero.id_estado == 1 || companero.id_estado == 5);
+    chatStatus.textContent = online ? 'en línea' : 'desconectado';
+    chatStatus.style.color = online ? '#9147ff' : '#b9bbbe';
 
-        chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
-        chatStatus.textContent = (companero.id_estado == 1 || companero.id_estado == 5) ? 'en línea' : 'desconectado';
-        chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
-        
-        // Construir la ruta de la imagen correctamente
-        const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : '/img/profile_img/avatar-default.png';
-        chatImg.src = imgPath;
-        chatImg.onerror = function() {
-            this.src = '/img/profile_img/avatar-default.png';
-        };
-    }
+    // 2) Construye la ruta de la imagen
+    const imgPath = companero.img
+        ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/')
+        : '/img/profile_img/avatar-default.png';
+
+    // 3) Extrae los datos de personalización (igual que en solicitudes)
+    const marco  = companero.marco  ?? 'default.svg';
+    const brillo = companero.brillo ?? '#fff';
+    const rotateClass = companero.rotacion ? 'marco-rotate' : '';
+
+    // 4) Crea el wrapper <div class="marco-externo ...">
+    const wrapper = document.createElement('div');
+    wrapper.className = `marco-externo marco-glow ${rotateClass}`;
+    wrapper.style.cssText = `
+      --glow-color: ${brillo};
+      background-image: url('/img/bordes/${marco}');
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    `;
+
+    // 5) Crea el <img> interno
+    const imgEl = document.createElement('img');
+    imgEl.src = imgPath;
+    imgEl.alt = companero.username || 'avatar';
+    imgEl.className = 'rounded-circle';
+    imgEl.style.cssText = 'width:32px; height:32px; object-fit: cover;';
+    imgEl.onerror = () => imgEl.src = '/img/profile_img/avatar-default.png';
+
+    // 6) Anida la img dentro del wrapper
+    wrapper.appendChild(imgEl);
+
+    // 7) Sustituye el antiguo <img id="chat-contact-img">
+    const chatImg = document.getElementById('chat-contact-img');
+    const container = chatImg.parentNode;
+    container.innerHTML = '';       // limpia el avatar anterior
+    container.appendChild(wrapper); // pone tu nuevo marco + img
+}
 
     // Toggle de opciones
     toggleOptions() {
