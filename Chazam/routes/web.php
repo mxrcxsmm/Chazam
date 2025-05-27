@@ -26,6 +26,7 @@ use App\Http\Controllers\ComunidadesController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\AmistadController;
 use App\Http\Controllers\UserSearchController;
+use App\Http\Middleware\CheckUserStatus;
 
 
 
@@ -38,9 +39,9 @@ Route::post('check-availability', [AuthController::class, 'checkAvailability'])-
 Route::post('logout', [AuthController::class, 'logout'])->name('logout');
 
 // Middleware para proteger todas las rutas
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', \App\Http\Middleware\CheckUserStatus::class])->group(function () {
     // Rutas para el administrador
-    Route::prefix('admin')->name('admin.')->group(function () {
+    Route::prefix('admin')->middleware([\App\Http\Middleware\AdminMiddleware::class])->name('admin.')->group(function () {
         Route::get('/', [AdminController::class, 'index'])->name('usuarios.index');
         Route::delete('/{id}', [AdminController::class, 'destroy'])->name('usuarios.destroy');
         Route::post('/usuarios/filtrar', [AdminController::class, 'filtrar'])->name('usuarios.filtrar');
