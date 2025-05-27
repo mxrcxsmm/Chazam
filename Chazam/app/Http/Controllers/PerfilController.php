@@ -40,6 +40,7 @@ class PerfilController extends Controller
 }*/
 
 
+
     /**
      * Actualiza los datos del usuario
      */
@@ -116,7 +117,8 @@ class PerfilController extends Controller
                 'descripcion' => $user->descripcion,
             ]);
         }
-
+    
+        // Redirección normal
         return redirect()->route('perfil.personalizacion')->with('success', 'Tus datos se han actualizado correctamente.');
     }
 }

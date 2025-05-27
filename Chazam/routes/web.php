@@ -25,6 +25,7 @@ use App\Http\Controllers\VistaController;
 use App\Http\Controllers\ComunidadesController;
 use App\Http\Controllers\SolicitudController;
 use App\Http\Controllers\AmistadController;
+use App\Http\Controllers\UserSearchController;
 
 
 
@@ -91,6 +92,7 @@ Route::middleware(['auth'])->group(function () {
             Route::post('/marco', [VistaController::class, 'cambiarMarco'])->name('cambiarMarco');
             Route::post('/glow', [VistaController::class, 'cambiarBrillo'])->name('cambiarBrillo');
             Route::put('/update', [PerfilController::class, 'update'])->name('update');
+            Route::post('/perfil/check-availability', [PerfilController::class, 'checkAvailability'])->name('perfil.checkAvailability');
             Route::get('/mejoras', function () {
                 return view('perfil.mejoras');
             })->name('mejoras');
@@ -160,9 +162,11 @@ Route::middleware(['auth'])->group(function () {
     
     // Rutas para el chat de amigos
     Route::get('user/chats', [FriendChatController::class, 'getUserChats'])->name('user.chats');
-    Route::get('user/chat/{chatId}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
-    Route::post('user/chat/{chatId}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
+    Route::get('/user/chat/{id}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
+    Route::post('/user/chat/{id}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
 
+    // Ruta para búsqueda de usuarios
+    Route::get('/buscar-usuarios', [UserSearchController::class, 'search'])->name('user.search');
 
     // Rutas para solicitudes y bloqueos
     Route::post('/solicitudes/enviar', [SolicitudUserController::class, 'enviarSolicitud'])->name('solicitudes.enviar');
@@ -172,6 +176,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/solicitudes/pendientes', [SolicitudUserController::class, 'getPendientes'])->name('solicitudes.pendientes');
     Route::post('/solicitudes/responder', [SolicitudUserController::class, 'responderSolicitud'])->name('solicitudes.responder');
     
+    // Rutas para búsqueda de usuarios
+    Route::get('/user/search', [UserController::class, 'search'])->name('user.search');
+    
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
 
@@ -180,6 +187,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/comunidades/create', [ComunidadesController::class, 'create'])->name('comunidades.create');
     Route::post('/comunidades', [ComunidadesController::class, 'store'])->name('comunidades.store');
     Route::post('/comunidades/{id}/join', [ComunidadesController::class, 'join'])->name('comunidades.join');
+    Route::get('/comunidades/{id}', [ComunidadesController::class, 'show'])->name('comunidades.show');
+    Route::get('/comunidades/{id}/edit', [ComunidadesController::class, 'edit'])->name('comunidades.edit');
+    Route::get('/comunidades/{id}/edit-form', [ComunidadesController::class, 'editForm'])->name('comunidades.edit-form');
+    Route::put('/comunidades/{id}', [ComunidadesController::class, 'update'])->name('comunidades.update');
+    Route::post('/comunidades/{id}/abandonar', [ComunidadesController::class, 'abandonar'])->name('comunidades.abandonar');
+    Route::post('/comunidades/{id}/eliminar', [ComunidadesController::class, 'eliminar'])->name('comunidades.eliminar');
+
+    // Nuevas rutas para la API de comunidades
+    Route::get('/comunidades/{id}/members', [ComunidadesController::class, 'getMembers'])->name('comunidades.members');
+    Route::get('/comunidades/{id}/messages', [ComunidadesController::class, 'getMessages'])->name('comunidades.messages');
+    Route::post('/comunidades/{id}/send-message', [ComunidadesController::class, 'sendMessage'])->name('comunidades.send-message');
 
     Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
 
@@ -200,6 +218,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/amistades', [AmistadController::class, 'index'])->name('amistades.index');
     Route::delete('/amistades/{idUsuario}', [AmistadController::class, 'destroy'])->name('amistades.destroy');
     Route::post('/amistades/{idUsuario}/bloquear', [AmistadController::class, 'bloquear'])->name('amistades.bloquear');
+    Route::get('/amistades/bloqueados', [AmistadController::class, 'getBloqueados'])->name('amistades.bloqueados');
+    Route::post('/amistades/desbloquear', [AmistadController::class, 'desbloquearUsuario'])->name('amistades.desbloquear');
 });
 
 Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');

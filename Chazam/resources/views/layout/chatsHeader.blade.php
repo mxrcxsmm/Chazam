@@ -6,20 +6,19 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Three.js para VANTA FOG -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
-
-<!-- VANTA FOG -->
-<script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
+    <!-- VANTA FOG -->
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.fog.min.js"></script>
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- Bootstrap Icons (opcional) -->
+    <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
-
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/retos.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/userSearch.css') }}">
     @stack('head')
 </head>
 <body>
@@ -27,13 +26,11 @@
     {{-- Navbar --}}
     <nav class="navbar navbar-expand-lg navbar-light shadow-sm px-4 py-2" style="position: relative; z-index: 1;">
         <div class="container-fluid d-flex justify-content-between align-items-center">
-
             <!-- Logo o nombre de la app -->
             <a href="{{ route('retos.guide') }}"><img src="{{ asset('img/Logo_Chazam.png') }}" alt="Logo" class="logo">Chazam</a>
 
             <!-- Racha, puntos y perfil -->
             <div class="d-flex align-items-center gap-4">
-
                 <!-- Racha de días -->
                 <div class="d-flex align-items-center text-warning fw-semibold">
                     <i class="bi bi-fire me-1"></i>
@@ -52,13 +49,18 @@
                     <i class="bi bi-people-fill"></i>
                 </button>
 
+                <!-- Botón de búsqueda de usuarios -->
+                <button class="btn btn-outline-dark" id="btnBuscarUsuarios" type="button">
+                    <i class="bi bi-search"></i>
+                </button>
+
                 <!-- Botón para abrir el menú -->
                 <button class="btn btn-outline-dark" onclick="toggleSidebar()">
                     @if(isset($imagen_perfil) && $imagen_perfil)
                     <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
-                @else
+                    @else
                     <i class="bi bi-person-circle"></i>
-                @endif
+                    @endif
                 </button>
 
                 <!-- Sidebar estilo perfil -->
@@ -68,7 +70,7 @@
                             @if(isset($imagen_perfil) && $imagen_perfil)
                             <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #E6E6FA;">
                             @else
-                                <i class="bi bi-person-circle fs-2"></i>
+                            <i class="bi bi-person-circle fs-2"></i>
                             @endif
                             <div>{{ isset($username) ? $username : 'Usuario' }}</div>
                             <div class="small">{{ isset($nombre_completo) ? $nombre_completo : '' }}</div>
@@ -91,7 +93,6 @@
                             <span>{{ isset($puntos) ? $puntos : 0 }} pts</span>
                         </div>
                     </div>
-                    
 
                     <hr class="border-light">
 
@@ -109,28 +110,6 @@
                         <button type="submit" class="btn btn-danger w-100 rounded-pill">Cerrar Sesión</button>
                     </form>
                 </div>
-
-                <script>
-                    function toggleSidebar(forceClose = false) {
-                        const sidebar = document.getElementById('sidebar');
-                        if (forceClose || sidebar.style.display === 'block') {
-                            sidebar.style.display = 'none';
-                            document.body.style.overflow = '';
-                        } else {
-                            sidebar.style.display = 'block';
-                            sidebar.focus();
-                            document.body.style.overflow = 'hidden';
-                        }
-                    }
-                    document.addEventListener('mousedown', function(e) {
-                        const sidebar = document.getElementById('sidebar');
-                        if (!sidebar) return;
-                        // Si el sidebar está visible y el click es fuera de él
-                        if (sidebar.style.display === 'block' && !sidebar.contains(e.target)) {
-                            toggleSidebar(true);
-                        }
-                    });
-                </script>
             </div>
         </div>
     </nav>
@@ -140,12 +119,14 @@
         @yield('content')
     </div>
 
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/estados.js') }}"></script>
     <script src="{{ asset('js/hamburger.js') }}"></script>
+    <script src="{{ asset('js/userSearch.js') }}"></script>
     @stack('scripts')
 
-    <!-- Modal de amistades (¡fuera del navbar y de cualquier div!) -->
+    <!-- Modal de amistades -->
     <div class="modal fade" id="modalAmistades" tabindex="-1" aria-labelledby="modalAmistadesLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -154,8 +135,21 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div id="listaAmistades" class="list-group">
-                        <!-- Aquí se cargarán las amistades dinámicamente -->
+                    <ul class="nav nav-tabs" id="amistadesTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="amistades-tab" data-bs-toggle="tab" data-bs-target="#amistades" type="button" role="tab">Amistades</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="bloqueados-tab" data-bs-toggle="tab" data-bs-target="#bloqueados" type="button" role="tab">Bloqueados</button>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade show active" id="amistades" role="tabpanel">
+                            <div id="listaAmistades" class="list-group"></div>
+                        </div>
+                        <div class="tab-pane fade" id="bloqueados" role="tabpanel">
+                            <div id="listaBloqueados" class="list-group"></div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -164,5 +158,50 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal de búsqueda de usuarios -->
+    <div class="modal fade" id="buscarUsuariosModal" tabindex="-1" aria-labelledby="buscarUsuariosModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#9147ff; color:#fff;">
+                    <h5 class="modal-title" id="buscarUsuariosModalLabel">Buscar Usuarios</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="search-user-container">
+                        <div class="search-box mb-3">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchUserInput" placeholder="Buscar por username..." class="form-control">
+                        </div>
+                        <div id="searchResults" class="search-results">
+                            <!-- Los resultados se cargarán aquí -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleSidebar(forceClose = false) {
+            const sidebar = document.getElementById('sidebar');
+            if (forceClose || sidebar.style.display === 'block') {
+                sidebar.style.display = 'none';
+                document.body.style.overflow = '';
+            } else {
+                sidebar.style.display = 'block';
+                sidebar.focus();
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        document.addEventListener('mousedown', function(e) {
+            const sidebar = document.getElementById('sidebar');
+            if (!sidebar) return;
+            if (sidebar.style.display === 'block' && !sidebar.contains(e.target)) {
+                toggleSidebar(true);
+            }
+        });
+    </script>
 </body>
 </html>
