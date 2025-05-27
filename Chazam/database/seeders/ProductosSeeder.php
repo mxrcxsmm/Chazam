@@ -112,6 +112,14 @@ class ProductosSeeder extends Seeder
                 'tipo_valor' => 'puntos',
                 'puntos' => 60000,
                 'id_tipo_producto' => 2,
+            ],
+            [
+                'titulo' => 'Comunidad',
+                'descripcion' => 'Creación de una comunidad.',
+                'precio' => 75000,
+                'tipo_valor' => 'puntos',
+                'puntos' => null,
+                'id_tipo_producto' => 5,
             ]
         ]);
     }

@@ -1,0 +1,216 @@
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: #fcfbfa;
+    color: #222;
+    margin: 0;
+    padding: 0;
+}
+
+.factura-container {
+    max-width: 700px;
+    margin: 30px auto;
+    background: #fff;
+    /* border-radius: 16px; */ /* Quitamos el border-radius */
+    box-shadow: 0 2px 8px rgba(108,52,131,0.08);
+    padding: 32px 40px;
+}
+
+.factura-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.factura-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.factura-num {
+    margin-top: 10px;
+    font-size: 1.1rem;
+    border: 2px solid #222;
+    /* border-radius: 16px; */
+    border-radius: 0;
+    padding: 2px 18px;
+    display: inline-block;
+    font-weight: bold;
+}
+
+.imagen {
+    width: 100px;      /* O el tamaño que prefieras */
+    height: 100px;
+    margin-left: 30%;   /* Elimina margen si no quieres separación extra */
+    border-radius: 20px; /* O el tamaño que prefieras */
+}
+
+.factura-datos {
+    display: flex;
+    justify-content: space-between;
+    margin: 32px 0 24px 0;
+    gap: 12px;
+}
+
+.factura-datos-box {
+    /* border-radius: 12px; */
+    border-radius: 0;
+    padding: 16px 18px;
+    width: 48%;
+    font-size: 1rem;
+    background: #fcfbfa;
+}
+
+.factura-datos-box strong {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 1.1rem;
+}
+
+.factura-table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-bottom: 18px;
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.factura-table th {
+    background: #222;
+    color: #fff;
+    font-weight: 600;
+    padding: 10px 0;
+    /* border-radius: 10px 10px 0 0; */
+    border-radius: 0;
+    font-size: 1.1rem;
+}
+
+.factura-table td {
+    text-align: center;
+    vertical-align: top;
+    padding: 10px 8px;
+    font-size: 1rem;
+}
+
+.encabezado {
+    background: #222;
+    color: #fff;
+    font-weight: 600;
+    padding: 10px 0;
+    /* border-radius: 10px 10px 0 0; */
+    border-radius: 0;
+    font-size: 1.1rem;
+    text-align: center;
+    width: 100%;
+}
+
+/* Mantén las celdas en una línea por defecto */
+.factura-table th,
+.factura-table td {
+    border: 1.5px solid #222;   /* Línea de tabla */
+    white-space: nowrap;        /* Todo en una línea, sin saltos */
+    overflow: visible;          /* No cortes el texto */
+    text-overflow: unset;       /* No uses puntos suspensivos */
+}
+
+/* Solo la columna de descripción permite saltos de línea */
+.factura-table td.descripcion,
+.factura-table th.descripcion {
+    white-space: normal;
+    word-break: break-word;
+}
+
+/* Solo la columna de descripción permite saltos de línea */
+.factura-table td.fecha_pago,
+.factura-table th.fecha_pago {
+    white-space: normal;
+    word-break: break-word;
+}
+
+.factura-total-row th, .factura-total-row td {
+    border-top: 2px solid #222;
+    font-size: 1.1rem;
+}
+
+.factura-total-label {
+    text-align: right;
+    font-weight: bold;
+    padding-right: 18px;
+}
+
+.factura-total-value {
+    background: #222;
+    color: #fff;
+    /* border-radius: 18px; */
+    border-radius: 0;
+    padding: 6px 24px;
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: inline-block;
+}
+
+.factura-footer {
+    margin-top: 32px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 12px;
+}
+
+.factura-pago-info {
+    border: 2px solid #222;
+    /* border-radius: 12px; */
+    border-radius: 0;
+    padding: 12px 18px;
+    width: 45%;
+    font-size: 1rem;
+    background: #fcfbfa;
+}
+
+.factura-gracias {
+    background: #222;
+    color: #fff;
+    /* border-radius: 18px; */
+    border-radius: 0;
+    padding: 8px 24px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    text-align: center;
+    margin-bottom: 8px;
+}
+
+.factura-web {
+    border: 2px solid #222;
+    /* border-radius: 16px; */
+    border-radius: 0;
+    padding: 6px 18px;
+    font-size: 1rem;
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* Responsive para impresión y móvil */
+@media (max-width: 800px) {
+    .factura-container {
+        padding: 12px 2vw;
+    }
+    .factura-header {
+        flex-direction: row;
+        align-items: center;
+    }
+    .factura-datos, .factura-footer {
+        flex-direction: column;
+        gap: 18px;
+    }
+    .factura-datos-box, .factura-pago-info {
+        width: 100%;
+    }
+    .factura-logo {
+        width: 60px;
+        height: 60px;
+    }
+    .factura-title {
+        font-size: 2rem;
+    }
+}

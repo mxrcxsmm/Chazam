@@ -1,4 +1,5 @@
 // Función para validar el formulario de registro
+
 function validateSignUpForm() {
     const formSignup = document.querySelector('.form-signup');
     if (!formSignup) return;
@@ -174,31 +175,166 @@ function validateSignUpForm() {
 
 // Inicializar el datepicker con las restricciones
 function initDatepicker() {
-    const datepickers = document.querySelectorAll('.datepicker');
-    const hoy = new Date();
-    const edadMinima = new Date(hoy.getFullYear() - 13, hoy.getMonth(), hoy.getDate());
-
-    M.Datepicker.init(datepickers, {
+    var today = new Date();
+    var maxDate = new Date(today.getFullYear() - 13, today.getMonth(), today.getDate() - 1);
+    var elems = document.querySelectorAll('.datepicker');
+    M.Datepicker.init(elems, {
         format: 'yyyy-mm-dd',
-        yearRange: [edadMinima.getFullYear() - 100, edadMinima.getFullYear()],
-        maxDate: edadMinima,
-        defaultDate: edadMinima,
-        setDefaultDate: true,
-        autoClose: true,
-        showClearBtn: false,
+        yearRange: [1900, maxDate.getFullYear()],
+        maxDate: maxDate,
+        setDefaultDate: false,
+        defaultDate: maxDate,
         i18n: {
-            months: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
-            monthsShort: ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
-            weekdays: ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"],
-            weekdaysShort: ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
-            weekdaysAbbrev: ["D", "L", "M", "M", "J", "V", "S"],
             cancel: 'Cancelar',
             clear: 'Limpiar',
-            done: 'Aceptar'
+            done: 'Aceptar',
+            months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+            monthsShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+            weekdays: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+            weekdaysShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
+            weekdaysAbbrev: ['D','L','M','M','J','V','S']
+        },
+        onSelect: function(date) {
+            // Formatea la fecha seleccionada y la pone en el input
+            if (this.el) {
+                const yyyy = date.getFullYear();
+                const mm = String(date.getMonth() + 1).padStart(2, '0');
+                const dd = String(date.getDate()).padStart(2, '0');
+                this.el.value = `${yyyy}-${mm}-${dd}`;
+            }
         }
     });
 }
 
 // Exportar las funciones para uso global
 window.validateSignUpForm = validateSignUpForm;
-window.initDatepicker = initDatepicker; 
+window.initDatepicker = initDatepicker;
+
+document.addEventListener('DOMContentLoaded', function() {
+    function closeAllDropdowns() {
+        document.querySelectorAll('.dropdown-content').forEach(el => el.style.display = 'none');
+    }
+
+    const loginContainer = document.querySelector('.login-container');
+    
+    // Función para manejar el cambio de ancho
+    function handleWidthChange() {
+        const activeTab = document.querySelector('.tabs .tab a.active');
+        if (window.innerWidth > 600) {
+            if (activeTab && activeTab.getAttribute('href') === '#signup') {
+                loginContainer.classList.add('wider');
+            } else {
+                loginContainer.classList.remove('wider');
+            }
+        } else {
+            loginContainer.classList.remove('wider');
+        }
+    }
+
+    // Inicializar tabs de Materialize
+    const materializeTabs = M.Tabs.init(document.querySelectorAll('.tabs'), {
+        onShow: function(tab) {
+            handleWidthChange();
+            
+            // Reiniciar componentes de Materialize
+            setTimeout(() => {
+                M.updateTextFields();
+                M.FormSelect.init(document.querySelectorAll('select'));
+            }, 50);
+        }
+    });
+
+    // Manejar cambios de tamaño de ventana
+    window.addEventListener('resize', handleWidthChange);
+
+    // Aplicar el ancho inicial
+    handleWidthChange();
+
+    // Inicializar componentes
+    initDatepicker();
+    M.FormSelect.init(document.querySelectorAll('select'));
+    M.CharacterCounter.init(document.querySelectorAll('textarea'));
+
+    // Inicializar validaciones
+    validateSignUpForm();
+
+    // Inicializar Vanta.js
+    VANTA.WAVES({
+        el: "#vanta-bg",
+        color: 0x703ea3,
+        backgroundColor: 0xaa00ff
+    });
+
+    // Oculta los dropdowns de Materialize cuando sale un SweetAlert
+    const observer = new MutationObserver(function(mutations) {
+        const swalVisible = !!document.querySelector('.swal2-container');
+        document.querySelectorAll('.dropdown-content').forEach(el => {
+            el.style.display = swalVisible ? 'none' : '';
+        });
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+
+    // Forzar repaint REAL de autofill al cambiar de tab
+    document.querySelectorAll('.tabs .tab a').forEach(tab => {
+        tab.addEventListener('click', () => {
+            setTimeout(() => {
+                document.querySelectorAll('input').forEach(input => {
+                    // Forzar reflow y trigger de autofill
+                    input.value = input.value; // trigger repaint
+                    
+                    void input.offsetHeight;
+                    input.style.display = '';
+                });
+            }, 100);
+        });
+    });
+
+    // Mostrar SweetAlert si hay mensajes de error de sesión
+    if (window.sweetAlertError) {
+        closeAllDropdowns && closeAllDropdowns();
+        Swal.fire({
+            icon: 'error',
+            title: '¡Sesión activa!',
+            text: window.sweetAlertError,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#703ea3'
+        });
+    }
+    if (window.sweetAlertLoginError) {
+        closeAllDropdowns && closeAllDropdowns();
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de acceso',
+            text: window.sweetAlertLoginError,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#703ea3'
+        });
+    }
+
+    const fileInput = document.querySelector('input[type="file"][name="img"]');
+    if (fileInput && formSignup) {
+        formSignup.addEventListener('submit', function(e) {
+            const file = fileInput.files[0];
+            let errorMsg = '';
+            if (file) {
+                const validTypes = ['image/jpeg', 'image/png'];
+                if (!validTypes.includes(file.type)) {
+                    errorMsg = 'La imagen debe ser JPG o PNG.';
+                } else if (file.size > 2 * 1024 * 1024) {
+                    errorMsg = 'La imagen no puede superar los 2MB.';
+                }
+            }
+            if (errorMsg) {
+                e.preventDefault();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Imagen no válida',
+                    text: errorMsg,
+                    confirmButtonText: 'Entendido',
+                    confirmButtonColor: '#703ea3'
+                });
+                return false;
+            }
+        });
+    }
+});

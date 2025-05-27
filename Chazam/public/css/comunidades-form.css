@@ -1,0 +1,101 @@
+#vanta-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+}
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+.comunidad-container {
+    background: rgba(45, 45, 45, 0.97);
+    padding: 60px 50px 40px 50px;
+    border-radius: 15px;
+    max-width: 800px;
+    margin: 60px auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    z-index: 2;
+    position: relative;
+}
+h4 {
+    text-align: center;
+    color: white;
+    margin-bottom: 30px;
+}
+.btn-comunidad {
+    background-color: #9147ff;
+    color: #fff;
+    border-radius: 25px;
+    width: 100%;
+    font-size: 1.1em;
+}
+.btn-comunidad:hover {
+    background-color: #7a30dd;
+}
+label {
+    color: #fff !important;
+}
+.input-field input[type=text],
+.input-field textarea,
+.input-field select {
+    color: #fff !important;
+    background-color: transparent !important;
+}
+.input-field input[type=text]:focus + label,
+.input-field textarea:focus + label {
+    color: #703ea3 !important;
+}
+.input-field input[type=text]:focus,
+.input-field textarea:focus {
+    border-bottom: 2px solid #703ea3 !important;
+    box-shadow: 0 1px 0 0 #703ea3 !important;
+}
+.input-field .prefix {
+    color: #9147ff !important;
+}
+.select-wrapper input.select-dropdown {
+    color: #fff !important;
+}
+.error-text {
+    color: #ff5252;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    display: block;
+}
+.input-field input.error,
+.input-field textarea.error,
+.input-field select.error {
+    border-bottom: 1px solid #ff5252 !important;
+    box-shadow: 0 1px 0 0 #ff5252 !important;
+}
+.input-field input.error + label,
+.input-field textarea.error + label,
+.input-field select.error + label {
+    color: #ff5252 !important;
+}
+/* Estilos para el dropdown de Materialize */
+.dropdown-content {
+    background-color: #2d2d2d !important;
+}
+.dropdown-content li > a,
+.dropdown-content li > span {
+    color: #fff !important;
+}
+.dropdown-content li:hover,
+.dropdown-content li.active {
+    background-color: #3a3a3a !important;
+}
+/* Estilos para el file input */
+.file-field .btn {
+    background-color: #9147ff;
+}
+.file-field .btn:hover {
+    background-color: #7a30dd;
+}
+.file-path-wrapper input {
+    color: #fff !important;
+} 

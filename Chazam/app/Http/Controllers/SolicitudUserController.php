@@ -8,6 +8,7 @@ use App\Models\Chat;
 use App\Models\ChatUsuario;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class SolicitudUserController extends Controller
 {
@@ -149,23 +150,47 @@ class SolicitudUserController extends Controller
      */
     public function verificarSolicitud($id_usuario)
     {
-        $solicitud = Solicitud::where(function($query) use ($id_usuario) {
-            $query->where('id_emisor', Auth::user()->id_usuario)
-                  ->where('id_receptor', $id_usuario);
-        })->orWhere(function($query) use ($id_usuario) {
-            $query->where('id_emisor', $id_usuario)
-                  ->where('id_receptor', Auth::user()->id_usuario);
-        })->first();
-
-        if ($solicitud) {
-            return response()->json([
-                'estado' => $solicitud->estado
+        try {
+            \Log::info('Verificando solicitud entre usuarios', [
+                'usuario_actual' => Auth::id(),
+                'usuario_destino' => $id_usuario
             ]);
-        }
 
-        return response()->json([
-            'estado' => null
-        ]);
+            $solicitud = Solicitud::where(function($query) use ($id_usuario) {
+                $query->where('id_emisor', Auth::id())
+                      ->where('id_receptor', $id_usuario);
+            })->orWhere(function($query) use ($id_usuario) {
+                $query->where('id_emisor', $id_usuario)
+                      ->where('id_receptor', Auth::id());
+            })->first();
+
+            \Log::info('Resultado de la verificación', [
+                'solicitud_encontrada' => $solicitud ? true : false,
+                'estado' => $solicitud ? $solicitud->estado : null
+            ]);
+
+            if ($solicitud) {
+                return response()->json([
+                    'success' => true,
+                    'estado' => $solicitud->estado
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'estado' => 'no_existe'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error al verificar solicitud', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al verificar el estado de la solicitud'
+            ], 500);
+        }
     }
 
     /**
@@ -179,7 +204,17 @@ class SolicitudUserController extends Controller
             }])
             ->where('id_receptor', Auth::id())
             ->where('estado', 'pendiente')
-            ->get();
+            ->get()
+            ->map(function($solicitud) {
+                return [
+                    'id_solicitud' => $solicitud->id_solicitud,
+                    'emisor' => [
+                        'id_usuario' => $solicitud->emisor->id_usuario,
+                        'username' => $solicitud->emisor->username,
+                        'img' => $solicitud->emisor->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', $solicitud->emisor->img)) : asset('img/profile_img/avatar-default.png')
+                    ]
+                ];
+            });
 
             return response()->json($solicitudes);
         } catch (\Exception $e) {
@@ -220,7 +255,6 @@ class SolicitudUserController extends Controller
             $solicitud->estado = $request->respuesta;
             $solicitud->save();
 
-            // Si se acepta la solicitud, crear un chat entre los usuarios si no existe
             if ($request->respuesta === 'aceptada') {
                 // Buscar un chat privado (sin id_reto) entre ambos usuarios
                 $chatExistente = \App\Models\Chat::whereNull('id_reto')
@@ -258,6 +292,29 @@ class SolicitudUserController extends Controller
                     'id_receptor' => $solicitud->id_emisor,
                     'estado' => 'aceptada'
                 ]);
+            } else if ($request->respuesta === 'rechazada') {
+                // Eliminar chats relacionados
+                $chats = \App\Models\Chat::whereHas('chatUsuarios', function($query) use ($solicitud) {
+                    $query->where('id_usuario', $solicitud->id_emisor)
+                          ->orWhere('id_usuario', $solicitud->id_receptor);
+                })->get();
+
+                foreach ($chats as $chat) {
+                    // Eliminar mensajes
+                    \App\Models\Mensaje::whereIn('id_chat_usuario', function($query) use ($chat) {
+                        $query->select('id_chat_usuario')
+                              ->from('chat_usuario')
+                              ->where('id_chat', $chat->id_chat);
+                    })->delete();
+
+                    // Eliminar relaciones chat_usuario
+                    \App\Models\ChatUsuario::where('id_chat', $chat->id_chat)->delete();
+
+                    // Eliminar el chat
+                    $chat->delete();
+                }
+                // Eliminar la solicitud rechazada de la base de datos
+                $solicitud->delete();
             }
 
             DB::commit();

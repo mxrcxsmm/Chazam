@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (cropBoxData) cropper.setCropBoxData(cropBoxData);
                         // Ocultar spinner al terminar
                         spinner.style.display = 'none';
-                        if (callback) callback();
+                if (callback) callback();
                     }
                 });
             }, 100);
@@ -306,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function() {
         textEl.style.color = options.color || '#ffffff';
         textEl.style.fontSize = (options.size || 30) + 'px';
         textEl.style.fontFamily = options.font || 'Arial';
-
+        
         // Posicionar en el centro del overlay-layer
         const rect = overlayLayer.getBoundingClientRect();
         textEl.style.left = (rect.width / 2) + 'px';

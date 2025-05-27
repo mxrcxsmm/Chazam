@@ -15,6 +15,7 @@ use App\Http\Controllers\ProductosAdminController;
 use App\Http\Controllers\MomentmsController;
 use App\Http\Controllers\TiendaController;
 use App\Http\Controllers\PagosAdminController;
+use App\Http\Controllers\CompraController;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
 use App\Http\Controllers\StripeController;
@@ -23,6 +24,8 @@ use App\Http\Controllers\ReporteController;
 use App\Http\Controllers\VistaController;
 use App\Http\Controllers\ComunidadesController;
 use App\Http\Controllers\SolicitudController;
+use App\Http\Controllers\AmistadController;
+use App\Http\Controllers\UserSearchController;
 
 
 
@@ -42,12 +45,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [AdminController::class, 'destroy'])->name('usuarios.destroy');
         Route::post('/usuarios/filtrar', [AdminController::class, 'filtrar'])->name('usuarios.filtrar');
         Route::post('/usuarios/{id}/ban', [AdminController::class, 'ban'])->name('usuarios.ban');
-
-        // Rutas para retos (administrador)
-        Route::get('retos', [RetoAdminController::class, 'index'])->name('retos.index');
-        Route::post('retos', [RetoAdminController::class, 'store'])->name('retos.store');
-        Route::put('retos/{id}', [RetoAdminController::class, 'update'])->name('retos.update');
-        Route::delete('retos/{id}', [RetoAdminController::class, 'destroy'])->name('retos.destroy');
+        Route::get('/usuarios/{id}/json', [AdminController::class, 'getUserJson'])->name('usuarios.json');
 
         // Rutas para reportes (administrador)
         Route::get('reportes', [ReporteAdminController::class, 'index'])->name('reportes.index');
@@ -176,9 +174,11 @@ Route::middleware(['auth'])->group(function () {
     
     // Rutas para el chat de amigos
     Route::get('user/chats', [FriendChatController::class, 'getUserChats'])->name('user.chats');
-    Route::get('user/chat/{chatId}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
-    Route::post('user/chat/{chatId}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
+    Route::get('/user/chat/{id}/messages', [FriendChatController::class, 'getChatMessages'])->name('user.chat.messages');
+    Route::post('/user/chat/{id}/send', [FriendChatController::class, 'sendMessage'])->name('user.chat.send');
 
+    // Ruta para búsqueda de usuarios
+    Route::get('/buscar-usuarios', [UserSearchController::class, 'search'])->name('user.search');
 
     // Rutas para solicitudes y bloqueos
     Route::post('/solicitudes/enviar', [SolicitudUserController::class, 'enviarSolicitud'])->name('solicitudes.enviar');
@@ -188,18 +188,50 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/solicitudes/pendientes', [SolicitudUserController::class, 'getPendientes'])->name('solicitudes.pendientes');
     Route::post('/solicitudes/responder', [SolicitudUserController::class, 'responderSolicitud'])->name('solicitudes.responder');
     
+    // Rutas para búsqueda de usuarios
+    Route::get('/user/search', [UserController::class, 'search'])->name('user.search');
+    
     // Ruta para reportes
     Route::post('/reportes/crear', [ReporteController::class, 'crear'])->name('reportes.crear');
 
     // Rutas para comunidades
     Route::get('/comunidades', [ComunidadesController::class, 'index'])->name('comunidades.index');
+    Route::get('/comunidades/create', [ComunidadesController::class, 'create'])->name('comunidades.create');
+    Route::post('/comunidades', [ComunidadesController::class, 'store'])->name('comunidades.store');
     Route::post('/comunidades/{id}/join', [ComunidadesController::class, 'join'])->name('comunidades.join');
+    Route::get('/comunidades/{id}', [ComunidadesController::class, 'show'])->name('comunidades.show');
+    Route::get('/comunidades/{id}/edit', [ComunidadesController::class, 'edit'])->name('comunidades.edit');
+    Route::get('/comunidades/{id}/edit-form', [ComunidadesController::class, 'editForm'])->name('comunidades.edit-form');
+    Route::put('/comunidades/{id}', [ComunidadesController::class, 'update'])->name('comunidades.update');
+    Route::post('/comunidades/{id}/abandonar', [ComunidadesController::class, 'abandonar'])->name('comunidades.abandonar');
+    Route::post('/comunidades/{id}/eliminar', [ComunidadesController::class, 'eliminar'])->name('comunidades.eliminar');
+
+    // Nuevas rutas para la API de comunidades
+    Route::get('/comunidades/{id}/members', [ComunidadesController::class, 'getMembers'])->name('comunidades.members');
+    Route::get('/comunidades/{id}/messages', [ComunidadesController::class, 'getMessages'])->name('comunidades.messages');
+    Route::post('/comunidades/{id}/send-message', [ComunidadesController::class, 'sendMessage'])->name('comunidades.send-message');
 
     Route::get('user/comunidades', [FriendChatController::class, 'comunidades'])->name('user.comunidades');
+
+    // Rutas para que el usuario vea sus propias compras
+    Route::get('/mis-compras', [CompraController::class, 'historial'])->name('compras.historial');
+    Route::get('/mis-compras/factura/{pagoId}', [CompraController::class, 'descargarFactura'])
+        ->middleware('auth')
+        ->name('compras.factura');
+    Route::post('/mis-compras/filtrar', [CompraController::class, 'filtrarAjax'])
+        ->middleware('auth')
+        ->name('compras.filtrar');
 
     // Rutas para el disclaimer
     Route::get('/retos/verificar-disclaimer', [RetoController::class, 'verificarDisclaimer'])->middleware(['auth']);
     Route::post('/retos/guardar-disclaimer', [RetoController::class, 'guardarDisclaimer'])->middleware(['auth']);
+
+    // Rutas de amistades
+    Route::get('/amistades', [AmistadController::class, 'index'])->name('amistades.index');
+    Route::delete('/amistades/{idUsuario}', [AmistadController::class, 'destroy'])->name('amistades.destroy');
+    Route::post('/amistades/{idUsuario}/bloquear', [AmistadController::class, 'bloquear'])->name('amistades.bloquear');
+    Route::get('/amistades/bloqueados', [AmistadController::class, 'getBloqueados'])->name('amistades.bloqueados');
+    Route::post('/amistades/desbloquear', [AmistadController::class, 'desbloquearUsuario'])->name('amistades.desbloquear');
 });
 
 Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');

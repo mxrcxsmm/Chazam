@@ -83,10 +83,6 @@
                         <button class="filter-btn" data-filter="bright">Brillo+</button>
                         <button class="filter-btn" data-filter="soft-bw">B/N-</button>
                         <button class="filter-btn" data-filter="strong-blur">Blur+</button>
-                        <button class="filter-btn" data-filter="dramatic">Drama</button>
-                        <button class="filter-btn" data-filter="bright">Brillo+</button>
-                        <button class="filter-btn" data-filter="soft-bw">B/N-</button>
-                        <button class="filter-btn" data-filter="strong-blur">Blur+</button>
                     </div>
                 </div>
 

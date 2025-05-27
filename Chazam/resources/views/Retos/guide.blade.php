@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
 @include('layout.chatsHeader')
 
 <div class="center-container">
@@ -6,7 +8,7 @@
     <div class="button-container">
         <a href="{{ route('retos.reto') }}"><button class="startbutton">Comenzar</button></a>
         <a href="{{ route('user.friendchat') }}"><button class="startbutton">Amigos</button></a>
-        <a href="{{ route('chats.index') }}"><button class="startbutton">Comunidades</button></a>
+        <a href="{{ route('comunidades.index') }}"><button class="startbutton">Comunidades</button></a>
     </div>
 </div>
 
@@ -33,4 +35,6 @@
     transform: scale(1.05);
 }
 </style>
+
+<script src="{{ asset('js/hamburger.js') }}"></script>
 

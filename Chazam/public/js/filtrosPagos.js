@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const filtroId = document.getElementById('filtro_id');
     const filtroComprador = document.getElementById('filtro_comprador');
     const filtroProducto = document.getElementById('filtro_producto');
+    const filtroCantidad = document.getElementById('filtro_cantidad');
     const filtroFechaPago = document.getElementById('filtro_fecha_pago');
     const limpiarFiltrosBtn = document.getElementById('limpiarFiltros');
     const tablaPagos = document.querySelector('tbody');
@@ -14,6 +15,7 @@ document.addEventListener('DOMContentLoaded', function () {
             id_pago: filtroId.value.trim(),
             comprador: filtroComprador.value.trim(),
             producto: filtroProducto.value.trim(),
+            cantidad: filtroCantidad.value.trim(),
             fecha_pago: filtroFechaPago.value.trim(),
         };
 
@@ -44,11 +46,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 tablaPagos.innerHTML = '';
                 data.forEach((pago) => {
                     const row = `<tr>
-                        <td>${pago.id_pago}</td>
-                        <td>${pago.comprador}</td>
-                        <td>${pago.producto}</td>
-                        <td>${pago.fecha_pago}</td>
-                    </tr>`;
+        <td class="td-id">${pago.id_pago}</td>
+        <td class="td-comprador">${pago.comprador}</td>
+        <td class="td-producto">${pago.producto}</td>
+        <td class="td-cantidad">${pago.cantidad}</td>
+        <td class="td-fecha">${pago.fecha_pago}</td>
+    </tr>`;
                     tablaPagos.innerHTML += row;
                 });
             })
@@ -63,6 +66,7 @@ document.addEventListener('DOMContentLoaded', function () {
         filtroId.value = '';
         filtroComprador.value = '';
         filtroProducto.value = '';
+        filtroCantidad.value = '';
         filtroFechaPago.value = '';
         aplicarFiltros();
     });
@@ -71,6 +75,7 @@ document.addEventListener('DOMContentLoaded', function () {
     filtroId.addEventListener('input', aplicarFiltros);
     filtroComprador.addEventListener('input', aplicarFiltros);
     filtroProducto.addEventListener('input', aplicarFiltros);
+    filtroCantidad.addEventListener('input', aplicarFiltros);
 
     // Configurar el datepicker para el campo de fecha de pago
     $('#filtro_fecha_pago').datepicker({

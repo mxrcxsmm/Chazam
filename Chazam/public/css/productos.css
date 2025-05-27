@@ -1,0 +1,299 @@
+/* Estilos generales */
+body {
+    background-color: #e3aee3 !important; /* Color de fondo personalizado */
+    font-family: Arial, sans-serif !important;
+}
+
+.container {
+    padding: 20px !important;
+}
+
+h2 {
+    text-align: center !important;
+    color: #333 !important;
+}
+
+/* Estilos para la tabla */
+.table-responsive {
+    overflow-x: auto; /* Permite el desplazamiento horizontal */
+    -webkit-overflow-scrolling: touch; /* Mejora la experiencia en dispositivos táctiles */
+}
+
+table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin-top: 20px !important;
+    background-color: #d092fd !important;
+}
+
+table th,
+table td {
+    border: 1px solid #ddd !important;
+    padding: 8px !important;
+    text-align: left !important;
+}
+
+table th {
+    background-color: black !important;
+    color: white !important;
+}
+
+tr:hover {
+    background-color: #d092fd !important;
+}
+
+/* Botones */
+.btn-edit,
+.btn-ban,
+.btn-unban,
+.btn-delete {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+}
+
+.btn-edit {
+    width: 2%;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.btn-ban {
+    background-color: #ff6666;
+}
+
+.btn-unban {
+    background-color: #00cc66;
+}
+
+.btn-edit i,
+.btn-delete i {
+    font-size: 18px;
+    color: #333;
+}
+
+/* Sobrescribir estilos de botones */
+.btn {
+    background-color: #4CAF50; /* Color personalizado */
+    color: white !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    font-size: 16px !important;
+    border-radius: 5px !important;
+}
+
+/* Sobrescribir estilos de inputs */
+.form-control {
+    border-radius: 5px !important;
+    padding: 10px !important;
+}
+
+/* Estilos para los modales */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    color: #dc3545;
+    font-size: 0.875em;
+    margin-top: 0.25rem;
+}
+
+/* Sobrescribir estilos de etiquetas */
+label {
+    font-weight: bold !important;
+    color: #333 !important;
+}
+
+/* Estilos para la navbar */
+.navbar {
+    background-color: #333 !important;
+}
+
+.navbar .nav-link {
+    color: white !important;
+}
+
+.navbar .nav-link.active {
+    color: white !important;
+}
+
+.navbar .nav-link:hover {
+    color: #575656 !important;
+}
+
+.navbar-toggler {
+    border: none; /* Elimina el borde del botón hamburguesa */
+}
+
+.navbar-toggler-icon {
+    border-radius: 2px;
+    width: 30px;
+    height: 3px;
+    display: block;
+    margin: 5px auto;
+}
+
+/* --- Estilos de formulario tipo login --- */
+.producto-form-container {
+    background-color: #d092fd;
+    padding: 40px 2vw;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    position: relative;
+}
+
+@media (min-width: 1200px) {
+    .producto-form-container {
+        max-width: 100% !important; /* Ocupa todo el ancho del modal */
+    }
+}
+
+.producto-form-container h5 {
+    text-align: center;
+    color: #222;
+    margin-bottom: 30px;
+    font-weight: bold;
+}
+
+.producto-form .input-field {
+    margin-bottom: 22px;
+    position: relative;
+}
+
+/* --- Inputs estilo login --- */
+.producto-form input,
+.producto-form textarea,
+.producto-form select {
+    background: transparent;
+    border: none;
+    border-bottom: 1.5px solid #a78bd4;
+    border-radius: 0;
+    color: #222;
+    width: 100%;
+    font-size: 1.1rem;
+    padding: 12px 0 8px 0;
+    margin-bottom: 28px;
+    box-shadow: none;
+    transition: border-color 0.2s;
+}
+
+.producto-form input:focus,
+.producto-form textarea:focus,
+.producto-form select:focus {
+    outline: none;
+    border-bottom: 2px solid #7c1fff;
+    background: transparent;
+}
+
+.producto-form label {
+    color: #a78bd4;
+    font-weight: 400;
+    font-size: 1.05rem;
+    margin-bottom: 0.2rem;
+    margin-left: 2px;
+}
+
+.producto-form .btn,
+.producto-form .btn-custom {
+    background: #a100ff;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    width: 100%;
+    font-size: 1.15rem;
+    padding: 13px 0;
+    margin-top: 18px;
+    box-shadow: 0 2px 8px rgba(130,0,255,0.13);
+    transition: background 0.2s, transform 0.2s;
+    font-weight: 500;
+    letter-spacing: 1px;
+}
+
+.producto-form .btn:hover,
+.producto-form .btn-custom:hover {
+    background: #7c1fff;
+    transform: scale(1.03);
+}
+
+/* Haz el fondo del modal y del contenido igual al del formulario */
+.modal-content {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+}
+
+/* Estilos responsive */
+@media (max-width: 768px) {
+    .navbar-collapse {
+        background-color: #333;
+        padding: 10px;
+    }
+
+    .navbar-nav {
+        text-align: center;
+    }
+
+    .navbar-nav .nav-item {
+        margin-bottom: 10px;
+    }
+
+    table {
+        width: 100% !important;
+        min-width: unset !important;
+        font-size: 11px !important;
+    }
+
+    /* Oculta solo la columna ID en móvil */
+    table th.th-id,
+    table td.td-id {
+        display: none;
+    }
+
+    /* Oculta todas las columnas excepto título, precio-valor y acciones */
+    table th:not(.th-titulo):not(.th-precio-valor):not(.th-acciones),
+    table td:not(.td-titulo):not(.td-precio-valor):not(.td-acciones) {
+        display: none;
+    }
+
+    /* Ajusta el tamaño y evita saltos de línea */
+    table th,
+    table td {
+        font-size: 12px !important;
+        padding: 2px 2px !important;
+        white-space: nowrap !important;
+        max-width: unset !important;
+    }
+}

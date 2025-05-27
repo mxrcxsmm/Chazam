@@ -467,7 +467,7 @@ input[type=\"color\"] {
 }
 body, .create-momentm-container, .editor-container, .editor-workspace, .img-container {
     position: relative;
-    z-index: 1;
+    z-index: 0;
 }
 
 @media (max-width: 900px) {

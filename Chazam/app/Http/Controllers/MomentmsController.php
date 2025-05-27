@@ -126,7 +126,7 @@ class MomentmsController extends Controller
             'fecha_inicio_diff' => $momentm->fecha_inicio->diffForHumans(),
             'usuario' => [
                 'username' => $momentm->usuario->username,
-                'img' => 'img/profile_img/' . $momentm->usuario->img
+                'img' => $momentm->usuario->img ?? '/img/profile_img/avatar-default.png'
             ]
         ]);
     }
@@ -244,7 +244,7 @@ class MomentmsController extends Controller
                     'username' => $m->usuario->username,
                     'nombre' => $m->usuario->nombre,
                     'apellido' => $m->usuario->apellido,
-                    'img' => asset('img/profile_img/' . ($m->usuario->img ?? 'default.png')),
+                    'img' => $m->usuario->img ? asset($m->usuario->img) : asset('/img/profile_img/avatar-default.png'),
                     'id_usuario' => $m->usuario->id_usuario,
                 ]
             ];
