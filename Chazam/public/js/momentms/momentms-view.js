@@ -110,6 +110,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function updateModalContent(momentm) {
+        console.log('Avatar:', momentm.usuario.img);
         document.querySelector('.momentm-user-avatar').src = getAssetUrl(momentm.usuario.img);
         document.querySelector('.momentm-user-name').textContent = momentm.usuario.username;
         document.querySelector('.momentm-time').textContent = momentm.fecha_inicio_diff;

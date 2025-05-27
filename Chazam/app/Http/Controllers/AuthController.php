@@ -97,7 +97,7 @@ class AuthController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'username' => 'required|unique:users|max:10',
+            'username' => 'required|unique:users|max:15',
             'nombre' => ['required', 'max:100', 'regex:/^[\p{L}\s\-]+$/u'],
             'apellido' => ['required', 'max:100', 'regex:/^[\p{L}\s\-]+$/u'],
             'fecha_nacimiento' => 'required|date|before_or_equal:' . Carbon::now()->subYears(13)->format('Y-m-d'),
@@ -122,6 +122,9 @@ class AuthController extends Controller
             'password_confirmation.same' => 'Las contraseñas no coinciden.',
             'genero.required' => 'El género es requerido',
             'genero.in' => 'El género debe ser Hombre o Mujer',
+            'img.image' => 'El archivo debe ser una imagen.',
+            'img.mimes' => 'La imagen debe ser JPG o PNG.',
+            'img.max' => 'La imagen no puede superar los 2MB.',
         ]);
 
         if ($validator->fails()) {
