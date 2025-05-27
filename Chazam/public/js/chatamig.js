@@ -14,6 +14,18 @@ const CHAT_CONFIG = {
     }
 };
 
+// Función utilitaria para obtener la ruta correcta de la imagen de perfil
+function getProfileImgPath(img) {
+    if (!img || img === 'avatar-default.png' || img === '/img/profile_img/avatar-default.png') {
+        return `${window.location.origin}/img/profile_img/avatar-default.png`;
+    }
+    if (img.startsWith('http')) {
+        return img;
+    }
+    const cleanImg = img.replace(/^\/?img\/profile_img\//, '');
+    return `${window.location.origin}/img/profile_img/${cleanImg}`;
+}
+
 // Función global para cargar solicitudes
 async function cargarSolicitudesAmistad() {
     try {
@@ -47,19 +59,14 @@ async function cargarSolicitudesAmistad() {
             const solicitudDiv = document.createElement('div');
             solicitudDiv.className = 'solicitud-item';
             solicitudDiv.id = `solicitud-${solicitud.id_solicitud}`;
-            
-            // SOLO aquí construimos la ruta completa
-            const imgPath = solicitud.emisor.img
-                ? `${window.location.origin}/img/profile_img/${solicitud.emisor.img}`
-                : `${window.location.origin}/img/profile_img/avatar-default.png`;
-
+            const imgPath = getProfileImgPath(solicitud.emisor.img);
             solicitudDiv.innerHTML = `
                 <div class="solicitud-info">
                     <img src="${imgPath}" 
                          alt="${solicitud.emisor.username}" 
                          class="rounded-circle"
                          style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #ccc;"
-                         onerror="this.src='${window.location.origin}/img/profile_img/avatar-default.png'">
+                         onerror="this.src='${getProfileImgPath()}'">
                     <span class="solicitud-username">${solicitud.emisor.username}</span>
                 </div>
                 <div class="solicitud-actions">
@@ -315,9 +322,7 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
-        const imgPath = chat.img
-            ? `${window.location.origin}/img/profile_img/${chat.img}`
-            : `${window.location.origin}/img/profile_img/avatar-default.png`;
+        const imgPath = getProfileImgPath(chat.img);
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
@@ -330,7 +335,7 @@ class ChatManager {
 
         chatItem.innerHTML = `
             <div class="chat-avatar">
-                <img src="${imgPath}" alt="Avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
+                <img src="${imgPath}" alt="Avatar" onerror="this.src='${getProfileImgPath()}'">
             </div>
             <div class="chat-info">
                 <div class="chat-header">
@@ -394,15 +399,13 @@ class ChatManager {
 
     // Creación de elemento de mensaje
     createMessageElement(msg) {
-        const imgSrc = msg.img
-            ? `${window.location.origin}/img/profile_img/${msg.img}`
-            : `${window.location.origin}/img/profile_img/avatar-default.png`;
+        const imgSrc = getProfileImgPath(msg.img);
         
         const msgDiv = document.createElement('div');
         msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
         msgDiv.innerHTML = `
             <div class="message-header">
-                <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
+                <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='${getProfileImgPath()}'">
                 <span class="message-username">${msg.usuario}</span>
                 <span class="message-time">${msg.fecha_envio}</span>
             </div>
@@ -511,13 +514,10 @@ class ChatManager {
         chatStatus.textContent = (companero.id_estado == 1 || companero.id_estado == 5) ? 'en línea' : 'desconectado';
         chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
         
-        // Construir la ruta de la imagen correctamente
-        const imgPath = companero.img
-            ? `${window.location.origin}/img/profile_img/${companero.img}`
-            : `${window.location.origin}/img/profile_img/avatar-default.png`;
+        const imgPath = getProfileImgPath(companero.img);
         chatImg.src = imgPath;
         chatImg.onerror = function() {
-            this.src = '/img/profile_img/avatar-default.png';
+            this.src = getProfileImgPath();
         };
     }
 
@@ -906,7 +906,7 @@ class ChatManager {
 
             searchResults.innerHTML = data.map(user => `
                 <div class="user-result">
-                    <img src="${user.img ? user.img : '/img/profile_img/avatar-default.png'}" alt="${user.username}">
+                    <img src="${getProfileImgPath(user.img)}" alt="${user.username}">
                     <div class="user-info">
                         <h6>${user.username}</h6>
                         <p>${user.nombre_completo}</p>
@@ -1013,10 +1013,7 @@ function cargarBloqueados() {
                 lista.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
             } else {
                 bloqueados.forEach(user => {
-                    // Generar ruta absoluta igual que en el backend
-                    const imgPath = user.img
-                        ? `${window.location.origin}/img/profile_img/${user.img}`
-                        : `${window.location.origin}/img/profile_img/avatar-default.png`;
+                    const imgPath = getProfileImgPath(user.img);
                     const item = document.createElement('div');
                     item.className = 'list-group-item d-flex align-items-center justify-content-between';
                     item.innerHTML = `
