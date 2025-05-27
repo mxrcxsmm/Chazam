@@ -1,0 +1,35 @@
+name: Deploy por FTP al servidor
+
+on:
+  push:
+    branches:
+      - Server
+
+jobs:
+  ftp-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout del código
+        uses: actions/checkout@v3
+
+      - name: Configurar PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, zip, bcmath, curl, dom, fileinfo, json, pdo, tokenizer, xml
+          coverage: none
+
+      - name: Instalar y cachear dependencias con Composer
+        uses: ramsey/composer-install@v2
+        with:
+          working-directory: ./Chazam
+          composer-options: --no-dev --prefer-dist --optimize-autoloader
+
+      - name: Subir archivos vía FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          server: ftp.daw2j23.es
+          username: ${{ secrets.FTP_USERNAME }}
+          password: ${{ secrets.FTP_PASSWORD }}
+          server-dir: /Chazam/
+          local-dir: ./Chazam/
