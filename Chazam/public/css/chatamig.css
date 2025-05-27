@@ -523,6 +523,32 @@ body, html {
     color: white;
 }
 
+/* Estilos para el botón de Amistades en el header */
+
+#btnAmistades {
+    color: #9147ff;
+    border-color: #9147ff;
+    transition: all 0.2s ease;
+}
+
+#btnAmistades:hover {
+    background-color: #9147ff;
+    color: white;
+}
+
+/* Estilos para el botón de Abrir menú en el header */
+
+#btnMenu {
+    color: #9147ff;
+    border-color: #9147ff;
+    transition: all 0.2s ease;
+}
+
+#btnMenu:hover {
+    background-color: #9147ff;
+    color: white;
+}
+
 /* Menú lateral hamburguesa */
 .main-menu-sidebar {
     position: fixed;
