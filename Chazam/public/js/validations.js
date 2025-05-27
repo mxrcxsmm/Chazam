@@ -29,7 +29,7 @@ function validateSignUpForm() {
             element: document.getElementById('username'),
             validate: async (value) => {
                 if (!value) return 'El nombre de usuario es requerido';
-                if (value.length > 10) return 'El nombre de usuario no puede tener más de 10 caracteres';
+                if (value.length > 15) return 'El nombre de usuario no puede tener más de 15 caracteres';
                 const available = await checkAvailability('username', value);
                 if (!available) return 'Este nombre de usuario ya está en uso';
                 return null;
@@ -311,10 +311,123 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    const fileInput = document.querySelector('input[type="file"][name="img"]');
-    if (fileInput && formSignup) {
+    // --- SUBIR O TOMAR FOTO ---
+    const uploadBtn = document.getElementById('uploadBtn');
+    const cameraBtn = document.getElementById('cameraBtn');
+    const imageInput = document.getElementById('imageInput');
+    const previewImg = document.getElementById('preview-img');
+    let videoStream = null;
+    let modalInstance = null;
+
+    // Inicializar el modal de la cámara
+    const cameraModal = document.getElementById('cameraModal');
+    if (cameraModal) {
+        modalInstance = M.Modal.init(cameraModal, {
+            dismissible: false,
+            onCloseEnd: function() {
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                }
+            }
+        });
+    }
+
+    // Función para mostrar la previsualización
+    function showPreview(file) {
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewImg.src = e.target.result;
+                previewImg.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        } else {
+            previewImg.src = '';
+            previewImg.style.display = 'none';
+        }
+    }
+
+    // Botón de subir foto
+    if (uploadBtn && imageInput) {
+        uploadBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            imageInput.click();
+        });
+
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const file = this.files[0];
+                showPreview(file);
+            }
+        });
+    }
+
+    // Botón de tomar foto
+    if (cameraBtn && modalInstance) {
+        cameraBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            modalInstance.open();
+            const video = document.getElementById('video');
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => {
+                    videoStream = stream;
+                    video.srcObject = stream;
+                })
+                .catch(err => {
+                    console.error("Error al acceder a la cámara:", err);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de cámara',
+                        text: 'No se pudo acceder a la cámara. Por favor, asegúrate de dar los permisos necesarios.',
+                        confirmButtonText: 'Entendido',
+                        confirmButtonColor: '#703ea3'
+                    });
+                    modalInstance.close();
+                });
+        });
+
+        // Botón de cerrar cámara
+        document.getElementById('closeCamera').addEventListener('click', () => {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+            modalInstance.close();
+        });
+
+        // Botón de capturar foto
+        document.getElementById('captureBtn').addEventListener('click', () => {
+            const video = document.getElementById('video');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            canvas.toBlob(blob => {
+                // Crear un archivo para el input
+                const file = new File([blob], 'foto_perfil.jpg', {type: 'image/jpeg'});
+                
+                // Asignar al input de archivo
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                imageInput.files = dataTransfer.files;
+
+                // Actualizar nombre y previsualización
+                showPreview(file);
+
+                // Cerrar cámara
+                if (videoStream) {
+                    videoStream.getTracks().forEach(track => track.stop());
+                }
+                modalInstance.close();
+            }, 'image/jpeg', 0.95);
+        });
+    }
+
+    // Validación del formulario al enviar
+    const formSignup = document.querySelector('.form-signup');
+    if (formSignup) {
         formSignup.addEventListener('submit', function(e) {
-            const file = fileInput.files[0];
+            const file = imageInput.files[0];
             let errorMsg = '';
             if (file) {
                 const validTypes = ['image/jpeg', 'image/png'];

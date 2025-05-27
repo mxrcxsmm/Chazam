@@ -5,6 +5,22 @@
 <meta name="user-id" content="{{ Auth::id() }}">
 <meta name="user-img" content="{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}">
 
+<!-- Menú lateral hamburguesa (solo móvil) -->
+<div id="mainMenuSidebar" class="main-menu-sidebar">
+    <button class="close-sidebar" id="closeMainMenuSidebar">&times;</button>
+    <hr>
+    <div class="sidebar-section">
+        <h5 class="text-center" style="color:#9147ff;">Tus chats</h5>
+        <div class="chats-list" id="chats-list-sidebar"></div>
+    </div>
+    <hr>
+    <div class="sidebar-section text-center">
+        <a href="{{ route('user.momentms') }}" class="btn btn-momentms" style="background:#9147ff;color:#fff;">
+            <i class="fas fa-bolt"></i> Momentms
+        </a>
+    </div>
+</div>
+
 <div class="main-container">
     <!-- Sidebar optimizado -->
     <div class="chat-sidebar">
@@ -30,12 +46,17 @@
     <!-- Chat principal optimizado -->
     <div class="chat-main">
         <div class="chat-header">
-            <div class="chat-contact">
-
-                <img id="chat-contact-img" src="{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}" alt="Contact Avatar">
-                <div class="contact-info">
+            <div class="chat-contact d-flex align-items-center">
+                <!-- Hamburguesa solo en móvil -->
+                <button id="sidebarToggle" class="btn btn-icon d-md-none me-2" type="button" style="font-size:1.5rem;">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <img id="chat-contact-img"
+                    src="{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}"
+                    alt="Contact Avatar">
+                <div class="contact-info ms-2">
                     <h3 id="chat-contact-name">Usuario</h3>
-                    <p id="chat-contact-status">Estado</p>
+                    <p id="chat-contact-status">en línea</p>
                 </div>
             </div>
             <div class="chat-actions">
@@ -73,6 +94,7 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <link rel="stylesheet" href="{{ asset('css/chatamig.css') }}">
 <script src="{{ asset('js/chatamig.js') }}"></script>
+<script src="{{ asset('js/hamburgerAmig.js') }}"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
 <!-- Componentes adicionales -->
