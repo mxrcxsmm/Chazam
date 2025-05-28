@@ -68,7 +68,7 @@
                     style="width: 80px; height: 40px; border: none; cursor: pointer;">
                 <span id="colorValueLabel" style="font-weight: bold;">{{ $personalizacion->brillo ?? '#FFD700' }}</span>
             </div>
-            <input type="hidden" name="glow_color" id="glow_color" value="{{ $personalizacion->brillo ?? '#FFD700' }}">
+            <input type="hidden" name="glow_color" id="glow_color" value="{{ $personalizacion->brillo ?? '#FFD700' }}" disabled>
         </div>
 
         <div class="mt-5">
