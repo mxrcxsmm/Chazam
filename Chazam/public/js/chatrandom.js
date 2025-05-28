@@ -362,8 +362,11 @@ async function cargarMensajes() {
             mensajes.forEach(mensaje => {
                 agregarMensaje(mensaje, mensaje.chat_usuario.usuario);
             });
-             // Actualizar lastMessageId al ID del último mensaje recibido
-            lastMessageId = mensajes[mensajes.length - 1].id; // Asumiendo que el mensaje tiene un ID
+             // Actualizar lastMessageId al ID del último mensaje recibido (el más alto de la lista)
+            const maxMessageId = Math.max(...mensajes.map(m => m.id));
+            if (maxMessageId > lastMessageId) {
+                lastMessageId = maxMessageId;
+            }
 
              // Hacer scroll al último mensaje solo si se agregaron nuevos
              container.scrollTop = container.scrollHeight;
