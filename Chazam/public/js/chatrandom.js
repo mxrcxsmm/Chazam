@@ -760,7 +760,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Intervalo para actualizar el tiempo del cooldown del botón skip cada segundo
         // Mantenemos 1 segundo para que el contador regresivo se vea en tiempo real en el botón
-        setInterval(actualizarBotonSkip, 10000);
+        setInterval(actualizarBotonSkip, 12000);
     }
 
 
