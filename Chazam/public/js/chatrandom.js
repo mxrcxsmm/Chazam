@@ -38,7 +38,7 @@ let estadoIntervalId = null; // Intervalo para estado general (manejado en estad
 let lastMessageId = 0; // Para rastrear el último mensaje cargado
 
 // Definir intervalos de polling en un solo lugar para fácil ajuste
-const INTERVALO_POLLING_CHAT = 2000; // Aumentado a 2 segundos para el chat
+const INTERVALO_POLLING_CHAT = 4000; // Aumentado a 4 segundos para reducir carga
 
 // Función para limpiar todos los intervalos
 function limpiarIntervalos() {
@@ -354,70 +354,75 @@ async function cargarMensajes() {
     console.log(`[Polling] Intentando cargar mensajes para chat ${chatId} con last_id ${lastMessageId}`);
 
     try {
-        // Solo pedir mensajes con ID mayor que el último mensaje cargado
         const mensajes = await safeFetch(`/retos/mensajes/${chatId}?last_id=${lastMessageId}`);
         const container = document.getElementById('mensajesContainer');
-        if (!container) return;
-
-        if (mensajes && mensajes.length > 0) {
-             console.log(`[Polling] Nuevos mensajes recibidos: ${mensajes.length}`, mensajes);
-            mensajes.forEach(mensaje => {
-                // Verificar que el mensaje y su usuario asociado son válidos antes de intentar agregarlo
-                if (mensaje && mensaje.chat_usuario && mensaje.chat_usuario.usuario) {
-                    console.log(`[Polling] Procesando mensaje con ID: ${mensaje.id}`);
-                    agregarMensaje(mensaje, mensaje.chat_usuario.usuario);
-                } else {
-                    console.error('[Polling] Mensaje recibido con datos de usuario incompletos o inválidos:', mensaje);
-                }
-            });
-             // Actualizar lastMessageId al ID del último mensaje recibido (el más alto de la lista)
-            const maxMessageId = Math.max(...mensajes.map(m => m.id));
-            if (maxMessageId > lastMessageId) {
-                lastMessageId = maxMessageId;
-                console.log(`[Polling] lastMessageId actualizado a: ${lastMessageId}`);
-            } else {
-                console.log(`[Polling] lastMessageId no actualizado, max ID recibido: ${maxMessageId}`);
-            }
-
-             // Hacer scroll al último mensaje solo si se agregaron nuevos
-             container.scrollTop = container.scrollHeight;
-        } else {
-             console.log('[Polling] No hay mensajes nuevos.');
+        if (!container) {
+            console.error('[Polling] Contenedor de mensajes no encontrado');
+            return;
         }
 
+        if (mensajes && mensajes.length > 0) {
+            console.log(`[Polling] Nuevos mensajes recibidos: ${mensajes.length}`, mensajes);
+            
+            // Ordenar mensajes por ID para asegurar orden correcto
+            mensajes.sort((a, b) => a.id - b.id);
+            
+            mensajes.forEach(mensaje => {
+                if (mensaje && mensaje.chat_usuario && mensaje.chat_usuario.usuario) {
+                    console.log(`[Polling] Procesando mensaje ID: ${mensaje.id}, Contenido: ${mensaje.contenido.substring(0, 50)}...`);
+                    agregarMensaje(mensaje, mensaje.chat_usuario.usuario);
+                } else {
+                    console.error('[Polling] Mensaje inválido:', mensaje);
+                }
+            });
+
+            // Actualizar lastMessageId al ID del último mensaje recibido
+            const maxMessageId = Math.max(...mensajes.map(m => m.id));
+            if (maxMessageId > lastMessageId) {
+                console.log(`[Polling] Actualizando lastMessageId de ${lastMessageId} a ${maxMessageId}`);
+                lastMessageId = maxMessageId;
+            }
+
+            // Hacer scroll al último mensaje solo si se agregaron nuevos
+            container.scrollTop = container.scrollHeight;
+        } else {
+            console.log('[Polling] No hay mensajes nuevos.');
+        }
     } catch (error) {
         console.error('[Polling] Error al cargar mensajes:', error);
-         // No mostramos SweetAlert aquí para evitar saturar si el polling falla temporalmente
     }
 }
 
-// Función para agregar un mensaje al contenedor (sin cambios significativos)
+// Función para agregar un mensaje al contenedor
 function agregarMensaje(mensaje, usuario) {
-    console.log('[AgregarMensaje] Llamada con mensaje:', mensaje, 'y usuario:', usuario);
+    console.log('[AgregarMensaje] Iniciando con mensaje:', {
+        id: mensaje.id,
+        contenido: mensaje.contenido.substring(0, 50) + '...',
+        fecha: mensaje.fecha_envio
+    });
 
-    // ** Verificaciones de datos esenciales **
+    // Verificaciones de datos esenciales
     if (!mensaje || typeof mensaje.id === 'undefined' || typeof mensaje.contenido === 'undefined' || typeof mensaje.fecha_envio === 'undefined') {
         console.error('[AgregarMensaje] Datos del mensaje incompletos o inválidos:', mensaje);
         return;
     }
-    if (!usuario || typeof usuario.id === 'undefined' || typeof usuario.username === 'undefined' || typeof usuario.imagen === 'undefined') {
-         console.error('[AgregarMensaje] Datos del usuario del mensaje incompletos o inválidos:', usuario);
-         // Proceder con valores por defecto si es posible, o retornar si el ID es crítico
-         // Por ahora, solo logueamos el error y permitimos que continúe con valores por defecto
-    }
-    // ** Fin Verificaciones **
 
-    const container = document.getElementById('mensajesContainer');
-    if (!container) {
-        console.error('[AgregarMensaje] Contenedor de mensajes no encontrado.');
+    if (!usuario || typeof usuario.id === 'undefined' || typeof usuario.username === 'undefined') {
+        console.error('[AgregarMensaje] Datos del usuario incompletos o inválidos:', usuario);
         return;
     }
 
-    // Evitar agregar mensajes duplicados si ya están en el DOM (seguro adicional)
-     if (document.getElementById(`message-${mensaje.id}`)) {
-         console.log(`[AgregarMensaje] Mensaje con ID ${mensaje.id} ya existe, ignorando.`);
-         return;
-     }
+    const container = document.getElementById('mensajesContainer');
+    if (!container) {
+        console.error('[AgregarMensaje] Contenedor de mensajes no encontrado');
+        return;
+    }
+
+    // Verificar si el mensaje ya existe
+    if (document.getElementById(`message-${mensaje.id}`)) {
+        console.log(`[AgregarMensaje] Mensaje ${mensaje.id} ya existe, ignorando`);
+        return;
+    }
 
     const metaUserId = document.querySelector('meta[name="user-id"]');
     // Asegurarse de que usuario y usuario.id existen antes de comparar

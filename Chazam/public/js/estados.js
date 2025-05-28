@@ -18,7 +18,7 @@ async function safeFetch(url, options = {}) {
 }
 
 // Variables para control de inactividad y intervalos
-let ultimoMensaje = Date.now();
+var ultimoMensaje = Date.now();
 let contadorInactividad = null; // Intervalo para verificar inactividad
 let contadorRegresivo = null; // Intervalo para el temporizador de la alerta
 let alertaMostrada = false;

@@ -302,15 +302,15 @@ class RetoController extends Controller
         $chatUsuarioIds = ChatUsuario::where('id_chat', $chatId)->pluck('id_chat_usuario');
 
         $mensajes = Mensaje::whereIn('id_chat_usuario', $chatUsuarioIds)
-            ->where('id_mensaje', '>', $lastMessageId) // Filtrar por last_id
-            ->with(['chatUsuario.usuario']) // Cargar la relación anidada
+            ->where('id_mensaje', '>', $lastMessageId)
+            ->with(['chatUsuario.usuario'])
             ->orderBy('fecha_envio', 'asc')
             ->get();
 
-        // La estructura de los mensajes recuperados será:
-        // Mensaje { id_mensaje, contenido, fecha_envio, chat_usuario { id_chat_usuario, id_chat, id_usuario, usuario { ...datos del usuario... } } }
-
-        return response()->json($mensajes);
+        return response()->json($mensajes)
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
     }
     
     /**
