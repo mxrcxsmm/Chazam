@@ -51,9 +51,11 @@
                 <button id="sidebarToggle" class="btn btn-icon d-md-none me-2" type="button" style="font-size:1.5rem;">
                     <i class="fas fa-bars"></i>
                 </button>
+                <div id="chat-contact-avatar">
                 <img id="chat-contact-img"
                     src="{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}"
                     alt="Contact Avatar">
+                </div>
                 <div class="contact-info ms-2">
                     <h3 id="chat-contact-name">Usuario</h3>
                     <p id="chat-contact-status">en línea</p>
