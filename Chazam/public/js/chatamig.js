@@ -360,7 +360,6 @@ class ChatManager {
     }
 
     // Creación de elemento de chat
-    // Dentro de ChatManager
     createChatElement(chat) {
         const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
         const chatItem = document.createElement('div');
@@ -385,9 +384,8 @@ class ChatManager {
                 <p class="last-message">${chat.last_message || ''}</p>
             </div>
         `;
-        chatItem.appendChild(info);
       
-        // 6) Click handler
+        // Click handler
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
       
         return chatItem;

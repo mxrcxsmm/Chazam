@@ -43,25 +43,25 @@ class FriendChatController extends Controller
                     $imgUrl = asset('img/profile_img/' . basename($other->img));
                 }
 
-                $prefs    = $other?->personalizacion;
-                $marco    = $prefs->marco    ?? 'default.svg';
-                $brillo   = $prefs->brillo;          // <- NO pongo '?? "#ffffff"' aquí
+                $prefs = $other?->personalizacion;
+                $marco = $prefs->marco ?? 'default.svg';
+                $brillo = $prefs->brillo;
                 $rotacion = (bool) ($prefs->rotacion ?? false);
 
                 $lastMsg = $chat->mensajes()->latest('fecha_envio')->first();
 
                 return [
-                    'id_chat'      => $chat->id_chat,
-                    'id_usuario'   => $other?->id_usuario,
-                    'nombre'       => $other?->nombre_completo ?? 'Desconocido',
-                    'username'     => $other?->username        ?? 'Desconocido',
-                    'img'          => $imgUrl,
-                    'marco'        => $marco,
-                    'brillo'       => $brillo,              // null si no hay brillo
-                    'rotacion'     => $rotacion,
+                    'id_chat' => $chat->id_chat,
+                    'id_usuario' => $other?->id_usuario,
+                    'username' => $other?->username ?? 'Desconocido',
+                    'nombre' => $other?->nombre_completo ?? 'Desconocido',
+                    'img' => $imgUrl,
+                    'marco' => $marco,
+                    'brillo' => $brillo,
+                    'rotacion' => $rotacion,
                     'last_message' => $lastMsg?->contenido,
-                    'last_time'    => $lastMsg?->fecha_envio?->format('H:i'),
-                    'id_estado'    => $other?->id_estado       ?? 2,
+                    'last_time' => $lastMsg?->fecha_envio?->format('H:i'),
+                    'id_estado' => $other?->id_estado ?? 2,
                 ];
             });
 
