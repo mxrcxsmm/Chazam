@@ -351,60 +351,72 @@ class ChatManager {
     createChatElement(chat) {
         const userId     = chat.id_usuario;
         const marco      = chat.marco    ?? 'default.svg';
-        const brillo     = chat.brillo;           // ya puede ser null
+        const brillo     = chat.brillo;                // null o '' si no hay
         const rotateClass= chat.rotacion ? 'marco-rotate' : '';
         const glowClass  = brillo ? 'marco-glow' : '';
-    
-        // 1) Container
+        const glowStyle  = brillo ? `--glow-color: ${brillo};` : '';
+      
+        // 1) Contenedor principal
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
         if (userId) chatItem.dataset.userId = userId;
-    
-        // 2) Avatar + marco
-        const avatarWrapper = document.createElement('div');
-        avatarWrapper.className = `marco-externo ${glowClass} ${rotateClass}`.trim();
-        avatarWrapper.style.cssText = `
-            ${brillo ? `--glow-color: ${brillo};` : ''}
-            background-image: url('/img/bordes/${marco}');
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        `;
-    
+      
+        // 2) Avatar puro
         const imgEl = document.createElement('img');
-        imgEl.src = chat.img || '/img/profile_img/avatar-default.png';
-        imgEl.alt = chat.username || 'Avatar';
+        imgEl.src    = chat.img || '/img/profile_img/avatar-default.png';
+        imgEl.alt    = chat.username || 'Usuario';
         imgEl.className = 'rounded-circle';
         imgEl.style.cssText = 'width:32px; height:32px; object-fit:cover;';
         imgEl.onerror = () => imgEl.src = '/img/profile_img/avatar-default.png';
-    
-        avatarWrapper.appendChild(imgEl);
-    
-        // 3) Info
+      
+        // 3) Decidir si es chat de amigo
+        const isFriend = !!userId;
+      
+        // 4) Crear avatar-wrapper solo si es amigo
+        let avatarNode;
+        if (!isFriend) {
+          // Sin amigo: muestro solo la img “desnuda” a 40px
+          imgEl.style.cssText = 'width:40px; height:40px; object-fit:cover;';
+          avatarNode = imgEl;
+        } else {
+          // Con amigo: siempre wrapper, incluso si default.svg y sin brillo
+          const wrapper = document.createElement('div');
+          wrapper.className = `marco-externo ${glowClass} ${rotateClass}`.trim();
+          wrapper.style.cssText = `
+            ${glowStyle}
+            background-image: url('/img/bordes/${marco}');
+            width: 40px; height: 40px;
+            display: flex; align-items: center; justify-content: center;
+          `;
+          wrapper.appendChild(imgEl);
+          avatarNode = wrapper;
+        }
+      
+        // 5) Montar avatar dentro de su contenedor
+        const avatarContainer = document.createElement('div');
+        avatarContainer.className = 'chat-avatar';
+        avatarContainer.appendChild(avatarNode);
+        chatItem.appendChild(avatarContainer);
+      
+        // 6) Info de usuario
         const info = document.createElement('div');
         info.className = 'chat-info';
         info.innerHTML = `
-            <div class="chat-header">
-                <h3>${chat.username || chat.nombre || 'Usuario'}</h3>
-                <span class="time">${chat.last_time || ''}</span>
-            </div>
-            <p class="last-message">${chat.last_message || ''}</p>
+          <div class="chat-header">
+            <h3>${chat.username || chat.nombre || 'Usuario'}</h3>
+            <span class="time">${chat.last_time || ''}</span>
+          </div>
+          <p class="last-message">${chat.last_message || ''}</p>
         `;
-    
-        const avatarContainer = document.createElement('div');
-        avatarContainer.className = 'chat-avatar';
-        avatarContainer.appendChild(avatarWrapper);
-    
-        chatItem.appendChild(avatarContainer);
         chatItem.appendChild(info);
-    
+      
+        // 7) Click handler
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
-    
+      
         return chatItem;
-    }    
+    }
+      
 
     // Manejo de selección de chat
     handleChatSelection(chatItem, chat) {
@@ -572,46 +584,53 @@ class ChatManager {
         chatStatus.textContent = online ? 'en línea' : 'desconectado';
         chatStatus.style.color = online ? '#9147ff' : '#b9bbbe';
       
-        // 2) Ruta de la imagen
-        const imgPath = companero.img
+        // 2) URL limpia de la imagen
+        const imgUrl = companero.img
           ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/')
           : '/img/profile_img/avatar-default.png';
       
-        // 3) Datos de personalización
+        // 3) Personalización
         const marco       = companero.marco    ?? 'default.svg';
-        const brillo      = companero.brillo;              // puede ser null o ''
+        const brillo      = companero.brillo;              // null o '' si no hay
         const rotateClass = companero.rotacion ? 'marco-rotate' : '';
         const glowClass   = brillo ? 'marco-glow' : '';
         const glowStyle   = brillo ? `--glow-color: ${brillo};` : '';
       
-        // 4) Construir el wrapper
+        // 4) Referencias DOM
+        const chatImg   = document.getElementById('chat-contact-img');
+        const container = chatImg.parentNode;
+      
+        // 5) Lógica:
+        //  - Si NO hay amigo (companero.id_usuario falsy), mostramos la img “desnuda”
+        //  - Si HAY amigo, siempre envolvemos en wrapper (aunque sea default.svg sin brillo)
+        const isFriend = !!companero.id_usuario;
+        if (!isFriend) {
+          container.innerHTML = '';
+          chatImg.src = imgUrl;
+          chatImg.style.cssText = 'width:40px; height:40px; object-fit:cover;';
+          container.appendChild(chatImg);
+          return;
+        }
+      
+        // 6) Caso “tengo amigo” → construyo el wrapper siempre
+        container.innerHTML = '';
         const wrapper = document.createElement('div');
         wrapper.className = `marco-externo ${glowClass} ${rotateClass}`.trim();
         wrapper.style.cssText = `
           ${glowStyle}
           background-image: url('/img/bordes/${marco}');
-          width: 40px;
-          height: 40px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          width: 40px; height: 40px;
+          display: flex; align-items: center; justify-content: center;
         `;
-      
-        // 5) Img interna
         const imgEl = document.createElement('img');
-        imgEl.src = imgPath;
-        imgEl.alt = companero.username || 'avatar';
+        imgEl.src    = imgUrl;
+        imgEl.alt    = companero.username || 'avatar';
         imgEl.className = 'rounded-circle';
-        imgEl.style.cssText = 'width:32px; height:32px; object-fit: cover;';
+        imgEl.style.cssText = 'width:32px; height:32px; object-fit:cover;';
         imgEl.onerror = () => imgEl.src = '/img/profile_img/avatar-default.png';
-      
-        // 6) Montar
         wrapper.appendChild(imgEl);
-        const chatImg = document.getElementById('chat-contact-img');
-        const container = chatImg.parentNode;
-        container.innerHTML = '';
         container.appendChild(wrapper);
-      }
+    }
 
     // Toggle de opciones
     toggleOptions() {

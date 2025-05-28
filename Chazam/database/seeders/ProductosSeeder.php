@@ -125,9 +125,9 @@ class ProductosSeeder extends Seeder
             [
                 'titulo'           => 'Marco Clásico',
                 'descripcion'      => 'default.svg',
-                'precio'           => 100,
+                'precio'           => 0,
                 'tipo_valor'       => 'puntos',
-                'puntos'           => 100,
+                'puntos'           => 0,
                 'id_tipo_producto' => 6,
             ],
             [
@@ -213,11 +213,19 @@ class ProductosSeeder extends Seeder
 
             // 2) Animación rotatoria
             [
-                'titulo'           => 'Rotación de Marco',
-                'descripcion'      => 'Activa/desactiva la rotación de tu marco.',
+                'titulo'           => 'Marco Rotatorio',
+                'descripcion'      => 'Activa la rotación de tu marco.',
                 'precio'           => 80,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 80,
+                'id_tipo_producto' => 6,
+            ],
+            [
+                'titulo'           => 'Marco Estático',
+                'descripcion'      => 'Desactiva la rotación de tu marco.',
+                'precio'           => 0,
+                'tipo_valor'       => 'puntos',
+                'puntos'           => 0,
                 'id_tipo_producto' => 6,
             ],
 
