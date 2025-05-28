@@ -82,42 +82,48 @@ class VistaController extends Controller
     {
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $isPremium = $user->id_rol === 3 || $user->id_rol === 4;
+        $isPremium = in_array($user->id_rol, [3, 4]);
 
-        $p = $user->personalizacion ?? new Personalizacion(['id_usuario' => $user->id_usuario]);
+        $p = $user->personalizacion
+        ?? new Personalizacion(['id_usuario' => $user->id_usuario]);
 
         $precioTotal = 0;
 
         // === 1. Marco ===
-        $nuevoMarco = $request->input('marco', 'default.svg');
-        if ($nuevoMarco !== $p->marco && !$isPremium) {
-            $producto = Producto::where('descripcion', $nuevoMarco)->first();
-            $precioTotal += $producto->puntos ?? 0;
+        if ($request->has('marco')) {
+            $nuevoMarco = $request->input('marco');
+            if ($nuevoMarco !== $p->marco && ! $isPremium) {
+                $producto = Producto::where('descripcion', $nuevoMarco)->first();
+                $precioTotal += $producto->puntos ?? 0;
+            }
+            $p->marco = $nuevoMarco;
         }
-        $p->marco = $nuevoMarco;
 
         // === 2. Rotación ===
-        $nuevaRotacion = filter_var($request->input('rotacion'), FILTER_VALIDATE_BOOLEAN);
-        // $nuevaRotacion = $request->input('rotacion') == '1';
-        if ($nuevaRotacion !== $p->rotacion && !$isPremium) {
-            $titulo = $nuevaRotacion ? 'Marco Rotatorio' : 'Marco Estático';
-            $producto = Producto::where('titulo', $titulo)->first();
-            $precioTotal += $producto->puntos ?? 0;
+        if ($request->has('rotacion')) {
+            $nuevaRotacion = filter_var($request->input('rotacion'), FILTER_VALIDATE_BOOLEAN);
+            if ($nuevaRotacion !== $p->rotacion && ! $isPremium) {
+                $titulo = $nuevaRotacion ? 'Marco Rotatorio' : 'Marco Estático';
+                $producto = Producto::where('titulo', $titulo)->first();
+                $precioTotal += $producto->puntos ?? 0;
+            }
+            $p->rotacion = $nuevaRotacion;
         }
-        $p->rotacion = $nuevaRotacion;
 
         // === 3. Sidebar ===
-        $nuevoSidebar = $request->input('sidebar', '#4B0082');
-        if ($nuevoSidebar !== $p->sidebar && !$isPremium) {
-            $producto = Producto::where('titulo', 'Color de Sidebar')->first();
-            $precioTotal += $producto->puntos ?? 0;
+        if ($request->has('sidebar')) {
+            $nuevoSidebar = $request->input('sidebar');
+            if ($nuevoSidebar !== $p->sidebar && ! $isPremium) {
+                $producto = Producto::where('titulo', 'Color de Sidebar')->first();
+                $precioTotal += $producto->puntos ?? 0;
+            }
+            $p->sidebar = $nuevoSidebar;
         }
-        $p->sidebar = $nuevoSidebar;
 
         // === 4. Brillo ===
         if ($request->has('brillo')) {
             $nuevoBrillo = $request->input('brillo');
-            if ($nuevoBrillo !== $p->brillo && !$isPremium) {
+            if ($nuevoBrillo !== $p->brillo && ! $isPremium) {
                 $producto = Producto::where('titulo', 'Brillo de Marco')->first();
                 $precioTotal += $producto->puntos ?? 0;
             }
@@ -125,21 +131,20 @@ class VistaController extends Controller
         }
 
         // === Comprobación de puntos ===
-        if (!$isPremium && $precioTotal > 0) {
+        if (! $isPremium && $precioTotal > 0) {
             if ($user->puntos < $precioTotal) {
                 return response()->json([
                     'message' => 'No tienes suficientes puntos para esta personalización.',
                 ], 403);
             }
-
-            $user->gastarPuntos($precioTotal); // Usa tu método
+            $user->gastarPuntos($precioTotal);
         }
 
         $p->save();
 
         return response()->json([
-            'message' => 'Personalización actualizada.',
-            'puntos_restantes' => $user->puntos
+            'message'          => 'Personalización actualizada.',
+            'puntos_restantes' => $user->puntos,
         ]);
     }
 }
