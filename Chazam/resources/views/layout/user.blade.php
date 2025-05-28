@@ -17,7 +17,7 @@
 <body>
 
     <!-- Añade esto justo después de <body> -->
-    <button id="sidebarToggle" class="btn btn-primary d-md-none"
+    <button id="sidebarToggle" class="btn d-md-none"
         style="margin: 20px 0 0 20px;">
         <i class="bi bi-list" style="font-size:2rem;"></i>
     </button>
