@@ -45,8 +45,8 @@ class FriendChatController extends Controller
 
                 $prefs = $other?->personalizacion;
                 $marco = $prefs->marco ?? 'default.svg';
-                $brillo = $prefs->brillo;
-                $rotacion = (bool) ($prefs->rotacion ?? false);
+                $brillo = $prefs?->brillo;
+                $rotacion = (bool) ($prefs?->rotacion ?? false);
 
                 $lastMsg = $chat->mensajes()->latest('fecha_envio')->first();
 
