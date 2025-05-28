@@ -415,8 +415,8 @@ function agregarMensaje(mensaje, usuario) {
         return false;
     }
 
-    // Verificaciones de datos esenciales: usuario, id, username
-     if (!usuario || usuario.id == null || usuario.username == null) {
+    // Verificaciones de datos esenciales: usuario, id_usuario, username
+     if (!usuario || usuario.id_usuario == null || usuario.username == null) {
         console.error('[AgregarMensaje] Datos del usuario incompletos o inválidos:', usuario);
         return false;
     }
@@ -435,7 +435,7 @@ function agregarMensaje(mensaje, usuario) {
 
     try {
         const metaUserId = document.querySelector('meta[name="user-id"]');
-        const esMio = metaUserId && usuario.id === parseInt(metaUserId.content);
+        const esMio = metaUserId && usuario.id_usuario === parseInt(metaUserId.content);
         
         console.log(`[AgregarMensaje] Mensaje ${mensaje.id_mensaje}: Es mío? ${esMio}`);
 
