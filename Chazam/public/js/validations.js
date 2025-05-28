@@ -290,26 +290,6 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Mostrar SweetAlert si hay mensajes de error de sesión
-    if (window.sweetAlertError) {
-        closeAllDropdowns && closeAllDropdowns();
-        Swal.fire({
-            icon: 'error',
-            title: '¡Sesión activa!',
-            text: window.sweetAlertError,
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: '#703ea3'
-        });
-    }
-    if (window.sweetAlertLoginError) {
-        closeAllDropdowns && closeAllDropdowns();
-        Swal.fire({
-            icon: 'error',
-            title: 'Error de acceso',
-            text: window.sweetAlertLoginError,
-            confirmButtonText: 'Entendido',
-            confirmButtonColor: '#703ea3'
-        });
-    }
 
     // --- SUBIR O TOMAR FOTO ---
     const uploadBtn = document.getElementById('uploadBtn');
@@ -448,6 +428,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 return false;
             }
+        });
+    }
+
+    console.log('sweetAlertLoginError:', window.sweetAlertLoginError);
+
+    // Mostrar SweetAlert si hay error de credenciales
+    if (window.sweetAlertLoginError) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error de acceso',
+            text: window.sweetAlertLoginError,
+            confirmButtonText: 'Entendido',
+            confirmButtonColor: '#703ea3'
         });
     }
 });

@@ -218,14 +218,18 @@ class MomentmsController extends Controller
                 $momentmsQuery->orderBy('fecha_inicio', 'asc');
                 break;
             case 'alfabetico_asc':
-                $momentmsQuery->join('users', 'historias.id_usuario', '=', 'users.id_usuario')
-                    ->orderBy('users.username', 'asc')
-                    ->select('historias.*');
+                $momentmsQuery->orderBy(
+                    User::select('username')
+                        ->whereColumn('users.id_usuario', 'historias.id_usuario'),
+                    'asc'
+                );
                 break;
             case 'alfabetico_desc':
-                $momentmsQuery->join('users', 'historias.id_usuario', '=', 'users.id_usuario')
-                    ->orderBy('users.username', 'desc')
-                    ->select('historias.*');
+                $momentmsQuery->orderBy(
+                    User::select('username')
+                        ->whereColumn('users.id_usuario', 'historias.id_usuario'),
+                    'desc'
+                );
                 break;
             case 'fecha_desc':
             default:
