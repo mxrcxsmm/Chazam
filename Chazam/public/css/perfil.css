@@ -88,7 +88,7 @@ canvas {
     margin-left: 260px;
     /* igual al ancho del sidebar */
     padding: 2rem;
-    background-color: #DFB5FF;
+    background-color: rgba(223, 181, 255, 0.70);
     min-height: 100vh;
 }
 
@@ -96,7 +96,7 @@ canvas {
 /* Contenedor del formulario */
 
 .form-container {
-    background-color: #EBD2FF;
+    background-color: rgba(235, 210, 255, 0.85);
     padding: 2rem 3rem;
     border-radius: 15px;
     max-width: 900px;
