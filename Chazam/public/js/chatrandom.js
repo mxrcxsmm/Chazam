@@ -362,8 +362,13 @@ async function cargarMensajes() {
         if (mensajes && mensajes.length > 0) {
              console.log(`[Polling] Nuevos mensajes recibidos: ${mensajes.length}`, mensajes);
             mensajes.forEach(mensaje => {
-                console.log(`[Polling] Procesando mensaje con ID: ${mensaje.id}`);
-                agregarMensaje(mensaje, mensaje.chat_usuario.usuario);
+                // Verificar que el mensaje y su usuario asociado son válidos antes de intentar agregarlo
+                if (mensaje && mensaje.chat_usuario && mensaje.chat_usuario.usuario) {
+                    console.log(`[Polling] Procesando mensaje con ID: ${mensaje.id}`);
+                    agregarMensaje(mensaje, mensaje.chat_usuario.usuario);
+                } else {
+                    console.error('[Polling] Mensaje recibido con datos de usuario incompletos o inválidos:', mensaje);
+                }
             });
              // Actualizar lastMessageId al ID del último mensaje recibido (el más alto de la lista)
             const maxMessageId = Math.max(...mensajes.map(m => m.id));
