@@ -44,9 +44,12 @@ class VistaController extends Controller
         // Establece los nuevos valores que vienen del formulario (ya sea clásico o vía fetch)
         $p->marco    = $request->input('marco', 'default.svg'); // Usa 'default.svg' si no viene valor
         $p->rotacion = filter_var($request->input('rotacion'), FILTER_VALIDATE_BOOLEAN); // Asegura valor booleano
-        $p->brillo   = $request->input('brillo'); // Campo opcional, puede ser null
         $p->sidebar  = $request->input('sidebar', '#4B0082'); // Usa color por defecto si no se recibe
     
+        if ($request->has('brillo')) {
+            $p->brillo = $request->input('brillo');
+        }
+
         $p->save(); // Guarda la personalización (crea o actualiza)
     
         // Si es una petición AJAX (fetch), responde con JSON
