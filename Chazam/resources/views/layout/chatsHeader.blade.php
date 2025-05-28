@@ -24,13 +24,13 @@
 <body>
     <div id="vanta-bg" style="z-index: 0;"></div>
     {{-- Navbar --}}
-    <nav class="navbar navbar-expand-lg navbar-light shadow-sm px-4 py-2" style="position: relative; z-index: 1;">
+    <nav class="navbar navbar-expand-lg navbar-light shadow-sm px-4 py-2" style="position: relative; z-index: 99999;">
         <div class="container-fluid d-flex justify-content-between align-items-center">
             <!-- Logo o nombre de la app -->
             <a href="{{ route('retos.guide') }}"><img src="{{ asset('img/Logo_Chazam.png') }}" alt="Logo" class="logo">Chazam</a>
 
             <!-- Racha, puntos y perfil -->
-            <div class="d-flex align-items-center gap-4">
+            <div class="d-flex align-items-center gap-4" style="position: relative; z-index: 99999;">
                 <!-- Racha de días -->
                 <div class="d-flex align-items-center text-warning fw-semibold">
                     <i class="bi bi-fire me-1"></i>
@@ -64,7 +64,7 @@
                 </button>
 
                 <!-- Sidebar estilo perfil -->
-                <div id="sidebar" class="position-fixed top-0 end-0 bg-purple text-white p-4" style="width: 260px; height: 100vh; display: none; z-index: 1050;">
+                <div id="sidebar" class="position-fixed top-0 end-0 bg-purple text-white p-4" style="width: 260px; height: 100vh; display: none; z-index: 99999;">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="text-center">
                             @if(isset($imagen_perfil) && $imagen_perfil)
