@@ -124,7 +124,7 @@ class ProductosSeeder extends Seeder
             [
                 'titulo' => 'Donacion',
                 'descripcion' => 'Donacion a la plataforma.',
-                'precio' => NULL,
+                'precio' => 0,
                 'tipo_valor' => 'euros',
                 'puntos' => null,
                 'id_tipo_producto' => 4,
