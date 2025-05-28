@@ -399,36 +399,43 @@ class RetoController extends Controller
                 // Obtener los usuarios del chat
                 $usuarios = $chat->chatUsuarios()->with('usuario')->get();
                 
-                // Verificar si algún usuario cambió de estado
-                foreach ($usuarios as $chatUsuario) {
-                    if ($chatUsuario->usuario->id_estado != 5) {
-                        Log::info('Usuario ' . $chatUsuario->usuario->id_usuario . ' cambió de estado. Eliminando chat ' . $chat->id_chat);
+                // Contar cuántos usuarios NO están en estado 5
+                $usuariosFueraDeEstado5 = $usuarios->filter(function($chatUsuario) {
+                    return $chatUsuario->usuario->id_estado != 5;
+                })->count();
+
+                // Si AMBOS usuarios están fuera de estado 5, eliminar el chat
+                if ($usuarios->count() >= 2 && $usuariosFueraDeEstado5 >= 2) {
+                    Log::info('Ambos usuarios en chat ' . $chat->id_chat . ' cambiaron de estado. Eliminando chat.');
+                    
+                    // Iniciar transacción
+                    DB::beginTransaction();
+                    try {
+                        // Eliminar todos los mensajes relacionados con este chat
+                        Mensaje::whereHas('chatUsuario', function($query) use ($chat) {
+                            $query->where('id_chat', $chat->id_chat);
+                        })->delete();
                         
-                        // Iniciar transacción
-                        DB::beginTransaction();
-                        try {
-                            // Eliminar todos los mensajes relacionados con este chat
-                            Mensaje::whereHas('chatUsuario', function($query) use ($chat) {
-                                $query->where('id_chat', $chat->id_chat);
-                            })->delete();
-                            
-                            // Eliminar todos los registros de chat_usuario relacionados con este chat
-                            ChatUsuario::where('id_chat', $chat->id_chat)->delete();
-                            
-                            // Eliminar el chat
-                            $chat->delete();
-                            
-                            // Confirmar transacción
-                            DB::commit();
-                            Log::info('Transacción completada exitosamente para el chat ' . $chat->id_chat);
-                        } catch (\Exception $e) {
-                            // Revertir transacción en caso de error
-                            DB::rollBack();
-                            Log::error('Error en la transacción para el chat ' . $chat->id_chat . ': ' . $e->getMessage());
-                            throw $e;
-                        }
-                        break;
+                        // Eliminar todos los registros de chat_usuario relacionados con este chat
+                        ChatUsuario::where('id_chat', $chat->id_chat)->delete();
+                        
+                        // Eliminar el chat
+                        $chat->delete();
+                        
+                        // Confirmar transacción
+                        DB::commit();
+                        Log::info('Transacción completada exitosamente para el chat ' . $chat->id_chat);
+                    } catch (\Exception $e) {
+                        // Revertir transacción en caso de error
+                        DB::rollBack();
+                        Log::error('Error en la transacción para el chat ' . $chat->id_chat . ': ' . $e->getMessage());
+                        throw $e;
                     }
+                } else if ($usuariosFueraDeEstado5 > 0) {
+                     // Si al menos un usuario está fuera de estado 5, pero no ambos,
+                     // loggeamos esto para monitoreo, pero no eliminamos el chat.
+                     // La verificación del chat en frontend (verificarChat) manejará si solo un usuario está presente.
+                     Log::info('Al menos un usuario en chat ' . $chat->id_chat . ' cambió de estado, pero no ambos. Chat no eliminado por verificarEstadoChats.');
                 }
             }
 
