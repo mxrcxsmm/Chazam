@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
+use App\Models\Personalizacion;
 
 class PerfilController extends Controller
 {
@@ -21,7 +22,9 @@ class PerfilController extends Controller
     public function edit()
     {
         $user = Auth::user();
-        return view('perfil.personalizacion', compact('user'));
+        // Obtener la personalización del usuario, o crear una nueva si no existe
+        $personalizacion = Personalizacion::firstOrCreate(['id_usuario' => $user->id_usuario]);
+        return view('perfil.personalizacion', compact('user', 'personalizacion'));
     }
 
     /*public function edit()
@@ -74,7 +77,7 @@ class PerfilController extends Controller
         $user->fecha_nacimiento = $request->input('fecha_nacimiento');
         $user->descripcion = $request->input('descripcion');
 
-        // 1) Si el usuario ha marcado “quitar foto”
+        // 1) Si el usuario ha marcado "quitar foto"
         if ($request->input('remove_img') === '1') {
             // Borra la anterior si existe
             if ($user->img && File::exists(public_path($user->img))) {
