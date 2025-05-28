@@ -18,7 +18,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/retos.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/perfil.css') }}">
+    {{-- <link rel="stylesheet" href="{{ asset('css/perfil.css') }}"> --}}
     <link rel="stylesheet" href="{{ asset('css/userSearch.css') }}">
     @stack('head')
 </head>
@@ -56,7 +56,7 @@
                 </button>
 
                 <!-- Botón para abrir el menú -->
-                <button class="btn btn-outline-dark p-0 border-0 bg-transparent" onclick="toggleSidebarPerfil()" style="width: 38px; height: 38px;">
+                <button class="btn btn-outline-dark p-0 border-0 bg-transparent" onclick="toggleSidebar()" style="width: 38px; height: 38px;">
                     <div class="marco-externo marco-glow {{ $rotacion ? 'marco-rotate' : '' }}"
                          style="
                             width: 38px;
@@ -83,7 +83,7 @@
                 
 
                 <!-- Sidebar estilo perfil -->
-                <div id="sidebarPerfil" class="position-fixed top-0 end-0 text-white p-4" style="width: 260px; height: 100vh; display: none; z-index: 1050; background-color: {{ $sidebar ?? '#4B0082' }};">
+                <div id="sidebar" class="position-fixed top-0 end-0 text-white p-4" style="width: 260px; height: 100vh; display: none; z-index: 1050; background-color: {{ $sidebar ?? '#4B0082' }};">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="text-center">
                             <div id="sidebarGeneral" 
@@ -103,7 +103,7 @@
                             <div>{{ isset($username) ? $username : 'Usuario' }}</div>
                             <div class="small">{{ isset($nombre_completo) ? $nombre_completo : '' }}</div>
                         </div>
-                        <button class="btn btn-danger btn-sm" onclick="toggleSidebarPerfil()">
+                        <button class="btn btn-danger btn-sm" onclick="toggleSidebar()">
                             <i class="bi bi-x-lg"></i>
                         </button>
                     </div>
@@ -211,9 +211,8 @@
     </div>
 
     <script>
-        function toggleSidebarPerfil(forceClose = false) {
-            const sidebar = document.getElementById('sidebarPerfil');
-            if (!sidebar) return;
+        function toggleSidebar(forceClose = false) {
+            const sidebar = document.getElementById('sidebar');
             if (forceClose || sidebar.style.display === 'block') {
                 sidebar.style.display = 'none';
                 document.body.style.overflow = '';
@@ -225,16 +224,10 @@
         }
 
         document.addEventListener('mousedown', function(e) {
-            const sidebar = document.getElementById('sidebarPerfil');
+            const sidebar = document.getElementById('sidebar');
             if (!sidebar) return;
-            if (sidebar.style.display === 'block' && !sidebar.contains(e.target) && !e.target.closest('[onclick=\"toggleSidebarPerfil()\"]')) {
-                toggleSidebarPerfil(true);
-            }
-        });
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === "Escape") {
-                toggleSidebarPerfil(true);
+            if (sidebar.style.display === 'block' && !sidebar.contains(e.target)) {
+                toggleSidebar(true);
             }
         });
     </script>
