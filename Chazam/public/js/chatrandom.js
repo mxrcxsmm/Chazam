@@ -369,13 +369,22 @@ async function cargarMensajes() {
             
             let mensajesAgregados = 0;
             mensajes.forEach(mensaje => {
-                if (mensaje && mensaje.chat_usuario && mensaje.chat_usuario.usuario) {
-                    console.log(`[Polling] Procesando mensaje ID: ${mensaje.id}, Contenido: ${mensaje.contenido.substring(0, 50)}...`);
+                // Verificación más robusta del objeto usuario anidado
+                if (mensaje && mensaje.id_mensaje != null && mensaje.contenido != null &&
+                    mensaje.chat_usuario && mensaje.chat_usuario.usuario &&
+                    mensaje.chat_usuario.usuario.id_usuario != null &&
+                    mensaje.chat_usuario.usuario.username != null) {
+
+                    console.log(`[Polling] Procesando mensaje ID: ${mensaje.id_mensaje}, Contenido: ${mensaje.contenido ? mensaje.contenido.substring(0, 50) + '...' : 'N/A'}`);
+                    console.log('[Polling] Datos de usuario a pasar a agregarMensaje:', mensaje.chat_usuario.usuario);
+
                     if (agregarMensaje(mensaje, mensaje.chat_usuario.usuario)) {
                         mensajesAgregados++;
                     }
                 } else {
-                    console.error('[Polling] Mensaje inválido:', mensaje);
+                    console.error('[Polling] Mensaje inválido o incompleto (falta mensaje, chat_usuario, usuario o campos requeridos del usuario):', mensaje);
+                     // Log detallado del mensaje completo que falló la validación inicial
+                    console.error('[Polling] Mensaje completo que falló la validación inicial:', JSON.stringify(mensaje, null, 2));
                 }
             });
 
