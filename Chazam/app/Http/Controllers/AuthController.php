@@ -23,8 +23,8 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'email' => 'email',
+            'password' => 'string|min:8',
         ]);
 
         // Buscar usuario por email
