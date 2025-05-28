@@ -18,6 +18,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/retos.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('css/userSearch.css') }}">
     @stack('head')
 </head>

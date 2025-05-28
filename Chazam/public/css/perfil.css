@@ -3,6 +3,7 @@ body {
     margin: 0;
     font-family: 'Segoe UI', sans-serif;
     color: #4B0082;
+    z-index: -1;
 }
 
 .custom-button {
