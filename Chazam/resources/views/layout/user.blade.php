@@ -51,7 +51,7 @@
                     <i class="bi bi-fire me-1"></i>
                     Racha: {{ $racha ?? 0 }} días
                 </div>
-                <div class="text-success fw-semibold">
+                <div class="text-success fw-semibold" id="userPuntos">
                     <i class="bi bi-star-fill me-1"></i>
                     {{ $puntos ?? 0 }} pts
                 </div>
