@@ -50,9 +50,9 @@
                     </div>
                     <div class="col-md-3 mb-3">
                         <div class="filtro-campo">
-                            <label for="filtro_cantidad">Cantidad</label>
-                            <input type="text" class="form-control" id="filtro_cantidad" name="filtro_cantidad"
-                                placeholder="Buscar por cantidad">
+                            <label for="filtro_tipo">Tipo de Producto</label>
+                            <input type="text" class="form-control" id="filtro_tipo" name="filtro_tipo"
+                                placeholder="Buscar por tipo">
                         </div>
                     </div>
                     <div class="col-md-3 mb-3">
@@ -91,6 +91,8 @@
                         <th class="th-usuario">Comprador</th>
                         <th class="th-producto">Producto</th>
                         <th class="th-cantidad">Cantidad</th>
+                        <th class="th-precio">Precio</th>
+                        <th class="th-tipo">Tipo de Producto</th>
                         <th class="th-fecha">Fecha de pago</th>
                     </tr>
                 </thead>
@@ -100,7 +102,9 @@
                             <td class="td-id">{{ $pago->id_pago }}</td>
                             <td class="td-usuario">{{ $pago->comprador->username ?? 'Usuario eliminado' }}</td>
                             <td class="td-producto">{{ $pago->producto->titulo ?? 'Producto eliminado' }}</td>
-                            <td class="td-cantidad">{{ $pago->cantidad }}</td>
+                            <td class="td-cantidad">{{ $pago->cantidad ?? 'N/A' }}</td>
+                            <td class="td-precio">{{ $pago->precio ?? 'N/A' }}</td>
+                            <td class="td-tipo">{{ $pago->nombre_tipo ?? 'N/A' }}</td>
                             <td class="td-fecha">{{ $pago->fecha_pago }}</td>
                         </tr>
                     @endforeach

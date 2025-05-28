@@ -58,6 +58,7 @@ class StripeController extends Controller
             'id_comprador' => Auth::id(), // ID del usuario autenticado
             'id_producto' => $producto->id_producto,
             'fecha_pago' => now(),
+            'cantidad' => null, // La cantidad es nula para compras normales
         ]);
 
         // Manejar lógica según el tipo de producto
@@ -155,7 +156,8 @@ class StripeController extends Controller
             return redirect()->back()->with('error', 'Por favor, introduce una cantidad válida.');
         }
 
-        $id_producto = $request->id_producto; // Obtener el ID del producto de donaciones
+        // ID fijo del producto de donaciones
+        $id_producto = 14;
 
         // Configurar Stripe
         Stripe::setApiKey(config('services.stripe.secret'));
@@ -202,7 +204,7 @@ class StripeController extends Controller
             'id_comprador' => Auth::id(), // ID del usuario autenticado
             'id_producto' => $id_producto, // ID del producto de donaciones
             'fecha_pago' => now(),
-            'cantidad' => $cantidad, // Cantidad donada
+            'cantidad' => $cantidad, // La cantidad se guarda solo para donaciones
         ]);
 
         $mensaje = '¡Gracias por tu donación de ' . $cantidad . '€!';

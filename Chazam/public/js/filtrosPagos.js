@@ -2,20 +2,20 @@ document.addEventListener('DOMContentLoaded', function () {
     const filtroId = document.getElementById('filtro_id');
     const filtroComprador = document.getElementById('filtro_comprador');
     const filtroProducto = document.getElementById('filtro_producto');
-    const filtroCantidad = document.getElementById('filtro_cantidad');
+    const filtroTipo = document.getElementById('filtro_tipo');
     const filtroFechaPago = document.getElementById('filtro_fecha_pago');
     const limpiarFiltrosBtn = document.getElementById('limpiarFiltros');
     const tablaPagos = document.querySelector('tbody');
 
     function aplicarFiltros() {
         // Mostrar spinner de carga
-        tablaPagos.innerHTML = '<tr><td colspan="4" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>';
+        tablaPagos.innerHTML = '<tr><td colspan="7" class="text-center"><div class="spinner-border text-primary" role="status"><span class="visually-hidden">Cargando...</span></div></td></tr>';
 
         const filtros = {
             id_pago: filtroId.value.trim(),
             comprador: filtroComprador.value.trim(),
             producto: filtroProducto.value.trim(),
-            cantidad: filtroCantidad.value.trim(),
+            tipo: filtroTipo.value.trim(),
             fecha_pago: filtroFechaPago.value.trim(),
         };
 
@@ -39,25 +39,27 @@ document.addEventListener('DOMContentLoaded', function () {
             })
             .then((data) => {
                 if (data.length === 0) {
-                    tablaPagos.innerHTML = '<tr><td colspan="4" class="text-center">No se encontraron resultados</td></tr>';
+                    tablaPagos.innerHTML = '<tr><td colspan="7" class="text-center">No se encontraron resultados</td></tr>';
                     return;
                 }
 
                 tablaPagos.innerHTML = '';
                 data.forEach((pago) => {
                     const row = `<tr>
-        <td class="td-id">${pago.id_pago}</td>
-        <td class="td-comprador">${pago.comprador}</td>
-        <td class="td-producto">${pago.producto}</td>
-        <td class="td-cantidad">${pago.cantidad}</td>
-        <td class="td-fecha">${pago.fecha_pago}</td>
-    </tr>`;
+                        <td class="td-id">${pago.id_pago}</td>
+                        <td class="td-usuario">${pago.usuario}</td>
+                        <td class="td-producto">${pago.producto}</td>
+                        <td class="td-cantidad">${pago.cantidad}</td>
+                        <td class="td-precio">${pago.precio}</td>
+                        <td class="td-tipo">${pago.tipo}</td>
+                        <td class="td-fecha">${pago.fecha_pago}</td>
+                    </tr>`;
                     tablaPagos.innerHTML += row;
                 });
             })
             .catch((error) => {
                 console.error('Error al aplicar filtros:', error);
-                tablaPagos.innerHTML = '<tr><td colspan="4" class="text-center alert alert-danger">Error al cargar los datos. Por favor, inténtelo de nuevo.</td></tr>';
+                tablaPagos.innerHTML = '<tr><td colspan="7" class="text-center alert alert-danger">Error al cargar los datos. Por favor, inténtelo de nuevo.</td></tr>';
             });
     }
 
@@ -66,7 +68,7 @@ document.addEventListener('DOMContentLoaded', function () {
         filtroId.value = '';
         filtroComprador.value = '';
         filtroProducto.value = '';
-        filtroCantidad.value = '';
+        filtroTipo.value = '';
         filtroFechaPago.value = '';
         aplicarFiltros();
     });
@@ -75,7 +77,7 @@ document.addEventListener('DOMContentLoaded', function () {
     filtroId.addEventListener('input', aplicarFiltros);
     filtroComprador.addEventListener('input', aplicarFiltros);
     filtroProducto.addEventListener('input', aplicarFiltros);
-    filtroCantidad.addEventListener('input', aplicarFiltros);
+    filtroTipo.addEventListener('input', aplicarFiltros);
 
     // Configurar el datepicker para el campo de fecha de pago
     $('#filtro_fecha_pago').datepicker({

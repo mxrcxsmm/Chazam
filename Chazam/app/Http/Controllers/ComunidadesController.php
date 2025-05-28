@@ -247,7 +247,6 @@ class ComunidadesController extends Controller
             \App\Models\Pago::create([
                 'id_comprador' => Auth::id(),
                 'id_producto' => 13, // ID del producto "Crear comunidad"
-                'cantidad' => $costoComunidad,
                 'fecha_pago' => now()
             ]);
 
