@@ -341,7 +341,7 @@ body {
 /* Sidebar del perfil (debe sobreponerse) */
 #sidebar {
     z-index: 99999 !important;
-    background: rgba(0,0,0,0.7) !important;
+    background-color: #4b0082 !important;
     position: fixed !important;
     top: 0 !important;
     right: 0 !important;
