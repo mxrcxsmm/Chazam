@@ -77,7 +77,6 @@
                             <label for="filtro_rol">Rol</label>
                             <select class="form-select" id="filtro_rol">
                                 <option value="">Todos los roles</option>
-                                <option value="1">Administrador</option>
                                 <option value="2">Usuario</option>
                                 <option value="3">Premium</option>
                                 <option value="4">Miembro</option>

@@ -16,7 +16,7 @@ class AdminController extends Controller
     // Mostrar la lista de administradores
     public function index()
     {
-        $admins = User::all();
+        $admins = User::where('id_rol', '!=', 1)->get();
         $nacionalidades = Nacionalidad::all(); // Obtiene todas las nacionalidades
         return view('admin.usuarios.index', compact('admins', 'nacionalidades')); // Pasa los administradores y nacionalidades a la vista
     }
@@ -48,7 +48,7 @@ class AdminController extends Controller
     // Filtrar usuarios mediante AJAX
     public function filtrar(Request $request)
     {
-        $query = User::query();
+        $query = User::where('id_rol', '!=', 1);
 
         if ($request->filled('id')) {
             $query->where('id_usuario', $request->id);

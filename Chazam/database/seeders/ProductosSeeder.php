@@ -120,6 +120,14 @@ class ProductosSeeder extends Seeder
                 'tipo_valor' => 'puntos',
                 'puntos' => null,
                 'id_tipo_producto' => 5,
+            ],
+            [
+                'titulo' => 'Donacion',
+                'descripcion' => 'Donacion a la plataforma.',
+                'precio' => NULL,
+                'tipo_valor' => 'euros',
+                'puntos' => null,
+                'id_tipo_producto' => 4,
             ]
         ]);
     }
