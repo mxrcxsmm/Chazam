@@ -199,28 +199,48 @@ class SolicitudUserController extends Controller
     public function getPendientes()
     {
         try {
-            $solicitudes = Solicitud::with(['emisor' => function($query) {
-                $query->select('id_usuario', 'username', 'img');
-            }])
-            ->where('id_receptor', Auth::id())
-            ->where('estado', 'pendiente')
-            ->get()
-            ->map(function($solicitud) {
-                return [
-                    'id_solicitud' => $solicitud->id_solicitud,
-                    'emisor' => [
-                        'id_usuario' => $solicitud->emisor->id_usuario,
-                        'username' => $solicitud->emisor->username,
-                        'img' => $solicitud->emisor->img ? basename($solicitud->emisor->img) : null
-                    ]
-                ];
-            });
-
+            $solicitudes = Solicitud::with([
+                    // 1) Carga al emisor (solo estos campos)
+                    'emisor' => function($q) {
+                        $q->select('id_usuario', 'username', 'img');
+                    },
+                    // 2) Carga su personalización, incluyendo la PK y la FK
+                    'emisor.personalizacion' => function($q) {
+                        $q->select(
+                            'id_personalizacion',  // PK de la tabla personalizacion
+                            'id_usuario',          // FK que enlaza con users
+                            'marco',
+                            'brillo',
+                            'rotacion'
+                        );
+                    }
+                ])
+                ->where('id_receptor', Auth::id())
+                ->where('estado', 'pendiente')
+                ->get()
+                ->map(function($sol) {
+                    $u = $sol->emisor;
+                    $p = $u->personalizacion;
+    
+                    return [
+                        'id_solicitud' => $sol->id_solicitud,
+                        'emisor' => [
+                            'id_usuario' => $u->id_usuario,
+                            'username'   => $u->username,
+                            'img'        => $u->imagen_perfil,
+                            'marco'      => $p->marco     ?? 'default.svg',
+                            'brillo'     => $p->brillo,
+                            'rotacion'   => $p->rotacion  ?? false,
+                        ],
+                    ];
+                });
+    
             return response()->json($solicitudes);
+    
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener las solicitudes: ' . $e->getMessage()
+                'message' => 'Error al obtener las solicitudes: '.$e->getMessage()
             ], 500);
         }
     }

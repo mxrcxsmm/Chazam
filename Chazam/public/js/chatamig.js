@@ -62,19 +62,34 @@ async function cargarSolicitudesAmistad() {
             const imgPath = getProfileImgPath(solicitud.emisor.img);
             solicitudDiv.innerHTML = `
                 <div class="solicitud-info">
-                    <img src="${imgPath}" 
-                         alt="${solicitud.emisor.username}" 
-                         class="rounded-circle"
-                         style="width: 40px; height: 40px; object-fit: cover; border: 2px solid #ccc;"
-                         onerror="this.src='${getProfileImgPath()}'">
+                    <div
+                    class="marco-externo marco-glow ${solicitud.emisor.rotacion ? 'marco-rotate' : ''}"
+                    style="
+                        --glow-color: ${solicitud.emisor.brillo || '#fff'};
+                        background-image: url('/img/bordes/${solicitud.emisor.marco ?? 'default.svg'}');
+                        width: 40px;
+                        height: 40px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    "
+                    >
+                    <img
+                        src="${solicitud.emisor.img}"
+                        alt="${solicitud.emisor.username}"
+                        class="rounded-circle"
+                        style="width: 32px; height: 32px; object-fit: cover;"
+                        onerror="this.src='/img/profile_img/avatar-default.png'"
+                    />
+                    </div>
                     <span class="solicitud-username">${solicitud.emisor.username}</span>
                 </div>
                 <div class="solicitud-actions">
                     <button class="btn btn-success btn-sm" title="Aceptar" onclick="responderSolicitud(${solicitud.id_solicitud}, 'aceptada')">
-                        <i class="fas fa-check"></i> 
+                    <i class="fas fa-check"></i>
                     </button>
                     <button class="btn btn-danger btn-sm" title="Rechazar" onclick="responderSolicitud(${solicitud.id_solicitud}, 'rechazada')">
-                        <i class="fas fa-times"></i>
+                    <i class="fas fa-times"></i>
                     </button>
                 </div>
             `;
@@ -219,7 +234,36 @@ async function bloquearUsuario(idUsuario) {
 
                 // Actualizar la lista de chats
                 if (window.chatManager) {
-                    window.chatManager.loadChats();
+                    await window.chatManager.loadChats();
+                    
+                    // Si estamos en el chat del usuario bloqueado, redirigir a la lista de chats
+                    if (window.chatManager.currentChatId === idUsuario) {
+                        // Limpiar el contenedor de mensajes
+                        const messagesContainer = document.getElementById('messages-container');
+                        if (messagesContainer) {
+                            messagesContainer.innerHTML = '';
+                        }
+                        
+                        // Limpiar el header del chat
+                        const chatHeader = document.getElementById('chat-contact-name');
+                        const chatStatus = document.getElementById('chat-contact-status');
+                        const chatImg = document.getElementById('chat-contact-img');
+                        
+                        if (chatHeader) chatHeader.textContent = 'Selecciona un chat';
+                        if (chatStatus) {
+                            chatStatus.textContent = '';
+                            chatStatus.style.color = '#b9bbbe';
+                        }
+                        if (chatImg) chatImg.src = '/img/profile_img/avatar-default.png';
+                        
+                        // Desactivar el chat actual
+                        window.chatManager.currentChatId = null;
+                        
+                        // Remover la clase active de todos los chats
+                        document.querySelectorAll('.chat-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                    }
                 }
 
                 // Mostrar mensaje de éxito
@@ -230,11 +274,6 @@ async function bloquearUsuario(idUsuario) {
                     timer: 2000,
                     showConfirmButton: false
                 });
-
-                // Si estamos en el chat del usuario bloqueado, redirigir a la lista de chats
-                if (window.chatManager && window.chatManager.currentChatId === idUsuario) {
-                    window.location.href = '/user/chats';
-                }
             } else {
                 throw new Error(data.message || 'Error al bloquear al usuario');
             }
@@ -321,8 +360,9 @@ class ChatManager {
     }
 
     // Creación de elemento de chat
+    // Dentro de ChatManager
     createChatElement(chat) {
-        const imgPath = getProfileImgPath(chat.img);
+        const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
@@ -335,7 +375,7 @@ class ChatManager {
 
         chatItem.innerHTML = `
             <div class="chat-avatar">
-                <img src="${imgPath}" alt="Avatar" onerror="this.src='${getProfileImgPath()}'">
+                <img src="${imgPath}" alt="Avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
             </div>
             <div class="chat-info">
                 <div class="chat-header">
@@ -345,9 +385,14 @@ class ChatManager {
                 <p class="last-message">${chat.last_message || ''}</p>
             </div>
         `;
+        chatItem.appendChild(info);
+      
+        // 6) Click handler
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
+      
         return chatItem;
     }
+      
 
     // Manejo de selección de chat
     handleChatSelection(chatItem, chat) {
@@ -505,19 +550,23 @@ class ChatManager {
     }
 
     // Actualización del encabezado del chat
+    // Dentro de tu clase ChatManager:
     updateChatHeader(companero) {
+        const defaultAvatar = window.CHAT_CONFIG.defaultAvatar;
+        const isFriend      = !!companero.id_usuario;
+      
+        // 1) Nombre y estado
         const chatHeader = document.getElementById('chat-contact-name');
         const chatStatus = document.getElementById('chat-contact-status');
-        const chatImg = document.getElementById('chat-contact-img');
-
         chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
         chatStatus.textContent = (companero.id_estado == 1 || companero.id_estado == 5) ? 'en línea' : 'desconectado';
         chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
         
-        const imgPath = getProfileImgPath(companero.img);
+        // Construir la ruta de la imagen correctamente
+        const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : '/img/profile_img/avatar-default.png';
         chatImg.src = imgPath;
         chatImg.onerror = function() {
-            this.src = getProfileImgPath();
+            this.src = '/img/profile_img/avatar-default.png';
         };
     }
 

@@ -3,7 +3,28 @@
 <!-- Meta tags optimizados -->
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <meta name="user-id" content="{{ Auth::id() }}">
-<meta name="user-img" content="{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}">
+<meta name="user-img" content="{{ Auth::user()->img
+    ? asset('img/profile_img/' . basename(Auth::user()->img))
+    : asset('img/profile_img/avatar-default.png') }}">
+
+<!-- Configuración JS global -->
+<script>
+  window.CHAT_CONFIG = {
+    defaultAvatar: "{{ asset('img/profile_img/avatar-default.png') }}",
+    chatsUrl: "{{ url('/user/chats') }}",
+    messagesUrl: function(chatId) { return `/user/chat/${chatId}/messages`; },
+    sendUrl:     function(chatId) { return `/user/chat/${chatId}/send`; },
+    pollingInterval: 4000,
+    headerRefreshInterval: 30000,
+    solicitudesInterval: 60000,
+    smartPolling: {
+      enabled: true,
+      idleTimeout: 300000,
+      idleInterval: 120000,
+      activeInterval: 4000
+    }
+  };
+</script>
 
 <!-- Menú lateral hamburguesa (solo móvil) -->
 <div id="mainMenuSidebar" class="main-menu-sidebar">
@@ -51,9 +72,17 @@
                 <button id="sidebarToggle" class="btn btn-icon d-md-none me-2" type="button" style="font-size:1.5rem;">
                     <i class="fas fa-bars"></i>
                 </button>
-                <img id="chat-contact-img"
-                    src="{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}"
-                    alt="Contact Avatar">
+                <div id="chat-contact-avatar">
+                    <img
+                      id="chat-contact-img"
+                      src="{{ Auth::user()->img
+                        ? asset('img/profile_img/' . basename(Auth::user()->img))
+                        : asset('img/profile_img/avatar-default.png') }}"
+                      alt="Contact Avatar"
+                      class="rounded-circle"
+                      style="width:40px; height:40px; object-fit:cover;"
+                    />
+                </div>
                 <div class="contact-info ms-2">
                     <h3 id="chat-contact-name">Usuario</h3>
                     <p id="chat-contact-status">en línea</p>
@@ -90,27 +119,13 @@
     </div>
 </div>
 
-<!-- Recursos externos optimizados -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-<link rel="stylesheet" href="{{ asset('css/chatamig.css') }}">
-<script src="{{ asset('js/chatamig.js') }}"></script>
-<script src="{{ asset('js/hamburgerAmig.js') }}"></script>
-<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-
-<!-- Componentes adicionales -->
-<emoji-picker style="position: absolute; bottom: 60px; left: 20px; display: none;"></emoji-picker>
-
-<div id="chats-loader" style="text-align:center; padding: 20px;">
-    <i class="fas fa-spinner fa-spin"></i> Cargando chats...
-</div>
-
 <!-- Modal de Solicitudes optimizado -->
 <div class="modal fade" id="solicitudesModal" tabindex="-1" aria-labelledby="solicitudesModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header" style="background:#9147ff; color:#fff;">
                 <h5 class="modal-title" id="solicitudesModalLabel">Solicitudes de Amistad</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="solicitudesContainer">
                 <div id="noSolicitudes" style="display:none;">No tienes solicitudes pendientes</div>
@@ -125,7 +140,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="confirmModalLabel">Confirmar acción</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
                 <p id="confirmMessage"></p>
@@ -138,44 +153,33 @@
     </div>
 </div>
 
-<!-- Estilos optimizados -->
+<!-- Recursos externos optimizados -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="{{ asset('css/chatamig.css') }}">
+
+<!-- Componentes adicionales -->
+<emoji-picker style="position: absolute; bottom: 60px; left: 20px; display: none;"></emoji-picker>
+
+<div id="chats-loader" style="text-align:center; padding: 20px;">
+    <i class="fas fa-spinner fa-spin"></i> Cargando chats...
+</div>
+
+<!-- Estilos específicos -->
 <style>
-.solicitud-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
-}
-.solicitud-info {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-.solicitud-username {
-    font-weight: bold;
-    font-size: 1rem;
-}
-.solicitud-actions .btn {
-    margin-left: 5px;
-}
-.btn-icon {
-    background: none;
-    border: none;
-    color: #9147ff;
-    font-size: 1.3rem;
-    position: relative;
-    padding: 0.3rem 0.5rem;
-    transition: color 0.2s;
-}
-.btn-icon:hover {
-    color: #fff;
-    background: #9147ff33;
-    border-radius: 50%;
-}
+  .solicitud-item { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; }
+  .solicitud-info { display: flex; align-items: center; gap: 10px; }
+  .solicitud-username { font-weight: bold; font-size: 1rem; }
+  .solicitud-actions .btn { margin-left: 5px; }
+  .btn-icon {
+    background: none; border: none; color: #9147ff; font-size: 1.3rem;
+    position: relative; padding: 0.3rem 0.5rem; transition: color 0.2s;
+  }
+  .btn-icon:hover {
+    color: #fff; background: #9147ff33; border-radius: 50%;
+  }
 </style>
 
-<!-- Script de inicialización -->
-<script>
-window.userImg = "{{ Auth::user()->img ? asset('img/profile_img/' . str_replace('/img/profile_img/', '', Auth::user()->img)) : asset('img/profile_img/avatar-default.png') }}";
-</script>
+<!-- Scripts -->
+<script src="{{ asset('js/chatamig.js') }}"></script>
+<script src="{{ asset('js/hamburgerAmig.js') }}"></script>
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>

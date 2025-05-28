@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use Carbon\Carbon;
 use App\Models\Nacionalidad;
+use App\Models\Personalizacion;
 
 class AuthController extends Controller
 {
@@ -23,8 +24,8 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email' => 'required|email',
-            'password' => 'required|string|min:6',
+            'email' => 'email',
+            'password' => 'string|min:8',
         ]);
 
         // Buscar usuario por email
@@ -122,6 +123,9 @@ class AuthController extends Controller
             'password_confirmation.same' => 'Las contraseñas no coinciden.',
             'genero.required' => 'El género es requerido',
             'genero.in' => 'El género debe ser Hombre o Mujer',
+            'img.image' => 'El archivo debe ser una imagen.',
+            'img.mimes' => 'La imagen debe ser JPG o PNG.',
+            'img.max' => 'La imagen no puede superar los 2MB.',
         ]);
 
         if ($validator->fails()) {
@@ -175,6 +179,16 @@ class AuthController extends Controller
 
             // Autenticar al usuario
             Auth::login($user);
+
+            if (!$user->personalizacion) {
+                Personalizacion::create([
+                    'id_usuario' => $user->id_usuario,
+                    'marco'      => 'default.svg',
+                    'rotacion'   => false,
+                    'brillo'     => null,
+                    'sidebar'    => '#4B0082',
+                ]);
+            }            
 
             // Redirigir al guide de retos
             return redirect()->route('retos.guide')->with('success', '¡Registro exitoso!');
