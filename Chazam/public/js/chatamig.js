@@ -221,7 +221,36 @@ async function bloquearUsuario(idUsuario) {
 
                 // Actualizar la lista de chats
                 if (window.chatManager) {
-                    window.chatManager.loadChats();
+                    await window.chatManager.loadChats();
+                    
+                    // Si estamos en el chat del usuario bloqueado, redirigir a la lista de chats
+                    if (window.chatManager.currentChatId === idUsuario) {
+                        // Limpiar el contenedor de mensajes
+                        const messagesContainer = document.getElementById('messages-container');
+                        if (messagesContainer) {
+                            messagesContainer.innerHTML = '';
+                        }
+                        
+                        // Limpiar el header del chat
+                        const chatHeader = document.getElementById('chat-contact-name');
+                        const chatStatus = document.getElementById('chat-contact-status');
+                        const chatImg = document.getElementById('chat-contact-img');
+                        
+                        if (chatHeader) chatHeader.textContent = 'Selecciona un chat';
+                        if (chatStatus) {
+                            chatStatus.textContent = '';
+                            chatStatus.style.color = '#b9bbbe';
+                        }
+                        if (chatImg) chatImg.src = '/img/profile_img/avatar-default.png';
+                        
+                        // Desactivar el chat actual
+                        window.chatManager.currentChatId = null;
+                        
+                        // Remover la clase active de todos los chats
+                        document.querySelectorAll('.chat-item').forEach(item => {
+                            item.classList.remove('active');
+                        });
+                    }
                 }
 
                 // Mostrar mensaje de éxito
@@ -232,11 +261,6 @@ async function bloquearUsuario(idUsuario) {
                     timer: 2000,
                     showConfirmButton: false
                 });
-
-                // Si estamos en el chat del usuario bloqueado, redirigir a la lista de chats
-                if (window.chatManager && window.chatManager.currentChatId === idUsuario) {
-                    window.location.href = '/user/chats';
-                }
             } else {
                 throw new Error(data.message || 'Error al bloquear al usuario');
             }

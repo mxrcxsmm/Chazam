@@ -63,10 +63,17 @@ class AmistadController extends Controller
             })->get();
 
             foreach ($solicitudes as $solicitud) {
-                // Eliminar chats relacionados
+                // Eliminar SOLO los chats entre estos dos usuarios específicos
                 $chats = Chat::whereHas('chatUsuarios', function($query) use ($usuario, $idUsuario) {
-                    $query->where('id_usuario', $usuario->id_usuario)
-                          ->orWhere('id_usuario', $idUsuario);
+                    $query->where(function($q) use ($usuario, $idUsuario) {
+                        $q->where('id_usuario', $usuario->id_usuario)
+                          ->whereExists(function($subquery) use ($idUsuario) {
+                              $subquery->select(DB::raw(1))
+                                     ->from('chat_usuario as cu2')
+                                     ->whereRaw('cu2.id_chat = chat_usuario.id_chat')
+                                     ->where('cu2.id_usuario', $idUsuario);
+                          });
+                    });
                 })->get();
 
                 foreach ($chats as $chat) {
