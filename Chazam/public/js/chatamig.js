@@ -323,33 +323,64 @@ class ChatManager {
     }
 
     // Creación de elemento de chat
+    // Dentro de ChatManager
     createChatElement(chat) {
-        const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
+        const userId     = chat.id_usuario;
+        const marco      = chat.marco    ?? 'default.svg';
+        const brillo     = chat.brillo;           // ya puede ser null
+        const rotateClass= chat.rotacion ? 'marco-rotate' : '';
+        const glowClass  = brillo ? 'marco-glow' : '';
+    
+        // 1) Container
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
+        if (userId) chatItem.dataset.userId = userId;
     
-        // Guardar el ID del usuario en el elemento
-        const userId = chat.id_usuario || chat.usuario_id || chat.user_id;
-        if (userId) {
-            chatItem.dataset.userId = userId;
-        }
-
-        chatItem.innerHTML = `
-            <div class="chat-avatar">
-                <img src="${imgPath}" alt="Avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
-            </div>
-            <div class="chat-info">
-                <div class="chat-header">
-                    <h3>${chat.username || chat.nombre}</h3>
-                    <span class="time">${chat.last_time || ''}</span>
-                </div>
-                <p class="last-message">${chat.last_message || ''}</p>
-            </div>
+        // 2) Avatar + marco
+        const avatarWrapper = document.createElement('div');
+        avatarWrapper.className = `marco-externo ${glowClass} ${rotateClass}`.trim();
+        avatarWrapper.style.cssText = `
+            ${brillo ? `--glow-color: ${brillo};` : ''}
+            background-image: url('/img/bordes/${marco}');
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         `;
+    
+        const imgEl = document.createElement('img');
+        imgEl.src = chat.img || '/img/profile_img/avatar-default.png';
+        imgEl.alt = chat.username || 'Avatar';
+        imgEl.className = 'rounded-circle';
+        imgEl.style.cssText = 'width:32px; height:32px; object-fit:cover;';
+        imgEl.onerror = () => imgEl.src = '/img/profile_img/avatar-default.png';
+    
+        avatarWrapper.appendChild(imgEl);
+    
+        // 3) Info
+        const info = document.createElement('div');
+        info.className = 'chat-info';
+        info.innerHTML = `
+            <div class="chat-header">
+                <h3>${chat.username || chat.nombre || 'Usuario'}</h3>
+                <span class="time">${chat.last_time || ''}</span>
+            </div>
+            <p class="last-message">${chat.last_message || ''}</p>
+        `;
+    
+        const avatarContainer = document.createElement('div');
+        avatarContainer.className = 'chat-avatar';
+        avatarContainer.appendChild(avatarWrapper);
+    
+        chatItem.appendChild(avatarContainer);
+        chatItem.appendChild(info);
+    
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
+    
         return chatItem;
-    }
+    }    
 
     // Manejo de selección de chat
     handleChatSelection(chatItem, chat) {
@@ -507,56 +538,56 @@ class ChatManager {
     }
 
     // Actualización del encabezado del chat
-// Dentro de tu clase ChatManager:
-updateChatHeader(companero) {
-    // 1) Actualiza nombre y estado
-    const chatHeader = document.getElementById('chat-contact-name');
-    const chatStatus = document.getElementById('chat-contact-status');
-    chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
-    const online = (companero.id_estado == 1 || companero.id_estado == 5);
-    chatStatus.textContent = online ? 'en línea' : 'desconectado';
-    chatStatus.style.color = online ? '#9147ff' : '#b9bbbe';
-
-    // 2) Construye la ruta de la imagen
-    const imgPath = companero.img
-        ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/')
-        : '/img/profile_img/avatar-default.png';
-
-    // 3) Extrae los datos de personalización (igual que en solicitudes)
-    const marco  = companero.marco  ?? 'default.svg';
-    const brillo = companero.brillo ?? '#fff';
-    const rotateClass = companero.rotacion ? 'marco-rotate' : '';
-
-    // 4) Crea el wrapper <div class="marco-externo ...">
-    const wrapper = document.createElement('div');
-    wrapper.className = `marco-externo marco-glow ${rotateClass}`;
-    wrapper.style.cssText = `
-      --glow-color: ${brillo};
-      background-image: url('/img/bordes/${marco}');
-      width: 40px;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    `;
-
-    // 5) Crea el <img> interno
-    const imgEl = document.createElement('img');
-    imgEl.src = imgPath;
-    imgEl.alt = companero.username || 'avatar';
-    imgEl.className = 'rounded-circle';
-    imgEl.style.cssText = 'width:32px; height:32px; object-fit: cover;';
-    imgEl.onerror = () => imgEl.src = '/img/profile_img/avatar-default.png';
-
-    // 6) Anida la img dentro del wrapper
-    wrapper.appendChild(imgEl);
-
-    // 7) Sustituye el antiguo <img id="chat-contact-img">
-    const chatImg = document.getElementById('chat-contact-img');
-    const container = chatImg.parentNode;
-    container.innerHTML = '';       // limpia el avatar anterior
-    container.appendChild(wrapper); // pone tu nuevo marco + img
-}
+    // Dentro de tu clase ChatManager:
+    updateChatHeader(companero) {
+        // 1) Nombre y estado
+        const chatHeader = document.getElementById('chat-contact-name');
+        const chatStatus = document.getElementById('chat-contact-status');
+        chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
+        const online = (companero.id_estado == 1 || companero.id_estado == 5);
+        chatStatus.textContent = online ? 'en línea' : 'desconectado';
+        chatStatus.style.color = online ? '#9147ff' : '#b9bbbe';
+      
+        // 2) Ruta de la imagen
+        const imgPath = companero.img
+          ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/')
+          : '/img/profile_img/avatar-default.png';
+      
+        // 3) Datos de personalización
+        const marco       = companero.marco    ?? 'default.svg';
+        const brillo      = companero.brillo;              // puede ser null o ''
+        const rotateClass = companero.rotacion ? 'marco-rotate' : '';
+        const glowClass   = brillo ? 'marco-glow' : '';
+        const glowStyle   = brillo ? `--glow-color: ${brillo};` : '';
+      
+        // 4) Construir el wrapper
+        const wrapper = document.createElement('div');
+        wrapper.className = `marco-externo ${glowClass} ${rotateClass}`.trim();
+        wrapper.style.cssText = `
+          ${glowStyle}
+          background-image: url('/img/bordes/${marco}');
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        `;
+      
+        // 5) Img interna
+        const imgEl = document.createElement('img');
+        imgEl.src = imgPath;
+        imgEl.alt = companero.username || 'avatar';
+        imgEl.className = 'rounded-circle';
+        imgEl.style.cssText = 'width:32px; height:32px; object-fit: cover;';
+        imgEl.onerror = () => imgEl.src = '/img/profile_img/avatar-default.png';
+      
+        // 6) Montar
+        wrapper.appendChild(imgEl);
+        const chatImg = document.getElementById('chat-contact-img');
+        const container = chatImg.parentNode;
+        container.innerHTML = '';
+        container.appendChild(wrapper);
+      }
 
     // Toggle de opciones
     toggleOptions() {
