@@ -390,6 +390,18 @@ async function cargarMensajes() {
 function agregarMensaje(mensaje, usuario) {
     console.log('[AgregarMensaje] Llamada con mensaje:', mensaje, 'y usuario:', usuario);
 
+    // ** Verificaciones de datos esenciales **
+    if (!mensaje || typeof mensaje.id === 'undefined' || typeof mensaje.contenido === 'undefined' || typeof mensaje.fecha_envio === 'undefined') {
+        console.error('[AgregarMensaje] Datos del mensaje incompletos o inválidos:', mensaje);
+        return;
+    }
+    if (!usuario || typeof usuario.id === 'undefined' || typeof usuario.username === 'undefined' || typeof usuario.imagen === 'undefined') {
+         console.error('[AgregarMensaje] Datos del usuario del mensaje incompletos o inválidos:', usuario);
+         // Proceder con valores por defecto si es posible, o retornar si el ID es crítico
+         // Por ahora, solo logueamos el error y permitimos que continúe con valores por defecto
+    }
+    // ** Fin Verificaciones **
+
     const container = document.getElementById('mensajesContainer');
     if (!container) {
         console.error('[AgregarMensaje] Contenedor de mensajes no encontrado.');
@@ -404,7 +416,7 @@ function agregarMensaje(mensaje, usuario) {
 
     const metaUserId = document.querySelector('meta[name="user-id"]');
     // Asegurarse de que usuario y usuario.id existen antes de comparar
-    const esMio = metaUserId && usuario && usuario.id ? usuario.id === parseInt(metaUserId.content) : false;
+    const esMio = metaUserId && usuario && typeof usuario.id !== 'undefined' ? usuario.id === parseInt(metaUserId.content) : false;
     
     console.log(`[AgregarMensaje] Mensaje ${mensaje.id}: Es mío? ${esMio}`);
 
