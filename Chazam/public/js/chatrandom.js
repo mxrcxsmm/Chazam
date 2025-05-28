@@ -14,15 +14,38 @@ function getProfileImgPath(img) {
 async function safeFetch(url, options = {}) {
     try {
         const response = await fetch(url, options);
-        if (!response.ok) {
-             const errorBody = await response.text();
-             console.error(`Error HTTP! estado: ${response.status} URL: ${url} Cuerpo: ${errorBody}`);
-            throw new Error(`HTTP error! status: ${response.status}`);
+        
+        // Intenta siempre parsear como JSON primero
+        let data;
+        try {
+            data = await response.json();
+        } catch (jsonError) {
+            // Si falla el parseo JSON, lee como texto y registra el error
+            const errorBody = await response.text();
+            console.error(`Error al parsear JSON de la URL: ${url}. Cuerpo: ${errorBody}`, jsonError);
+            // Si la respuesta no es OK y no es JSON, aún consideramos que hay un error HTTP
+            if (!response.ok) {
+                 throw new Error(`HTTP error! status: ${response.status}, URL: ${url}`);
+            }
+            // Si la respuesta es OK pero no es JSON (inesperado), puedes decidir qué hacer
+            // Por ahora, devolver un objeto con un error para indicar que no fue JSON
+             return { error: `Respuesta inesperada no JSON (status: ${response.status})` };
         }
-        return await response.json();
+
+        // Si la respuesta no es OK, pero es JSON, no lanzamos excepción aquí.
+        // La función que llama a safeFetch debe verificar si 'data' contiene un campo 'error'.
+        if (!response.ok) {
+             console.warn(`Respuesta HTTP no-OK (status: ${response.status}) con cuerpo JSON de URL: ${url}`, data);
+            // No lanzar error, simplemente devolver los datos que contienen el error del backend
+            return data;
+        }
+
+        // Si la respuesta es OK y es JSON, devolver los datos
+        return data;
+
     } catch (error) {
-        console.error('Error en la petición:', error);
-        throw error;
+        console.error('Error en la petición safeFetch:', error, 'URL:', url);
+        throw error; // Re-lanzar el error para que la lógica de llamada lo maneje si es necesario
     }
 }
 
@@ -168,8 +191,8 @@ async function buscarCompaneroAutomatico() {
                 }
             });
 
-            // Si se encuentra un compañero
-            if (data.chat_id && data.companero) {
+            // Si se encuentra un compañero (verificar si hay error en la respuesta JSON)
+            if (data && !data.error && data.chat_id && data.companero) {
                 chatId = data.chat_id;
                 companero = data.companero;
                 usuarioReportadoId = companero.id; // Asumo que el ID del usuario reportado es el ID del compañero
@@ -204,16 +227,19 @@ async function buscarCompaneroAutomatico() {
 
                 break; // Salir del bucle while una vez que se encuentra un compañero
 
+            } else if (data && data.error) {
+                 // Si hubo un error reportado en el cuerpo JSON (ej. no hay usuarios)
+                 console.log('Error del backend al buscar compañero:', data.error, ', reintentando en 8 segundos...');
+                 await new Promise(resolve => setTimeout(resolve, 8000)); // Esperar antes de reintentar
             } else {
-                 // Si no se encuentra compañero pero no hubo error (ej. no hay disponibles)
+                 // Si no se encuentra compañero y no hubo error reportado
                  console.log('No se encontró compañero, reintentando en 8 segundos...');
                  await new Promise(resolve => setTimeout(resolve, 8000)); // Esperar antes de reintentar
             }
 
         } catch (error) {
             console.error('Error al buscar compañero:', error);
-            // Si hay un error HTTP o de conexión, espera antes de reintentar
-             // Solo mostramos un mensaje de error si no estamos buscando activamente (buscandoCompanero = true)
+            // Si hay un error en safeFetch que no se manejó internamente (ej. error de red)
              if (buscandoCompanero) {
                  console.log('Error buscando compañero, reintentando en 8 segundos...');
                  await new Promise(resolve => setTimeout(resolve, 8000));
@@ -357,6 +383,14 @@ async function cargarMensajes() {
         const container = document.getElementById('mensajesContainer');
         if (!container) return;
 
+        // Verificar si la respuesta JSON contiene un error
+        if (mensajes && mensajes.error) {
+            console.warn('Error del backend al cargar mensajes:', mensajes.error);
+            // Dependiendo del error, podrías querer hacer algo específico.
+            // Por ahora, simplemente no procesamos los mensajes.
+            return;
+        }
+
         if (mensajes && mensajes.length > 0) {
              console.log('Nuevos mensajes recibidos:', mensajes.length);
             mensajes.forEach(mensaje => {
@@ -372,7 +406,7 @@ async function cargarMensajes() {
         }
 
     } catch (error) {
-        console.error('Error al cargar mensajes:', error);
+        console.error('Error al cargar mensajes (catch):', error);
          // No mostramos SweetAlert aquí para evitar saturar si el polling falla temporalmente
     }
 }
@@ -474,8 +508,11 @@ async function verificarEstadoChat() {
         });
 
         // Si la respuesta no es OK (por ejemplo, 404 porque el chat terminó)
-        if (!chatResponse.status || chatResponse.status === 'ended') { // Asumo que el backend puede enviar status 'ended' o un error HTTP como 404
-            console.log('El chat ha terminado o no es válido.');
+        // Ahora safeFetch devuelve el cuerpo JSON incluso si no es OK, así que verificamos data.error
+        if (chatResponse && chatResponse.error) { // Verificar si hay un error reportado
+            console.log('Error del backend al verificar estado del chat:', chatResponse.error);
+             // Asumimos que un error aquí significa que el chat terminó o es inválido
+             console.log('El chat ha terminado o no es válido.');
             // Restablecer el estado del chat en el frontend
             chatId = null;
             companero = null;
@@ -512,14 +549,49 @@ async function verificarEstadoChat() {
             // Iniciar la búsqueda de un nuevo compañero
             buscarCompaneroAutomatico();
 
-        } else {
+        } else if (chatResponse) { // Si no hay error reportado y la respuesta es válida (status OK)
             console.log('El chat sigue activo.');
              // Si el chat sigue activo, no hacer nada (el polling de mensajes ya se encarga)
+        } else {
+             // Manejar caso inesperado si chatResponse es nulo o indefinido
+             console.error('Respuesta inesperada al verificar estado del chat.', chatResponse);
+             // Podrías querer tratar esto como un fin de chat también
+             console.log('Respuesta inesperada, asumiendo fin del chat y reiniciando búsqueda.');
+             chatId = null;
+             companero = null;
+             buscandoCompanero = true;
+
+             limpiarIntervalos();
+
+             const chatHeader = document.getElementById('chatHeader');
+             const chatOptions = document.getElementById('chatOptions');
+             const mensajesContainer = document.getElementById('mensajesContainer');
+
+              if (chatHeader) {
+                  chatHeader.innerHTML = `
+                      <div class="d-flex align-items-center">
+                          <div class="spinner-border spinner-border-sm text-warning me-2" role="status">
+                              <span class="visually-hidden">Cargando...</span>
+                          </div>
+                          Buscando usuarios disponibles...
+                      </div>
+                  `;
+              }
+
+              if (chatOptions) {
+                  chatOptions.style.display = 'none';
+              }
+
+              if (mensajesContainer) {
+                  mensajesContainer.innerHTML = ''; // Limpiar mensajes
+              }
+             lastMessageId = 0; // Resetear el último ID de mensaje
+
+             buscarCompaneroAutomatico(); // Reiniciar la búsqueda
         }
     } catch (error) {
-        console.error('Error al verificar estado del chat:', error);
-        // Si hay un error al verificar el estado, asumimos que el chat pudo haber terminado
-        // y reiniciamos la búsqueda para mayor seguridad
+        console.error('Error al verificar estado del chat (catch):', error);
+        // Si hay un error en safeFetch que no se manejó internamente (ej. error de red)
         console.log('Error al verificar estado, asumiendo fin del chat y reiniciando búsqueda.');
         chatId = null;
         companero = null;
