@@ -240,92 +240,72 @@
             const input = document.getElementById('mensajeInput');
             input.value += emoji;
         });
-    @elseif($reto->id_reto == 3)
-    // Para el reto 3, agregar contador de caracteres
-    const mensajeInput = document.getElementById('mensajeInput');
-    
-    // Crear elemento contador
-    const contadorContainer = document.createElement('div');
-    contadorContainer.id = 'contador-caracteres';
-    contadorContainer.style.fontSize = '12px';
-    contadorContainer.style.color = '#6c757d';
-    contadorContainer.style.marginTop = '5px';
-    contadorContainer.style.textAlign = 'right';
-    document.querySelector('.input-group').insertAdjacentElement('afterend', contadorContainer);
-    
-    // Actualizar contador al escribir
-    mensajeInput.addEventListener('input', function() {
-        const longitud = this.value.trim().length;
-        const caracteresRestantes = 500 - longitud;
-        let textoContador = `${longitud}/500 caracteres`;
-        
-        // Si es menor a 60 caracteres, mostrar cuántos faltan para puntuar
-        if (longitud < 60) {
-            const caracteresParaPuntos = 60 - longitud;
-            textoContador += ` (Faltan ${caracteresParaPuntos} para ganar puntos)`;
-            contadorContainer.style.color = '#dc3545';
-        } else {
-            contadorContainer.style.color = '#28a745';
-            textoContador += ' (¡Suficiente para puntuar!)';
-        }
-        
-        if (caracteresRestantes < 50) {
-            contadorContainer.style.color = '#dc3545';
-        }
-        
-        contadorContainer.textContent = textoContador;
-    });
-    
-    // Inicializar el contador
-    mensajeInput.dispatchEvent(new Event('input'));
-    @else
+    @elseif($reto->id_reto != 1)
     // Mostrar mensaje cuando intentan usar emojis en otros retos
     const emojiButtonDisabled = document.getElementById('emojiButtonDisabled');
-    emojiButtonDisabled.addEventListener('click', () => {
-        Swal.fire({
-            title: 'No disponible',
-            text: 'Los emojis solo están disponibles en los retos de emojis 😊',
-            icon: 'info',
-            confirmButtonText: 'Entendido'
+    if(emojiButtonDisabled) {
+        emojiButtonDisabled.addEventListener('click', () => {
+            Swal.fire({
+                title: 'No disponible',
+                text: 'Los emojis solo están disponibles en los retos de emojis 😊',
+                icon: 'info',
+                confirmButtonText: 'Entendido'
+            });
         });
-    });
+    }
     @endif
 
-    // Agregar un contador simple de caracteres para todos los retos
-    @if($reto->id_reto != 3)
+    // === Lógica del contador de caracteres ===
     const mensajeInput = document.getElementById('mensajeInput');
-    
-    // Crear elemento contador simple
-    const contadorContainer = document.createElement('div');
-    contadorContainer.id = 'contador-caracteres';
-    contadorContainer.style.fontSize = '12px';
-    contadorContainer.style.color = '#6c757d';
-    contadorContainer.style.marginTop = '5px';
-    contadorContainer.style.textAlign = 'right';
-    document.querySelector('.input-group').insertAdjacentElement('afterend', contadorContainer);
-    
-    // Actualizar contador al escribir
-    mensajeInput.addEventListener('input', function() {
-        const longitud = this.value.trim().length;
-        const caracteresRestantes = 500 - longitud;
-        let textoContador = `${longitud}/500 caracteres`;
-        
-        if (caracteresRestantes < 50) {
-            contadorContainer.style.color = '#dc3545';
-        } else {
-            contadorContainer.style.color = '#6c757d';
-        }
-        
-        contadorContainer.textContent = textoContador;
-    });
-    
-    // Inicializar el contador
-    mensajeInput.dispatchEvent(new Event('input'));
-    @endif
+    const inputGroup = document.querySelector('.input-group');
+
+    if (mensajeInput && inputGroup) {
+        // Crear elemento contador
+        const contadorContainer = document.createElement('div');
+        contadorContainer.id = 'contador-caracteres';
+        contadorContainer.style.fontSize = '12px';
+        contadorContainer.style.color = '#6c757d';
+        contadorContainer.style.marginTop = '5px';
+        contadorContainer.style.textAlign = 'right';
+        inputGroup.insertAdjacentElement('afterend', contadorContainer);
+
+        // Actualizar contador al escribir
+        mensajeInput.addEventListener('input', function() {
+            const longitud = this.value.trim().length;
+            const caracteresRestantes = 500 - longitud;
+            let textoContador = `${longitud}/500 caracteres`;
+
+            // Lógica específica para el reto 3
+            @if($reto->id_reto == 3)
+            if (longitud < 60) {
+                const caracteresParaPuntos = 60 - longitud;
+                textoContador += ` (Faltan ${caracteresParaPuntos} para ganar puntos)`;
+                contadorContainer.style.color = '#dc3545'; // Color de advertencia
+            } else {
+                contadorContainer.style.color = '#28a745'; // Color de éxito
+                textoContador += ' (¡Suficiente para puntuar!)';
+            }
+            // Si no es reto 3, solo mostrar alerta si quedan pocos caracteres
+            @else
+            if (caracteresRestantes < 50) {
+                contadorContainer.style.color = '#dc3545'; // Color de advertencia
+            } else {
+                contadorContainer.style.color = '#6c757d'; // Color normal
+            }
+            @endif
+
+            contadorContainer.textContent = textoContador;
+        });
+
+        // Inicializar el contador
+        mensajeInput.dispatchEvent(new Event('input'));
+    }
+    // === Fin Lógica del contador de caracteres ===
+
 </script>
-<script src="{{ asset('js/estados.js') }}"></script>
 <script src="{{ asset('js/chatrandom.js') }}"></script>
 <script src="{{ asset('js/reto' . $reto->id_reto . '.js') }}"></script>
+<script src="{{ asset('js/reto_specific.js') }}"></script>
 
 <style>
 .solicitud-item {

@@ -19,15 +19,15 @@ async function safeFetch(url, options = {}) {
 
 // Variables para control de inactividad y intervalos
 var ultimoMensaje = Date.now();
-var contadorInactividad = null; // Cambiado de let a var
-var contadorRegresivo = null; // Cambiado de let a var
+var contadorInactividad = null;
+var contadorRegresivo = null;
 var alertaMostrada = false;
 var miAlerta = false;
 // tiempoInicialEspera ya fue ajustado a 5000ms en el commit anterior
 
 // Definir intervalos de polling en un solo lugar para fácil ajuste
-const INTERVALO_ESTADO = 60000; // 60 segundos para actualizar estado
-const INTERVALO_USUARIOS_ONLINE = 60000; // 60 segundos para actualizar usuarios en línea
+var INTERVALO_ESTADO = 60000; // 60 segundos para actualizar estado
+var INTERVALO_USUARIOS_ONLINE = 60000; // 60 segundos para actualizar usuarios en línea
 
 // Función para actualizar el estado del usuario usando safeFetch
 function actualizarEstado(estado) {
@@ -266,9 +266,19 @@ window.addEventListener('beforeunload', async () => { // Usar async para poder u
 });
 
 
-// Hacer las funciones disponibles globalmente para chatrandom.js
-window.actualizarUltimoMensaje = actualizarUltimoMensaje;
-window.iniciarControlInactividad = iniciarControlInactividad;
-window.detenerControlInactividad = detenerControlInactividad;
+// Hacer las funciones relevantes disponibles globalmente si otros scripts las necesitan
+// Usamos un patrón para evitar errores si ya existen (por si el script se carga dos veces, aunque no debería pasar)
+if (typeof window.actualizarUltimoMensaje === 'undefined') {
+    window.actualizarUltimoMensaje = actualizarUltimoMensaje;
+}
+
+if (typeof window.iniciarControlInactividad === 'undefined') {
+    window.iniciarControlInactividad = iniciarControlInactividad;
+}
+
+if (typeof window.detenerControlInactividad === 'undefined') {
+    window.detenerControlInactividad = detenerControlInactividad;
+}
+
 // Exponer tiempoInicialEspera globalmente también si chatrandom.js lo necesita para el setTimeout inicial
 // window.tiempoInicialEspera = tiempoInicialEspera; // (Ya lo ajustamos directamente en chatrandom.js) 

@@ -56,7 +56,10 @@ class RetoController extends Controller
             // Verificar autenticación
             if (!Auth::check()) {
                 Log::error('Usuario no autenticado');
-                return response()->json(['error' => 'Usuario no autenticado'], 401);
+                return response()->json(['error' => 'Usuario no autenticado'], 401)
+                    ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                    ->header('Pragma', 'no-cache')
+                    ->header('Expires', '0');
             }
             
             $usuarioActual = Auth::user();
@@ -98,7 +101,10 @@ class RetoController extends Controller
                                 'nombre_completo' => $companero->nombre_completo,
                                 'imagen' => $companero->imagen_perfil
                             ]
-                        ]);
+                        ])
+                        ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                        ->header('Pragma', 'no-cache')
+                        ->header('Expires', '0');
                     }
                 }
             } catch (\Exception $e) {
@@ -200,11 +206,17 @@ class RetoController extends Controller
                     'nombre_completo' => $companero->nombre_completo,
                     'imagen' => $companero->imagen_perfil
                 ]
-            ]);
+            ])
+            ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+            ->header('Pragma', 'no-cache')
+            ->header('Expires', '0');
         } catch (\Exception $e) {
             Log::error('Error en buscarCompanero: ' . $e->getMessage());
             Log::error('Stack trace: ' . $e->getTraceAsString());
-            return response()->json(['error' => 'Error interno del servidor'], 500);
+            return response()->json(['error' => 'Error interno del servidor'], 500)
+                ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
         }
     }
 
@@ -438,19 +450,31 @@ class RetoController extends Controller
                 ->first();
 
             if (!$chat) {
-                return response()->json(['error' => 'Chat no encontrado'], 404);
+                return response()->json(['error' => 'Chat no encontrado'], 404)
+                    ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                    ->header('Pragma', 'no-cache')
+                    ->header('Expires', '0');
             }
 
             // Verificar si ambos usuarios siguen en el chat
             $usuariosEnChat = ChatUsuario::where('id_chat', $chatId)->count();
             if ($usuariosEnChat < 2) {
-                return response()->json(['error' => 'Chat incompleto'], 404);
+                return response()->json(['error' => 'Chat incompleto'], 404)
+                    ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                    ->header('Pragma', 'no-cache')
+                    ->header('Expires', '0');
             }
 
-            return response()->json(['status' => 'active']);
+            return response()->json(['status' => 'active'])
+                ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
         } catch (\Exception $e) {
             Log::error('Error al verificar chat: ' . $e->getMessage());
-            return response()->json(['error' => 'Error al verificar chat'], 500);
+            return response()->json(['error' => 'Error al verificar chat'], 500)
+                ->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0')
+                ->header('Pragma', 'no-cache')
+                ->header('Expires', '0');
         }
     }
 
