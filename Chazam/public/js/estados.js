@@ -19,10 +19,10 @@ async function safeFetch(url, options = {}) {
 
 // Variables para control de inactividad y intervalos
 var ultimoMensaje = Date.now();
-let contadorInactividad = null; // Intervalo para verificar inactividad
-let contadorRegresivo = null; // Intervalo para el temporizador de la alerta
-let alertaMostrada = false;
-let miAlerta = false;
+var contadorInactividad = null; // Cambiado de let a var
+var contadorRegresivo = null; // Cambiado de let a var
+var alertaMostrada = false;
+var miAlerta = false;
 // tiempoInicialEspera ya fue ajustado a 5000ms en el commit anterior
 
 // Definir intervalos de polling en un solo lugar para fácil ajuste

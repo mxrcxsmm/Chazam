@@ -367,14 +367,19 @@ async function cargarMensajes() {
             // Ordenar mensajes por ID para asegurar orden correcto
             mensajes.sort((a, b) => a.id - b.id);
             
+            let mensajesAgregados = 0;
             mensajes.forEach(mensaje => {
                 if (mensaje && mensaje.chat_usuario && mensaje.chat_usuario.usuario) {
                     console.log(`[Polling] Procesando mensaje ID: ${mensaje.id}, Contenido: ${mensaje.contenido.substring(0, 50)}...`);
-                    agregarMensaje(mensaje, mensaje.chat_usuario.usuario);
+                    if (agregarMensaje(mensaje, mensaje.chat_usuario.usuario)) {
+                        mensajesAgregados++;
+                    }
                 } else {
                     console.error('[Polling] Mensaje inválido:', mensaje);
                 }
             });
+
+            console.log(`[Polling] Mensajes agregados exitosamente: ${mensajesAgregados}`);
 
             // Actualizar lastMessageId al ID del último mensaje recibido
             const maxMessageId = Math.max(...mensajes.map(m => m.id));
@@ -384,7 +389,9 @@ async function cargarMensajes() {
             }
 
             // Hacer scroll al último mensaje solo si se agregaron nuevos
-            container.scrollTop = container.scrollHeight;
+            if (mensajesAgregados > 0) {
+                container.scrollTop = container.scrollHeight;
+            }
         } else {
             console.log('[Polling] No hay mensajes nuevos.');
         }
@@ -404,101 +411,102 @@ function agregarMensaje(mensaje, usuario) {
     // Verificaciones de datos esenciales
     if (!mensaje || typeof mensaje.id === 'undefined' || typeof mensaje.contenido === 'undefined' || typeof mensaje.fecha_envio === 'undefined') {
         console.error('[AgregarMensaje] Datos del mensaje incompletos o inválidos:', mensaje);
-        return;
+        return false;
     }
 
     if (!usuario || typeof usuario.id === 'undefined' || typeof usuario.username === 'undefined') {
         console.error('[AgregarMensaje] Datos del usuario incompletos o inválidos:', usuario);
-        return;
+        return false;
     }
 
     const container = document.getElementById('mensajesContainer');
     if (!container) {
         console.error('[AgregarMensaje] Contenedor de mensajes no encontrado');
-        return;
+        return false;
     }
 
     // Verificar si el mensaje ya existe
     if (document.getElementById(`message-${mensaje.id}`)) {
         console.log(`[AgregarMensaje] Mensaje ${mensaje.id} ya existe, ignorando`);
-        return;
+        return false;
     }
 
-    const metaUserId = document.querySelector('meta[name="user-id"]');
-    // Asegurarse de que usuario y usuario.id existen antes de comparar
-    const esMio = metaUserId && usuario && typeof usuario.id !== 'undefined' ? usuario.id === parseInt(metaUserId.content) : false;
-    
-    console.log(`[AgregarMensaje] Mensaje ${mensaje.id}: Es mío? ${esMio}`);
+    try {
+        const metaUserId = document.querySelector('meta[name="user-id"]');
+        const esMio = metaUserId && usuario.id === parseInt(metaUserId.content);
+        
+        console.log(`[AgregarMensaje] Mensaje ${mensaje.id}: Es mío? ${esMio}`);
 
-    const mensajeDiv = document.createElement('div');
-    mensajeDiv.className = `reto-message ${esMio ? 'sent' : 'received'}`;
-    mensajeDiv.id = `message-${mensaje.id}`; // Añadir ID al elemento del mensaje
-    mensajeDiv.style.cssText = 'display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;';
+        const mensajeDiv = document.createElement('div');
+        mensajeDiv.className = `reto-message ${esMio ? 'sent' : 'received'}`;
+        mensajeDiv.id = `message-${mensaje.id}`;
+        mensajeDiv.style.cssText = 'display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;';
 
-    const userImage = document.createElement('img');
-    // Usar la función getProfileImgPath para la imagen del usuario del mensaje
-    // Asegurarse de que usuario y usuario.imagen existen
-    userImage.src = getProfileImgPath(usuario?.imagen); // Usar ?. para acceso seguro
-    userImage.alt = usuario?.username || 'Usuario'; // Usar ?. y default
-    userImage.className = 'reto-message-user-image';
-    userImage.style.cssText = 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
-     // Añadir manejo de error para la imagen por si acaso
-     userImage.onerror = function() {
-         this.src = getProfileImgPath(null); // Carga la imagen por defecto si falla
-     };
+        const userImage = document.createElement('img');
+        // Usar la función getProfileImgPath para la imagen del usuario del mensaje
+        // Asegurarse de que usuario y usuario.imagen existen
+        userImage.src = getProfileImgPath(usuario?.imagen); // Usar ?. para acceso seguro
+        userImage.alt = usuario?.username || 'Usuario'; // Usar ?. y default
+        userImage.className = 'reto-message-user-image';
+        userImage.style.cssText = 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
+         // Añadir manejo de error para la imagen por si acaso
+         userImage.onerror = function() {
+             this.src = getProfileImgPath(null); // Carga la imagen por defecto si falla
+         };
 
 
-    const mensajeWrapper = document.createElement('div');
-    mensajeWrapper.className = 'reto-message-wrapper';
-    mensajeWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-start;';
+        const mensajeWrapper = document.createElement('div');
+        mensajeWrapper.className = 'reto-message-wrapper';
+        mensajeWrapper.style.cssText = 'display: flex; flex-direction: column; align-items: flex-start;';
 
-    const userName = document.createElement('span');
-    userName.className = 'reto-message-username';
-    userName.textContent = usuario?.username || 'Desconocido'; // Usar ?. y default
-    userName.style.cssText = 'font-weight: bold; color: ' + (esMio ? '#4B0082' : '#6c757d') + '; font-size: 15px; margin-bottom: 2px;';
+        const userName = document.createElement('span');
+        userName.className = 'reto-message-username';
+        userName.textContent = usuario?.username || 'Desconocido'; // Usar ?. y default
+        userName.style.cssText = 'font-weight: bold; color: ' + (esMio ? '#4B0082' : '#6c757d') + '; font-size: 15px; margin-bottom: 2px;';
 
-    const contenido = document.createElement('div');
-    contenido.className = 'reto-message-content';
-    contenido.textContent = mensaje.contenido; // Asumimos que contenido siempre existe
-    contenido.style.cssText = 'background: ' + (esMio ? '#4B0082' : '#f3e6ff') + '; color: ' + (esMio ? 'white' : '#222') + '; padding: 10px 18px; border-radius: 14px; margin-bottom: 2px; max-width: 600px; font-size: 16px; word-break: break-word;';
+        const contenido = document.createElement('div');
+        contenido.className = 'reto-message-content';
+        contenido.textContent = mensaje.contenido; // Asumimos que contenido siempre existe
+        contenido.style.cssText = 'background: ' + (esMio ? '#4B0082' : '#f3e6ff') + '; color: ' + (esMio ? 'white' : '#222') + '; padding: 10px 18px; border-radius: 14px; margin-bottom: 2px; max-width: 600px; font-size: 16px; word-break: break-word;';
 
-    const fecha = document.createElement('div');
-    fecha.className = 'reto-message-time';
-    // Parsear la fecha correctamente (puede ser string de ISO 8601)
-    // Asegurarse de que mensaje.fecha_envio existe
-    const fechaMensaje = mensaje?.fecha_envio ? new Date(mensaje.fecha_envio) : new Date();
-    // Formatear hora localmente (puede requerir polyfill si no es soportado)
-    fecha.textContent = fechaMensaje.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-    fecha.style.cssText = 'font-size: 12px; color: #888; margin-left: 2px;';
+        const fecha = document.createElement('div');
+        fecha.className = 'reto-message-time';
+        // Parsear la fecha correctamente (puede ser string de ISO 8601)
+        // Asegurarse de que mensaje.fecha_envio existe
+        const fechaMensaje = mensaje?.fecha_envio ? new Date(mensaje.fecha_envio) : new Date();
+        // Formatear hora localmente (puede requerir polyfill si no es soportado)
+        fecha.textContent = fechaMensaje.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        fecha.style.cssText = 'font-size: 12px; color: #888; margin-left: 2px;';
 
-    mensajeWrapper.appendChild(userName);
-    mensajeWrapper.appendChild(contenido);
-    mensajeWrapper.appendChild(fecha);
+        mensajeWrapper.appendChild(userName);
+        mensajeWrapper.appendChild(contenido);
+        mensajeWrapper.appendChild(fecha);
 
-    // Asegurarse de que la imagen esté a la izquierda para mensajes recibidos y a la derecha para enviados
-    if (esMio) {
-         mensajeDiv.style.flexDirection = 'row-reverse'; // Invierte el orden para mensajes enviados
-         mensajeWrapper.style.alignItems = 'flex-end'; // Alinea texto a la derecha
-         userName.style.textAlign = 'right';
-         contenido.style.textAlign = 'right';
-         fecha.style.textAlign = 'right';
-         fecha.style.marginRight = '2px'; // Ajustar margen
-         fecha.style.marginLeft = '0';
-         mensajeDiv.appendChild(mensajeWrapper); // Añadir primero el wrapper para invertir el orden
-         mensajeDiv.appendChild(userImage);
-    } else {
-         mensajeDiv.appendChild(userImage);
-         mensajeDiv.appendChild(mensajeWrapper);
+        // Asegurarse de que la imagen esté a la izquierda para mensajes recibidos y a la derecha para enviados
+        if (esMio) {
+             mensajeDiv.style.flexDirection = 'row-reverse'; // Invierte el orden para mensajes enviados
+             mensajeWrapper.style.alignItems = 'flex-end'; // Alinea texto a la derecha
+             userName.style.textAlign = 'right';
+             contenido.style.textAlign = 'right';
+             fecha.style.textAlign = 'right';
+             fecha.style.marginRight = '2px'; // Ajustar margen
+             fecha.style.marginLeft = '0';
+             mensajeDiv.appendChild(mensajeWrapper); // Añadir primero el wrapper para invertir el orden
+             mensajeDiv.appendChild(userImage);
+        } else {
+             mensajeDiv.appendChild(userImage);
+             mensajeDiv.appendChild(mensajeWrapper);
+        }
+
+
+        // Añadir el mensaje al final del contenedor
+        container.appendChild(mensajeDiv);
+        console.log(`[AgregarMensaje] Mensaje ${mensaje.id} agregado exitosamente`);
+        return true;
+    } catch (error) {
+        console.error(`[AgregarMensaje] Error al agregar mensaje ${mensaje.id}:`, error);
+        return false;
     }
-
-
-    // Añadir el mensaje al final del contenedor
-    container.appendChild(mensajeDiv);
-
-    // Hacer scroll al último mensaje si el usuario estaba cerca del final
-     // (Opcional: lógica para detectar si el usuario estaba haciendo scroll hacia arriba)
-     // Por ahora, siempre hacemos scroll al final si se añade un nuevo mensaje
-     container.scrollTop = container.scrollHeight;
 }
 
 // Función para verificar el estado del chat
