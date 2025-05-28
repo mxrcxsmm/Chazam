@@ -371,19 +371,23 @@ async function cargarMensajes() {
             mensajes.forEach(mensaje => {
                 // Verificación más robusta del objeto usuario anidado
                 if (mensaje && mensaje.id_mensaje != null && mensaje.contenido != null &&
-                    mensaje.chat_usuario && mensaje.chat_usuario.usuario &&
-                    mensaje.chat_usuario.usuario.id_usuario != null &&
-                    mensaje.chat_usuario.usuario.username != null) {
+                    mensaje.chat_usuario && mensaje.chat_usuario.usuario) {
+                    
+                    // Normalizar el ID del usuario como en agregarMensaje
+                    const userId = mensaje.chat_usuario.usuario?.id_usuario ?? mensaje.chat_usuario.usuario?.id;
+                    
+                    if (userId != null && mensaje.chat_usuario.usuario.username != null) {
+                        console.log(`[Polling] Procesando mensaje ID: ${mensaje.id_mensaje}, Contenido: ${mensaje.contenido ? mensaje.contenido.substring(0, 50) + '...' : 'N/A'}`);
+                        console.log('[Polling] Datos de usuario a pasar a agregarMensaje:', mensaje.chat_usuario.usuario);
 
-                    console.log(`[Polling] Procesando mensaje ID: ${mensaje.id_mensaje}, Contenido: ${mensaje.contenido ? mensaje.contenido.substring(0, 50) + '...' : 'N/A'}`);
-                    console.log('[Polling] Datos de usuario a pasar a agregarMensaje:', mensaje.chat_usuario.usuario);
-
-                    if (agregarMensaje(mensaje, mensaje.chat_usuario.usuario)) {
-                        mensajesAgregados++;
+                        if (agregarMensaje(mensaje, mensaje.chat_usuario.usuario)) {
+                            mensajesAgregados++;
+                        }
+                    } else {
+                        console.error('[Polling] Datos de usuario incompletos o inválidos:', mensaje.chat_usuario.usuario);
                     }
                 } else {
                     console.error('[Polling] Mensaje inválido o incompleto (falta mensaje, chat_usuario, usuario o campos requeridos del usuario):', mensaje);
-                     // Log detallado del mensaje completo que falló la validación inicial
                     console.error('[Polling] Mensaje completo que falló la validación inicial:', JSON.stringify(mensaje, null, 2));
                 }
             });
@@ -424,8 +428,11 @@ function agregarMensaje(mensaje, usuario) {
         return false;
     }
 
-    // Verificaciones de datos esenciales: usuario, id_usuario, username
-     if (!usuario || usuario.id_usuario == null || usuario.username == null) {
+    // Normalizar el ID del usuario (aceptar tanto id como id_usuario)
+    const userId = usuario?.id_usuario ?? usuario?.id;
+    
+    // Verificaciones de datos esenciales: usuario, id_usuario/id, username
+    if (!usuario || userId == null || usuario.username == null) {
         console.error('[AgregarMensaje] Datos del usuario incompletos o inválidos:', usuario);
         return false;
     }
@@ -444,7 +451,7 @@ function agregarMensaje(mensaje, usuario) {
 
     try {
         const metaUserId = document.querySelector('meta[name="user-id"]');
-        const esMio = metaUserId && usuario.id_usuario === parseInt(metaUserId.content);
+        const esMio = metaUserId && userId === parseInt(metaUserId.content);
         
         console.log(`[AgregarMensaje] Mensaje ${mensaje.id_mensaje}: Es mío? ${esMio}`);
 
@@ -464,7 +471,6 @@ function agregarMensaje(mensaje, usuario) {
          userImage.onerror = function() {
              this.src = getProfileImgPath(null); // Carga la imagen por defecto si falla
          };
-
 
         const mensajeWrapper = document.createElement('div');
         mensajeWrapper.className = 'reto-message-wrapper';
@@ -508,7 +514,6 @@ function agregarMensaje(mensaje, usuario) {
              mensajeDiv.appendChild(userImage);
              mensajeDiv.appendChild(mensajeWrapper);
         }
-
 
         // Añadir el mensaje al final del contenedor
         container.appendChild(mensajeDiv);
