@@ -404,17 +404,19 @@ async function cargarMensajes() {
 function agregarMensaje(mensaje, usuario) {
     console.log('[AgregarMensaje] Iniciando con mensaje:', {
         id: mensaje.id_mensaje,
-        contenido: mensaje.contenido.substring(0, 50) + '...',
+        contenido: mensaje.contenido ? mensaje.contenido.substring(0, 50) + '...' : 'N/A',
         fecha: mensaje.fecha_envio
     });
 
-    // Verificaciones de datos esenciales
-    if (!mensaje || typeof mensaje.id_mensaje === 'undefined' || typeof mensaje.contenido === 'undefined' || typeof mensaje.fecha_envio === 'undefined') {
+    // Verificaciones de datos esenciales: mensaje, id_mensaje, contenido, fecha_envio
+    // Usar verificación explícita para null y undefined para mayor robustez
+    if (!mensaje || mensaje.id_mensaje == null || mensaje.contenido == null || mensaje.fecha_envio == null) {
         console.error('[AgregarMensaje] Datos del mensaje incompletos o inválidos:', mensaje);
         return false;
     }
 
-    if (!usuario || typeof usuario.id === 'undefined' || typeof usuario.username === 'undefined') {
+    // Verificaciones de datos esenciales: usuario, id_usuario, username
+     if (!usuario || usuario.id_usuario == null || usuario.username == null) {
         console.error('[AgregarMensaje] Datos del usuario incompletos o inválidos:', usuario);
         return false;
     }
@@ -433,7 +435,7 @@ function agregarMensaje(mensaje, usuario) {
 
     try {
         const metaUserId = document.querySelector('meta[name="user-id"]');
-        const esMio = metaUserId && usuario.id === parseInt(metaUserId.content);
+        const esMio = metaUserId && usuario.id_usuario === parseInt(metaUserId.content);
         
         console.log(`[AgregarMensaje] Mensaje ${mensaje.id_mensaje}: Es mío? ${esMio}`);
 
