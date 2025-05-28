@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use App\Models\User;
 use Carbon\Carbon;
 use App\Models\Nacionalidad;
+use App\Models\Personalizacion;
 
 class AuthController extends Controller
 {
@@ -178,6 +179,16 @@ class AuthController extends Controller
 
             // Autenticar al usuario
             Auth::login($user);
+
+            if (!$user->personalizacion) {
+                Personalizacion::create([
+                    'id_usuario' => $user->id_usuario,
+                    'marco'      => 'default.svg',
+                    'rotacion'   => false,
+                    'brillo'     => null,
+                    'sidebar'    => '#4B0082',
+                ]);
+            }            
 
             // Redirigir al guide de retos
             return redirect()->route('retos.guide')->with('success', '¡Registro exitoso!');

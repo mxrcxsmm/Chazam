@@ -28,8 +28,7 @@
             <div class="d-flex d-lg-none align-items-center ms-auto">
                 <span class="puntos-text me-2 puntos-responsive">Puntos: {{ Auth::user()->puntos ?? 0 }}</span>
                 <i class="fas fa-coins puntos-icon puntos-responsive"></i>
-                <button class="navbar-toggler ms-2" type="button" id="sidebarToggle"
-                    aria-label="Toggle navigation">
+                <button class="navbar-toggler ms-2" type="button" id="sidebarToggle" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
             </div>
@@ -43,7 +42,7 @@
             <h3>User</h3>
             <ul class="categorias">
                 @foreach ($categorias as $categoria)
-                    @if ($categoria->id_tipo_producto != 5)
+                    @if ($categoria->id_tipo_producto != 5 && $categoria->id_tipo_producto != 4)
                         <li><a href="#categoria-{{ $categoria->id_tipo_producto }}">{{ $categoria->tipo_producto }}</a>
                         </li>
                     @endif
@@ -55,16 +54,30 @@
         <!-- Contenido principal -->
         <div class="main-content">
             <h1>Tienda</h1>
+            @php
+                $user = Auth::user();
+            @endphp
+
             @foreach ($categorias as $categoria)
-                @if ($categoria->id_tipo_producto != 5)
+                {{-- Ocultar visualmente categorías con id_tipo_producto = 4 o 5 --}}
+                @if ($categoria->id_tipo_producto != 5 && $categoria->id_tipo_producto != 4)
                     <div id="categoria-{{ $categoria->id_tipo_producto }}" class="categoria-section">
                         <h2>{{ $categoria->tipo_producto }}</h2>
                         <div class="productos-grid">
                             @foreach ($productos->where('id_tipo_producto', $categoria->id_tipo_producto) as $producto)
+                                {{-- Si el usuario es Premium (id_rol == 3) y el producto es el id_producto 11, ocultar --}}
+                                @if ($user && $user->id_rol == 3 && $producto->id_producto == 11)
+                                    @continue
+                                @endif
+                                {{-- Ocultar productos con id_tipo_producto = 4 por si acaso --}}
+                                @if ($producto->id_tipo_producto == 4)
+                                    @continue
+                                @endif
                                 <div class="producto-card">
                                     <a class="producto"
                                         href="{{ route('producto.comprar', ['id' => $producto->id_producto]) }}">
-                                        <img src="{{ asset('img/' . $producto->titulo . '.png') }}" alt="{{ $producto->titulo }}">
+                                        <img src="{{ asset('img/' . $producto->titulo . '.png') }}"
+                                            alt="{{ $producto->titulo }}">
                                         <h3>{{ $producto->titulo }}</h3>
                                         <p>{{ $producto->descripcion }}</p>
                                         <div class="precio">
