@@ -7,6 +7,7 @@ use Illuminate\Http\Request;                  // Para manejar solicitudes HTTP
 use App\Models\Personalizacion;               // Modelo para la tabla de personalización
 use App\Models\Producto;
 use App\Models\User;
+use App\Models\Pago;
 
 class VistaController extends Controller
 {
@@ -85,59 +86,92 @@ class VistaController extends Controller
         $isPremium = in_array($user->id_rol, [3, 4]);
 
         $p = $user->personalizacion
-        ?? new Personalizacion(['id_usuario' => $user->id_usuario]);
+            ?? new Personalizacion(['id_usuario' => $user->id_usuario]);
 
         $precioTotal = 0;
+        $pagos = [];
 
-        // === 1. Marco ===
+        // 1) Marco
         if ($request->has('marco')) {
             $nuevoMarco = $request->input('marco');
             if ($nuevoMarco !== $p->marco && ! $isPremium) {
                 $producto = Producto::where('descripcion', $nuevoMarco)->first();
-                $precioTotal += $producto->puntos ?? 0;
+                $pts = $producto->puntos ?? 0;
+                $precioTotal += $pts;
+                $pagos[] = [
+                    'producto_id' => $producto->id,
+                    'puntos'      => $pts,
+                ];
             }
             $p->marco = $nuevoMarco;
         }
 
-        // === 2. Rotación ===
+        // 2) Rotación
         if ($request->has('rotacion')) {
             $nuevaRotacion = filter_var($request->input('rotacion'), FILTER_VALIDATE_BOOLEAN);
             if ($nuevaRotacion !== $p->rotacion && ! $isPremium) {
                 $titulo = $nuevaRotacion ? 'Marco Rotatorio' : 'Marco Estático';
                 $producto = Producto::where('titulo', $titulo)->first();
-                $precioTotal += $producto->puntos ?? 0;
+                $pts = $producto->puntos ?? 0;
+                $precioTotal += $pts;
+                $pagos[] = [
+                    'producto_id' => $producto->id,
+                    'puntos'      => $pts,
+                ];
             }
             $p->rotacion = $nuevaRotacion;
         }
 
-        // === 3. Sidebar ===
+        // 3) Sidebar
         if ($request->has('sidebar')) {
             $nuevoSidebar = $request->input('sidebar');
             if ($nuevoSidebar !== $p->sidebar && ! $isPremium) {
                 $producto = Producto::where('titulo', 'Color de Sidebar')->first();
-                $precioTotal += $producto->puntos ?? 0;
+                $pts = $producto->puntos ?? 0;
+                $precioTotal += $pts;
+                $pagos[] = [
+                    'producto_id' => $producto->id,
+                    'puntos'      => $pts,
+                ];
             }
             $p->sidebar = $nuevoSidebar;
         }
 
-        // === 4. Brillo ===
+        // 4) Brillo
         if ($request->has('brillo')) {
             $nuevoBrillo = $request->input('brillo');
             if ($nuevoBrillo !== $p->brillo && ! $isPremium) {
                 $producto = Producto::where('titulo', 'Brillo de Marco')->first();
-                $precioTotal += $producto->puntos ?? 0;
+                $pts = $producto->puntos ?? 0;
+                $precioTotal += $pts;
+                $pagos[] = [
+                    'producto_id' => $producto->id,
+                    'puntos'      => $pts,
+                ];
             }
             $p->brillo = $nuevoBrillo;
         }
 
-        // === Comprobación de puntos ===
+        // Validar saldo y registrar pagos
         if (! $isPremium && $precioTotal > 0) {
             if ($user->puntos < $precioTotal) {
                 return response()->json([
                     'message' => 'No tienes suficientes puntos para esta personalización.',
                 ], 403);
             }
+
+            // Descontar puntos
             $user->gastarPuntos($precioTotal);
+
+            // Registrar cada pago
+            foreach ($pagos as $info) {
+                Pago::create([
+                    'id_comprador' => Auth::id(),
+                    'id_producto' => $producto->id_producto,
+                    'cantidad'     => $info['puntos'],
+                    'fecha_pago' => now(),
+                ]);
+            }
         }
 
         $p->save();
