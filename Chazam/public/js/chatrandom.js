@@ -206,8 +206,8 @@ async function buscarCompaneroAutomatico() {
 
             } else {
                  // Si no se encuentra compañero pero no hubo error (ej. no hay disponibles)
-                 console.log('No se encontró compañero, reintentando en 3 segundos...');
-                 await new Promise(resolve => setTimeout(resolve, 3000)); // Esperar antes de reintentar
+                 console.log('No se encontró compañero, reintentando en 8 segundos...');
+                 await new Promise(resolve => setTimeout(resolve, 8000)); // Esperar antes de reintentar
             }
 
         } catch (error) {
@@ -215,8 +215,8 @@ async function buscarCompaneroAutomatico() {
             // Si hay un error HTTP o de conexión, espera antes de reintentar
              // Solo mostramos un mensaje de error si no estamos buscando activamente (buscandoCompanero = true)
              if (buscandoCompanero) {
-                 console.log('Error buscando compañero, reintentando en 3 segundos...');
-                 await new Promise(resolve => setTimeout(resolve, 3000));
+                 console.log('Error buscando compañero, reintentando en 8 segundos...');
+                 await new Promise(resolve => setTimeout(resolve, 8000));
              } else {
                   // Si el error ocurre después de haber encontrado compañero, el verificarEstadoChat lo manejará
                  break; // Salir del bucle si ya no estamos buscando activamente
@@ -329,8 +329,6 @@ async function enviarMensaje() {
             if (window.actualizarUltimoMensaje) {
                 window.actualizarUltimoMensaje();
             }
-             // Actualizar el lastMessageId al enviar un mensaje propio
-            lastMessageId = data.mensaje.id; // Asumiendo que el mensaje tiene un ID
         } else {
              console.error('Respuesta inesperada al enviar mensaje:', data);
              Swal.fire({
