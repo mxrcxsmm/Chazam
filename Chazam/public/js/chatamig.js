@@ -296,12 +296,24 @@ class ChatManager {
         this.lastImageUpdate = 0;
         this.lastActivity = Date.now();
         this.isActive = true;
+        this.elements = {};
+        
+        // Esperar a que el DOM esté completamente cargado
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => this.initialize());
+        } else {
+            this.initialize();
+        }
+    }
+
+    initialize() {
         this.initializeElements();
         this.setupEventListeners();
         this.startSmartPolling();
         this.setupSolicitudesHandlers();
         this.setupBlockHandlers();
         this.setupSearchHandlers();
+        this.loadChats();
     }
 
     // Inicialización de elementos DOM
@@ -319,8 +331,16 @@ class ChatManager {
             chatsList: document.getElementById('chats-list'),
             messagesContainer: document.getElementById('messages-container'),
             btnSolicitudesPendientes: document.getElementById('btnSolicitudesPendientes'),
-            solicitudesModal: document.getElementById('solicitudesModal')
+            solicitudesModal: document.getElementById('solicitudesModal'),
+            chatHeader: document.getElementById('chat-contact-name'),
+            chatStatus: document.getElementById('chat-contact-status'),
+            chatImg: document.getElementById('chat-contact-img')
         };
+
+        // Verificar elementos críticos
+        if (!this.elements.chatHeader || !this.elements.chatStatus || !this.elements.chatImg) {
+            console.error('Elementos críticos del chat no encontrados');
+        }
     }
 
     // Configuración de event listeners
@@ -549,28 +569,27 @@ class ChatManager {
 
     // Actualización del encabezado del chat
     updateChatHeader(companero) {
-        const defaultAvatar = window.CHAT_CONFIG.defaultAvatar;
+        if (!companero) return;
+
+        const defaultAvatar = window.CHAT_CONFIG?.defaultAvatar || '/img/profile_img/avatar-default.png';
         const isFriend = !!companero.id_usuario;
       
-        // 1) Nombre y estado
-        const chatHeader = document.getElementById('chat-contact-name');
-        const chatStatus = document.getElementById('chat-contact-status');
-        const chatImg = document.getElementById('chat-contact-img');
-        
-        if (!chatHeader || !chatStatus || !chatImg) {
-            console.error('No se encontraron elementos del header del chat');
+        // Verificar que los elementos existen
+        if (!this.elements.chatHeader || !this.elements.chatStatus || !this.elements.chatImg) {
+            console.error('Elementos del header del chat no encontrados');
             return;
         }
 
-        chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
-        chatStatus.textContent = (companero.id_estado == 1 || companero.id_estado == 5) ? 'en línea' : 'desconectado';
-        chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
+        // Actualizar nombre y estado
+        this.elements.chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
+        this.elements.chatStatus.textContent = (companero.id_estado == 1 || companero.id_estado == 5) ? 'en línea' : 'desconectado';
+        this.elements.chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
         
         // Construir la ruta de la imagen correctamente
         const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : defaultAvatar;
-        chatImg.src = imgPath;
-        chatImg.onerror = function() {
-            this.src = defaultAvatar;
+        this.elements.chatImg.src = imgPath;
+        this.elements.chatImg.onerror = () => {
+            this.elements.chatImg.src = defaultAvatar;
         };
     }
 
@@ -1022,8 +1041,7 @@ class ChatManager {
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', () => {
     window.chatManager = new ChatManager();
-    window.chatManager.loadChats();
-    window.bloquearUsuario = bloquearUsuario; // Hacer la función globalmente accesible
+    window.bloquearUsuario = bloquearUsuario;
 });
 
 // Añadir estilos CSS para las animaciones
