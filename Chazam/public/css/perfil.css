@@ -5,6 +5,7 @@ body {
     color: #4B0082;
 }
 
+
 /* .file-upload-wrapper {
     display: flex;
     justify-content: center;
@@ -82,7 +83,9 @@ canvas {
     display: none;
 }
 
+
 /* Sidebar fijo */
+
 .sidebar {
     background-color: #4B0082;
     width: 260px;
@@ -108,13 +111,16 @@ canvas {
 }
 
 .main-content {
-    margin-left: 260px; /* igual al ancho del sidebar */
+    margin-left: 260px;
+    /* igual al ancho del sidebar */
     padding: 2rem;
     background-color: #DFB5FF;
     min-height: 100vh;
 }
 
+
 /* Contenedor del formulario */
+
 .form-container {
     background-color: #EBD2FF;
     padding: 2rem 3rem;
@@ -125,7 +131,9 @@ canvas {
     color: #4B0082;
 }
 
+
 /* Título */
+
 .form-container .titulo {
     text-align: center;
     color: #4B0082;
@@ -134,19 +142,25 @@ canvas {
     margin-bottom: 2rem;
 }
 
+
 /* Grid del formulario */
+
 .formulario {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
 }
 
+
 /* Ocupa ancho completo para textarea, etc */
+
 .formulario .full {
     grid-column: span 2;
 }
 
+
 /* Etiquetas */
+
 .formulario label {
     display: block;
     margin-bottom: 0.25rem;
@@ -155,7 +169,9 @@ canvas {
     font-weight: 500;
 }
 
+
 /* Inputs y textarea */
+
 .formulario input {
     width: 100%;
     border: none;
@@ -173,7 +189,9 @@ canvas {
     outline: none;
 }
 
+
 /* Botón guardar */
+
 .formulario button[type="submit"] {
     background-color: #4B0082;
     color: white;
@@ -190,7 +208,9 @@ canvas {
     background-color: #8750B2;
 }
 
+
 /* Estilo del botón Capturar */
+
 .btn-capture {
     background-color: #4B0082;
     color: white;
@@ -207,7 +227,9 @@ canvas {
     background-color: #8750B2;
 }
 
+
 /* Centrar botón */
+
 .formulario .center {
     display: flex;
     justify-content: center;
@@ -242,7 +264,8 @@ canvas {
 }
 
 .modal-content {
-    background-color: #f4ddff; /* tono lavanda suave */
+    background-color: #f4ddff;
+    /* tono lavanda suave */
     border-radius: 1rem;
     padding: 1.5rem;
     border: 3px solid #8750B2;
@@ -272,7 +295,8 @@ canvas {
     display: inline-block;
 }
 
-#discardBtn, #downloadBtn {
+#discardBtn,
+#downloadBtn {
     position: absolute;
     top: 5px;
     background-color: white;
@@ -339,7 +363,9 @@ canvas {
     justify-content: center;
 }
 
+
 /* Estilos específicos solo para el avatar de vista.blade */
+
 #previewAvatar {
     width: 130px;
     height: 130px;
@@ -382,7 +408,9 @@ canvas {
     object-fit: cover;
 }
 
+
 /* Avatar del sidebar (más pequeño y bien proporcionado) */
+
 #sidebarGeneral {
     width: 80px;
     height: 80px;
@@ -395,9 +423,15 @@ canvas {
 }
 
 @keyframes glowPulse {
-    0% { box-shadow: 0 0 5px var(--glow-color); }
-    50% { box-shadow: 0 0 20px var(--glow-color), 0 0 30px var(--glow-color); }
-    100% { box-shadow: 0 0 5px var(--glow-color); }
+    0% {
+        box-shadow: 0 0 5px var(--glow-color);
+    }
+    50% {
+        box-shadow: 0 0 20px var(--glow-color), 0 0 30px var(--glow-color);
+    }
+    100% {
+        box-shadow: 0 0 5px var(--glow-color);
+    }
 }
 
 input[type="color"] {
@@ -421,8 +455,12 @@ input[type="color"]::-webkit-color-swatch {
 }
 
 @keyframes rotateSlow {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
 }
 
 .radio-group {
@@ -442,7 +480,8 @@ input[type="color"]::-webkit-color-swatch {
     border-radius: 9999px;
     transition: all 0.3s ease;
     cursor: pointer;
-    position: relative; /* necesario para posicionar el ::before */
+    position: relative;
+    /* necesario para posicionar el ::before */
 }
 
 .radio-group .form-check:hover {
@@ -456,7 +495,7 @@ input[type="color"]::-webkit-color-swatch {
     pointer-events: none;
 }
 
-.radio-group .form-check-input:checked + .form-check-label::before {
+.radio-group .form-check-input:checked+.form-check-label::before {
     content: "";
     position: absolute;
     top: 2px;
@@ -472,6 +511,7 @@ input[type="color"]::-webkit-color-swatch {
     font-weight: 600;
     cursor: pointer;
 }
+
 
 /*.marco-default {
     background-image: url('/IMG/bordes/default.svg');
@@ -507,3 +547,18 @@ input[type="color"]::-webkit-color-swatch {
     background-image: url('/IMG/bordes/estrellas-haikei.svg');
 }*/
 
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        top: 0;
+        left: -260px;
+        height: 100vh;
+        width: 260px;
+        z-index: 2001;
+        transition: left 0.3s;
+    }
+    .main-content {
+        margin-left: 0 !important;
+        padding: 1rem !important;
+    }
+}

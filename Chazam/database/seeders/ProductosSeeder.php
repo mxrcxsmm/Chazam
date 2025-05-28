@@ -128,7 +128,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 0,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 0,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Azul Suave',
@@ -136,7 +136,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 120,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 120,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Azul Champions',
@@ -144,7 +144,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 120,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 120,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Rojinegro',
@@ -152,7 +152,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 130,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 130,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Cromado',
@@ -160,7 +160,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 150,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 150,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Cromado Normal',
@@ -168,7 +168,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 140,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 140,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Cromado Pequeño',
@@ -176,7 +176,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 130,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 130,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Estrellas Cutres',
@@ -184,7 +184,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 110,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 110,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Golden Champions',
@@ -192,7 +192,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 160,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 160,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Wave Haikei',
@@ -200,7 +200,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 125,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 125,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Estrellas Haikei',
@@ -208,7 +208,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 125,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 125,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
 
             // 2) Animación rotatoria
@@ -218,7 +218,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 80,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 80,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
             [
                 'titulo'           => 'Marco Estático',
@@ -226,7 +226,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 0,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 0,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
 
             // 3) Brillo
@@ -236,7 +236,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 90,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 90,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
 
             // 4) Color de Sidebar
@@ -246,7 +246,7 @@ class ProductosSeeder extends Seeder
                 'precio'           => 100,
                 'tipo_valor'       => 'puntos',
                 'puntos'           => 100,
-                'id_tipo_producto' => 6,
+                'id_tipo_producto' => 4,
             ],
         ]);
     }

@@ -42,7 +42,7 @@
             <h3>User</h3>
             <ul class="categorias">
                 @foreach ($categorias as $categoria)
-                    @if ($categoria->id_tipo_producto != 5)
+                    @if ($categoria->id_tipo_producto != 5 && $categoria->id_tipo_producto != 4)
                         <li><a href="#categoria-{{ $categoria->id_tipo_producto }}">{{ $categoria->tipo_producto }}</a>
                         </li>
                     @endif
@@ -59,13 +59,18 @@
             @endphp
 
             @foreach ($categorias as $categoria)
-                @if ($categoria->id_tipo_producto != 5)
+                {{-- Ocultar visualmente categorías con id_tipo_producto = 4 o 5 --}}
+                @if ($categoria->id_tipo_producto != 5 && $categoria->id_tipo_producto != 4)
                     <div id="categoria-{{ $categoria->id_tipo_producto }}" class="categoria-section">
                         <h2>{{ $categoria->tipo_producto }}</h2>
                         <div class="productos-grid">
                             @foreach ($productos->where('id_tipo_producto', $categoria->id_tipo_producto) as $producto)
                                 {{-- Si el usuario es Premium (id_rol == 3) y el producto es el id_producto 11, ocultar --}}
                                 @if ($user && $user->id_rol == 3 && $producto->id_producto == 11)
+                                    @continue
+                                @endif
+                                {{-- Ocultar productos con id_tipo_producto = 4 por si acaso --}}
+                                @if ($producto->id_tipo_producto == 4)
                                     @continue
                                 @endif
                                 <div class="producto-card">
