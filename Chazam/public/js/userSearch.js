@@ -79,14 +79,14 @@ class UserSearch {
 
             this.searchResults.innerHTML = data.map(user => `
                 <div class="user-result">
-                    <img src="${user.img}" alt="${user.username}">
+                    <img src="${window.getProfileImgPath(user.img)}" alt="${user.username}" onerror="this.src='${window.getProfileImgPath()}'; this.onerror=null;">
                     <div class="user-info">
                         <h6>${user.username}</h6>
                         <p>${user.nombre_completo}</p>
                     </div>
                     <button class="send-request-btn" 
                             data-user-id="${user.id_usuario}"
-                            onclick="window.userSearch.sendFriendRequest(${user.id_usuario}, this)">
+                            onclick="window.chatManager.sendFriendRequest(${user.id_usuario}, this)">
                         Enviar solicitud
                     </button>
                 </div>

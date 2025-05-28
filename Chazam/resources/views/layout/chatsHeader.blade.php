@@ -5,6 +5,21 @@
     <title>@yield('title', 'Mi Aplicación')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <!-- Función global para manejar rutas de imágenes -->
+    <script>
+        window.getProfileImgPath = function(img) {
+            if (!img || img === 'null' || img === 'avatar-default.png' || img === '/img/profile_img/avatar-default.png') {
+                return `${window.location.origin}/img/profile_img/avatar-default.png`;
+            }
+            if (img.startsWith('http')) {
+                return img;
+            }
+            const cleanImg = img.replace(/^\/?img\/profile_img\//, '');
+            return `${window.location.origin}/img/profile_img/${cleanImg}`;
+        };
+    </script>
+
     <!-- Three.js para VANTA FOG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r121/three.min.js"></script>
     <!-- VANTA FOG -->
