@@ -45,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('rotacion', optional($personalizacion)->rotacion ?? false);
                 $view->with('sidebar', optional($personalizacion)->sidebar ?? '#4B0082');
             } else {
+                // Valores por defecto solo si no hay usuario autenticado
                 $view->with('user', null);
                 $view->with('personalizacion', null);
                 $view->with('racha', 0);
