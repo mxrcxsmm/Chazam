@@ -67,7 +67,7 @@
             <div id="previewContainer" class="position-relative mb-3">
                 <img src="{{ asset($user->imagen_perfil ?? '') }}" id="profilePreview" alt="Foto de perfil"
                      class="rounded-circle shadow"
-                     style="width: 120px; height: 120px; object-fit: cover; border: 3px solid #8750B2;">
+                     style="width: 120px; height: 120px; object-fit: cover;">
         
                 <!-- Botón Descargar -->
                 <a id="downloadBtn"

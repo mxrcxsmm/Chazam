@@ -21,45 +21,50 @@ class FriendChatController extends Controller
         return view('user.momentms');
     }
   
+    // …
     public function getUserChats()
     {
         $userId = Auth::id();
-        
-        $chats = ChatUsuario::with(['chat', 'usuario'])
+
+        $chats = ChatUsuario::with(['chat', 'usuario.personalizacion'])
             ->where('id_usuario', $userId)
-            ->whereHas('chat', function($query) {
-                $query->whereNull('id_reto');
-            })
+            ->whereHas('chat', fn($q) => $q->whereNull('id_reto'))
             ->get()
             ->map(function($chatUsuario) use ($userId) {
                 $chat = $chatUsuario->chat;
-                // Buscar el otro usuario del chat
-                $compa = ChatUsuario::where('id_chat', $chat->id_chat)
+
+                $other = ChatUsuario::where('id_chat', $chat->id_chat)
                     ->where('id_usuario', '!=', $userId)
-                    ->with('usuario')
-                    ->first();
-                $compaUser = $compa ? $compa->usuario : null;
-                
-                // Construir la URL de la imagen correctamente
+                    ->with('usuario.personalizacion')
+                    ->first()?->usuario;
+
                 $imgUrl = asset('img/profile_img/avatar-default.png');
-                if ($compaUser && $compaUser->img) {
-                    $imgPath = basename($compaUser->img);
-                    $imgUrl = asset('img/profile_img/' . $imgPath);
+                if ($other?->img) {
+                    $imgUrl = asset('img/profile_img/' . basename($other->img));
                 }
-                
+
+                $prefs    = $other?->personalizacion;
+                $marco    = $prefs->marco    ?? 'default.svg';
+                $brillo   = $prefs->brillo;          // <- NO pongo '?? "#ffffff"' aquí
+                $rotacion = (bool) ($prefs->rotacion ?? false);
+
+                $lastMsg = $chat->mensajes()->latest('fecha_envio')->first();
+
                 return [
-                    'id_chat' => $chat->id_chat,
-                    'id_usuario' => $compaUser ? $compaUser->id_usuario : null,
-                    'nombre' => $compaUser ? $compaUser->nombre : 'Desconocido',
-                    'username' => $compaUser ? $compaUser->username : 'Desconocido',
-
-                    'img' => $imgUrl,
-
-                    'last_message' => optional($chat->mensajes()->latest('fecha_envio')->first())->contenido,
-                    'last_time' => optional($chat->mensajes()->latest('fecha_envio')->first())->fecha_envio?->format('H:i'),
-                    'id_estado' => $compaUser ? $compaUser->id_estado : 2, // 2 = desconectado por defecto
+                    'id_chat'      => $chat->id_chat,
+                    'id_usuario'   => $other?->id_usuario,
+                    'nombre'       => $other?->nombre_completo ?? 'Desconocido',
+                    'username'     => $other?->username        ?? 'Desconocido',
+                    'img'          => $imgUrl,
+                    'marco'        => $marco,
+                    'brillo'       => $brillo,              // null si no hay brillo
+                    'rotacion'     => $rotacion,
+                    'last_message' => $lastMsg?->contenido,
+                    'last_time'    => $lastMsg?->fecha_envio?->format('H:i'),
+                    'id_estado'    => $other?->id_estado       ?? 2,
                 ];
             });
+
         return response()->json($chats);
     }
 
