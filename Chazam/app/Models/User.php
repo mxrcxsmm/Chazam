@@ -62,7 +62,7 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function personalizacion()
     {
-        return $this->hasOne(\App\Models\Personalizacion::class, 'id_usuario');
+        return $this->hasOne(Personalizacion::class, 'id_usuario', 'id_usuario');
     }
 
     public function estado(): BelongsTo

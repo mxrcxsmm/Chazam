@@ -39,9 +39,9 @@ class AppServiceProvider extends ServiceProvider
                 $view->with('nombre_completo', $user->nombre_completo);
                 $view->with('imagen_perfil', $user->imagen_perfil);
         
-                // Desglosar campos por separado
+                // Desglosar campos por separado con valores por defecto
                 $view->with('marco', optional($personalizacion)->marco ?? 'default.svg');
-                $view->with('brillo', optional($personalizacion)->brillo ?? null);
+                $view->with('brillo', optional($personalizacion)->brillo);
                 $view->with('rotacion', optional($personalizacion)->rotacion ?? false);
                 $view->with('sidebar', optional($personalizacion)->sidebar ?? '#4B0082');
             } else {
