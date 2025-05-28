@@ -38,7 +38,7 @@ let estadoIntervalId = null; // Intervalo para estado general (manejado en estad
 let lastMessageId = 0; // Para rastrear el último mensaje cargado
 
 // Definir intervalos de polling en un solo lugar para fácil ajuste
-const INTERVALO_POLLING_CHAT = 5000; // Aumentado a 5 segundos para el chat
+const INTERVALO_POLLING_CHAT = 12000; // Aumentado a 12 segundos para el chat
 
 // Función para limpiar todos los intervalos
 function limpiarIntervalos() {
@@ -758,8 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Intervalo para actualizar el tiempo del cooldown del botón skip cada segundo
-        // Mantenemos 1 segundo para que el contador regresivo se vea en tiempo real en el botón
+        // Intervalo para actualizar el tiempo del cooldown del botón skip cada 12 segundos
         setInterval(actualizarBotonSkip, 12000);
     }
 
