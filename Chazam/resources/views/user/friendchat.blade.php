@@ -26,22 +26,6 @@
   };
 </script>
 
-<!-- Menú lateral hamburguesa (solo móvil) -->
-<div id="mainMenuSidebar" class="main-menu-sidebar">
-    <button class="close-sidebar" id="closeMainMenuSidebar">&times;</button>
-    <hr>
-    <div class="sidebar-section">
-        <h5 class="text-center" style="color:#9147ff;">Tus chats</h5>
-        <div class="chats-list" id="chats-list-sidebar"></div>
-    </div>
-    <hr>
-    <div class="sidebar-section text-center">
-        <a href="{{ route('user.momentms') }}" class="btn btn-momentms" style="background:#9147ff;color:#fff;">
-            <i class="fas fa-bolt"></i> Momentms
-        </a>
-    </div>
-</div>
-
 <div class="main-container">
     <!-- Sidebar optimizado -->
     <div class="chat-sidebar">
