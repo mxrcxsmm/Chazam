@@ -18,6 +18,7 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{{ asset('css/retos.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/perfil.css') }}">
     <link rel="stylesheet" href="{{ asset('css/userSearch.css') }}">
     @stack('head')
 </head>
@@ -55,23 +56,50 @@
                 </button>
 
                 <!-- Botón para abrir el menú -->
-                <button class="btn btn-outline-dark" onclick="toggleSidebar()">
-                    @if(isset($imagen_perfil) && $imagen_perfil)
-                    <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
-                    @else
-                    <i class="bi bi-person-circle"></i>
-                    @endif
+                <button class="btn btn-outline-dark p-0 border-0 bg-transparent" onclick="toggleSidebar()" style="width: 38px; height: 38px;">
+                    <div class="marco-externo marco-glow {{ $rotacion ? 'marco-rotate' : '' }}"
+                         style="
+                            width: 38px;
+                            height: 38px;
+                            border-radius: 50%;
+                            background-image: url('{{ asset('img/bordes/' . ($marco ?? 'default.svg')) }}');
+                            background-size: cover;
+                            background-position: center;
+                            background-repeat: no-repeat;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            @if(isset($brillo))
+                                --glow-color: {{ $brillo }};
+                            @endif
+                         ">
+                        @if(isset($imagen_perfil) && $imagen_perfil)
+                            <img src="{{ $imagen_perfil }}" alt="Foto" class="avatar-img" style="width: 90%; height: 90%;">
+                        @else
+                            <i class="bi bi-person-circle fs-5 text-white"></i>
+                        @endif
+                    </div>
                 </button>
+                
 
                 <!-- Sidebar estilo perfil -->
-                <div id="sidebar" class="position-fixed top-0 end-0 bg-purple text-white p-4" style="width: 260px; height: 100vh; display: none; z-index: 1050;">
+                <div id="sidebar" class="position-fixed top-0 end-0 text-white p-4" style="width: 260px; height: 100vh; display: none; z-index: 1050; background-color: {{ $sidebar ?? '#4B0082' }};">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="text-center">
-                            @if(isset($imagen_perfil) && $imagen_perfil)
-                            <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle mb-2" style="width: 80px; height: 80px; object-fit: cover; border: 3px solid #E6E6FA;">
-                            @else
-                            <i class="bi bi-person-circle fs-2"></i>
-                            @endif
+                            <div id="sidebarGeneral" 
+                                class="marco-externo sidebar-avatar marco-glow {{ $rotacion ?? false ? 'marco-rotate' : '' }}"
+                                style="
+                                    background-image: url('{{ asset('img/bordes/' . ($marco ?? 'default.svg')) }}');
+                                    @if(isset($brillo))
+                                        --glow-color: {{ $brillo }};
+                                    @endif
+                                ">
+                                @if(isset($imagen_perfil) && $imagen_perfil)
+                                    <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="avatar-img">
+                                @else
+                                    <i class="bi bi-person-circle fs-2"></i>
+                                @endif
+                            </div>
                             <div>{{ isset($username) ? $username : 'Usuario' }}</div>
                             <div class="small">{{ isset($nombre_completo) ? $nombre_completo : '' }}</div>
                         </div>

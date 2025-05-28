@@ -86,13 +86,24 @@ Route::middleware(['auth'])->group(function () {
     // Rutas para usuarios autenticados
     Route::middleware(['auth'])->group(function () {
         Route::prefix('perfil')->name('perfil.')->group(function () {
-            Route::get('/dashboard', [PerfilController::class, 'dashboard'])->name('dashboard');
+            // Ruta de edición de personalización general (formulario en perfil/personalizacion.blade.php)
             Route::get('/personalizacion', [PerfilController::class, 'edit'])->name('personalizacion');
+        
+            // Actualizar datos personales del perfil
+            Route::put('/personalizacion', [PerfilController::class, 'update'])->name('update');
+        
+            // Verificar disponibilidad de username en AJAX
+            Route::post('/personalizacion/check-availability', [PerfilController::class, 'checkAvailability'])->name('checkAvailability');
+        
+            // Vista de personalización visual (perfil/vista.blade.php)
             Route::get('/vista', [VistaController::class, 'show'])->name('vista');
-            Route::post('/marco', [VistaController::class, 'cambiarMarco'])->name('cambiarMarco');
-            Route::post('/glow', [VistaController::class, 'cambiarBrillo'])->name('cambiarBrillo');
-            Route::put('/update', [PerfilController::class, 'update'])->name('update');
-            Route::post('/perfil/check-availability', [PerfilController::class, 'checkAvailability'])->name('perfil.checkAvailability');
+        
+            // Guardar cambios visuales de personalización
+            Route::put('/vista', [VistaController::class, 'actualizar'])->name('vista.actualizar');
+        
+            // Restablecer configuración visual a valores por defecto
+            Route::put('/vista/restablecer', [VistaController::class, 'restablecer'])->name('vista.restablecer');
+
             Route::get('/mejoras', function () {
                 return view('perfil.mejoras');
             })->name('mejoras');
@@ -113,6 +124,7 @@ Route::middleware(['auth'])->group(function () {
     // Rutas para retos
     Route::prefix('retos')->name('retos.')->group(function () {
         Route::get('reto', [RetoController::class, 'show'])->name('reto');
+        // Route::view('guide', 'Retos.guide')->name('guide');
         Route::get('guide', function () {
             $user = Auth::user();
             return view('Retos.guide', [

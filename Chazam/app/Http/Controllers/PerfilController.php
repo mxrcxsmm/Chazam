@@ -53,6 +53,7 @@ class PerfilController extends Controller
             'fecha_nacimiento' => 'nullable|date|before_or_equal:' . Carbon::now()->subYears(13)->format('Y-m-d'),
             'descripcion' => 'nullable|string|max:1000',
             'img' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'img' => 'nullable|image|mimes:jpeg,jpg,png,gif,webp,heic|max:5120',
         ]);
 
         $user = Auth::user();
