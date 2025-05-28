@@ -388,17 +388,25 @@ async function cargarMensajes() {
 
 // Función para agregar un mensaje al contenedor (sin cambios significativos)
 function agregarMensaje(mensaje, usuario) {
+    console.log('[AgregarMensaje] Llamada con mensaje:', mensaje, 'y usuario:', usuario);
+
     const container = document.getElementById('mensajesContainer');
-    if (!container) return;
+    if (!container) {
+        console.error('[AgregarMensaje] Contenedor de mensajes no encontrado.');
+        return;
+    }
 
     // Evitar agregar mensajes duplicados si ya están en el DOM (seguro adicional)
-     if (document.getElementById(`message-${mensaje.id}`)) { // Asumiendo que cada mensaje tiene un ID único
-         // console.log('Mensaje duplicado, ignorando:', mensaje.id);
+     if (document.getElementById(`message-${mensaje.id}`)) {
+         console.log(`[AgregarMensaje] Mensaje con ID ${mensaje.id} ya existe, ignorando.`);
          return;
      }
 
     const metaUserId = document.querySelector('meta[name="user-id"]');
-    const esMio = metaUserId ? usuario.id === parseInt(metaUserId.content) : false;
+    // Asegurarse de que usuario y usuario.id existen antes de comparar
+    const esMio = metaUserId && usuario && usuario.id ? usuario.id === parseInt(metaUserId.content) : false;
+    
+    console.log(`[AgregarMensaje] Mensaje ${mensaje.id}: Es mío? ${esMio}`);
 
     const mensajeDiv = document.createElement('div');
     mensajeDiv.className = `reto-message ${esMio ? 'sent' : 'received'}`;
@@ -407,8 +415,9 @@ function agregarMensaje(mensaje, usuario) {
 
     const userImage = document.createElement('img');
     // Usar la función getProfileImgPath para la imagen del usuario del mensaje
-    userImage.src = getProfileImgPath(usuario.imagen); // Asegúrate de que el backend envía la imagen como 'imagen' o ajusta aquí
-    userImage.alt = usuario.username;
+    // Asegurarse de que usuario y usuario.imagen existen
+    userImage.src = getProfileImgPath(usuario?.imagen); // Usar ?. para acceso seguro
+    userImage.alt = usuario?.username || 'Usuario'; // Usar ?. y default
     userImage.className = 'reto-message-user-image';
     userImage.style.cssText = 'width: 40px; height: 40px; object-fit: cover; border-radius: 50%;';
      // Añadir manejo de error para la imagen por si acaso
@@ -423,18 +432,19 @@ function agregarMensaje(mensaje, usuario) {
 
     const userName = document.createElement('span');
     userName.className = 'reto-message-username';
-    userName.textContent = usuario.username;
+    userName.textContent = usuario?.username || 'Desconocido'; // Usar ?. y default
     userName.style.cssText = 'font-weight: bold; color: ' + (esMio ? '#4B0082' : '#6c757d') + '; font-size: 15px; margin-bottom: 2px;';
 
     const contenido = document.createElement('div');
     contenido.className = 'reto-message-content';
-    contenido.textContent = mensaje.contenido;
+    contenido.textContent = mensaje.contenido; // Asumimos que contenido siempre existe
     contenido.style.cssText = 'background: ' + (esMio ? '#4B0082' : '#f3e6ff') + '; color: ' + (esMio ? 'white' : '#222') + '; padding: 10px 18px; border-radius: 14px; margin-bottom: 2px; max-width: 600px; font-size: 16px; word-break: break-word;';
 
     const fecha = document.createElement('div');
     fecha.className = 'reto-message-time';
     // Parsear la fecha correctamente (puede ser string de ISO 8601)
-    const fechaMensaje = new Date(mensaje.fecha_envio);
+    // Asegurarse de que mensaje.fecha_envio existe
+    const fechaMensaje = mensaje?.fecha_envio ? new Date(mensaje.fecha_envio) : new Date();
     // Formatear hora localmente (puede requerir polyfill si no es soportado)
     fecha.textContent = fechaMensaje.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     fecha.style.cssText = 'font-size: 12px; color: #888; margin-left: 2px;';
