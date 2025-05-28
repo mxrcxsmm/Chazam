@@ -86,7 +86,7 @@ class UserSearch {
                     </div>
                     <button class="send-request-btn" 
                             data-user-id="${user.id_usuario}"
-                            onclick="window.chatManager.sendFriendRequest(${user.id_usuario}, this)">
+                            onclick="window.userSearch.sendFriendRequest(${user.id_usuario}, this)">
                         Enviar solicitud
                     </button>
                 </div>
