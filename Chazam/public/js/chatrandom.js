@@ -351,6 +351,8 @@ async function enviarMensaje() {
 async function cargarMensajes() {
     if (!chatId) return;
 
+    console.log(`[Polling] Intentando cargar mensajes para chat ${chatId} con last_id ${lastMessageId}`);
+
     try {
         // Solo pedir mensajes con ID mayor que el último mensaje cargado
         const mensajes = await safeFetch(`/retos/mensajes/${chatId}?last_id=${lastMessageId}`);
@@ -358,24 +360,28 @@ async function cargarMensajes() {
         if (!container) return;
 
         if (mensajes && mensajes.length > 0) {
-             console.log('Nuevos mensajes recibidos:', mensajes.length);
+             console.log(`[Polling] Nuevos mensajes recibidos: ${mensajes.length}`, mensajes);
             mensajes.forEach(mensaje => {
+                console.log(`[Polling] Procesando mensaje con ID: ${mensaje.id}`);
                 agregarMensaje(mensaje, mensaje.chat_usuario.usuario);
             });
              // Actualizar lastMessageId al ID del último mensaje recibido (el más alto de la lista)
             const maxMessageId = Math.max(...mensajes.map(m => m.id));
             if (maxMessageId > lastMessageId) {
                 lastMessageId = maxMessageId;
+                console.log(`[Polling] lastMessageId actualizado a: ${lastMessageId}`);
+            } else {
+                console.log(`[Polling] lastMessageId no actualizado, max ID recibido: ${maxMessageId}`);
             }
 
              // Hacer scroll al último mensaje solo si se agregaron nuevos
              container.scrollTop = container.scrollHeight;
         } else {
-             console.log('No hay mensajes nuevos.');
+             console.log('[Polling] No hay mensajes nuevos.');
         }
 
     } catch (error) {
-        console.error('Error al cargar mensajes:', error);
+        console.error('[Polling] Error al cargar mensajes:', error);
          // No mostramos SweetAlert aquí para evitar saturar si el polling falla temporalmente
     }
 }
