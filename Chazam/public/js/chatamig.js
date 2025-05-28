@@ -548,23 +548,29 @@ class ChatManager {
     }
 
     // Actualización del encabezado del chat
-    // Dentro de tu clase ChatManager:
     updateChatHeader(companero) {
         const defaultAvatar = window.CHAT_CONFIG.defaultAvatar;
-        const isFriend      = !!companero.id_usuario;
+        const isFriend = !!companero.id_usuario;
       
         // 1) Nombre y estado
         const chatHeader = document.getElementById('chat-contact-name');
         const chatStatus = document.getElementById('chat-contact-status');
+        const chatImg = document.getElementById('chat-contact-img');
+        
+        if (!chatHeader || !chatStatus || !chatImg) {
+            console.error('No se encontraron elementos del header del chat');
+            return;
+        }
+
         chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
         chatStatus.textContent = (companero.id_estado == 1 || companero.id_estado == 5) ? 'en línea' : 'desconectado';
         chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
         
         // Construir la ruta de la imagen correctamente
-        const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : '/img/profile_img/avatar-default.png';
+        const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : defaultAvatar;
         chatImg.src = imgPath;
         chatImg.onerror = function() {
-            this.src = '/img/profile_img/avatar-default.png';
+            this.src = defaultAvatar;
         };
     }
 
