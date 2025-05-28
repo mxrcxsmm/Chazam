@@ -15,7 +15,7 @@ class ProductosSeeder extends Seeder
         DB::table('productos')->insert([
             // Suscripciones (id_tipo_producto = 1)
             [
-                'titulo' => 'Suscripción Premium',
+                'titulo' => 'Usuario Premium',
                 'descripcion' => 'Acceso completo a todas las funciones premium durante un mes.',
                 'precio' => 9.99,
                 'tipo_valor' => 'euros',
@@ -98,8 +98,8 @@ class ProductosSeeder extends Seeder
                 'id_tipo_producto' => 3,
             ],
             [
-                'titulo' => 'Suscripción de miembro con puntos',
-                'descripcion' => 'Suscripción de miembro con 15000 puntos.',
+                'titulo' => 'Usuario miembro con puntos',
+                'descripcion' => 'Usuario miembro con 15000 puntos.',
                 'precio' => 15000,
                 'tipo_valor' => 'puntos',
                 'puntos' => 15000,

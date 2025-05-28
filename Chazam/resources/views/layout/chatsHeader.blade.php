@@ -79,6 +79,12 @@
                             <i class="bi bi-person-circle fs-5 text-white"></i>
                         @endif
                     </div>
+                <button class="btn btn-outline-dark" id="btnMenu" onclick="toggleSidebar()">
+                    @if(isset($imagen_perfil) && $imagen_perfil)
+                    <img src="{{ $imagen_perfil }}" alt="Foto de perfil" class="rounded-circle" style="width: 30px; height: 30px; object-fit: cover;">
+                    @else
+                    <i class="bi bi-person-circle"></i>
+                    @endif
                 </button>
                 
 

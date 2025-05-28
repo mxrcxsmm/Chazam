@@ -522,3 +522,188 @@ body, html {
     background-color: #9147ff;
     color: white;
 }
+
+/* Estilos para el botón de Amistades en el header */
+
+#btnAmistades {
+    color: #9147ff;
+    border-color: #9147ff;
+    transition: all 0.2s ease;
+}
+
+#btnAmistades:hover {
+    background-color: #9147ff;
+    color: white;
+}
+
+/* Estilos para el botón de Abrir menú en el header */
+
+#btnMenu {
+    color: #9147ff;
+    border-color: #9147ff;
+    transition: all 0.2s ease;
+}
+
+#btnMenu:hover {
+    background-color: #9147ff;
+    color: white;
+}
+
+/* Menú lateral hamburguesa */
+.main-menu-sidebar {
+    position: fixed;
+    top: 0; left: -260px;
+    width: 260px;
+    height: 100vh;
+    background: #23272a;
+    color: #fff;
+    z-index: 2000;
+    transition: left 0.3s;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+    padding: 20px 15px;
+}
+.main-menu-sidebar.active {
+    left: 0;
+}
+.main-menu-sidebar .close-sidebar {
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    position: absolute;
+    top: 10px; right: 15px;
+    cursor: pointer;
+}
+.main-menu-sidebar .user-stats {
+    margin-bottom: 20px;
+}
+
+/* Responsive para el chat */
+@media (max-width: 768px) {
+    .chat-sidebar {
+        display: none !important;
+    }
+    .main-menu-sidebar {
+        position: fixed;
+        top: 0; left: -260px;
+        width: 260px;
+        height: 100vh;
+        background: #23272a;
+        color: #fff;
+        z-index: 2000;
+        transition: left 0.3s;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+        padding: 20px 15px;
+        display: block;
+        overflow-y: auto;
+    }
+    .main-menu-sidebar.active {
+        left: 0;
+    }
+    .main-menu-sidebar .close-sidebar {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 2rem;
+        position: absolute;
+        top: 10px; right: 15px;
+        cursor: pointer;
+    }
+    .chat-main {
+        width: 100vw !important;
+        min-width: 0;
+        padding-right: 0 !important;
+        margin-top: 50px !important; /* MENOS margen arriba */
+        padding-bottom: 70px !important; /* espacio para la barra de escribir */
+    }
+    #sidebarToggle {
+        display: block !important;
+        margin-right: 12px;
+    }
+    .chat-header img#chat-contact-img {
+        margin-left: 8px;
+        margin-right: 12px;
+    }
+
+    .message-input-container {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100;
+        background: #1a1a1a;
+        border-top: 1px solid #2d2d2d;
+        width: 100vw;
+        min-width: 0;
+        max-width: 100vw;
+        box-sizing: border-box;
+        padding: 15px 10px;
+        /* Evita que se corte visualmente */
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
+@media (min-width: 769px) and (max-width: 1024px) {
+    .chat-sidebar {
+        display: none !important;
+    }
+    .main-menu-sidebar {
+        position: fixed;
+        top: 0; left: -260px;
+        width: 260px;
+        height: 100vh;
+        background: #23272a;
+        color: #fff;
+        z-index: 2000;
+        transition: left 0.3s;
+        box-shadow: 2px 0 10px rgba(0,0,0,0.2);
+        padding: 20px 15px;
+        display: block;
+        overflow-y: auto;
+    }
+    .main-menu-sidebar.active {
+        left: 0;
+    }
+    .main-menu-sidebar .close-sidebar {
+        background: none;
+        border: none;
+        color: #fff;
+        font-size: 2rem;
+        position: absolute;
+        top: 10px; right: 15px;
+        cursor: pointer;
+    }
+    .chat-main {
+        width: 100vw !important;
+        min-width: 0;
+        padding-right: 0 !important;
+        margin-top: 50px !important; /* MENOS margen arriba */
+        padding-bottom: 70px !important; /* espacio para la barra de escribir */
+    }
+    #sidebarToggle {
+        display: block !important;
+        margin-right: 12px;
+    }
+    .chat-header img#chat-contact-img {
+        margin-left: 8px;
+        margin-right: 12px;
+    }
+    
+    .message-input-container {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 100;
+        background: #1a1a1a;
+        border-top: 1px solid #2d2d2d;
+        width: 100vw;
+        min-width: 0;
+        max-width: 100vw;
+        box-sizing: border-box;
+        padding: 15px 10px;
+        /* Evita que se corte visualmente */
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+}
