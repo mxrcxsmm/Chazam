@@ -403,13 +403,13 @@ async function cargarMensajes() {
 // Función para agregar un mensaje al contenedor
 function agregarMensaje(mensaje, usuario) {
     console.log('[AgregarMensaje] Iniciando con mensaje:', {
-        id: mensaje.id,
+        id: mensaje.id_mensaje,
         contenido: mensaje.contenido.substring(0, 50) + '...',
         fecha: mensaje.fecha_envio
     });
 
     // Verificaciones de datos esenciales
-    if (!mensaje || typeof mensaje.id === 'undefined' || typeof mensaje.contenido === 'undefined' || typeof mensaje.fecha_envio === 'undefined') {
+    if (!mensaje || typeof mensaje.id_mensaje === 'undefined' || typeof mensaje.contenido === 'undefined' || typeof mensaje.fecha_envio === 'undefined') {
         console.error('[AgregarMensaje] Datos del mensaje incompletos o inválidos:', mensaje);
         return false;
     }
@@ -425,9 +425,9 @@ function agregarMensaje(mensaje, usuario) {
         return false;
     }
 
-    // Verificar si el mensaje ya existe
-    if (document.getElementById(`message-${mensaje.id}`)) {
-        console.log(`[AgregarMensaje] Mensaje ${mensaje.id} ya existe, ignorando`);
+    // Verificar si el mensaje ya existe usando id_mensaje
+    if (document.getElementById(`message-${mensaje.id_mensaje}`)) {
+        console.log(`[AgregarMensaje] Mensaje ${mensaje.id_mensaje} ya existe, ignorando`);
         return false;
     }
 
@@ -435,11 +435,11 @@ function agregarMensaje(mensaje, usuario) {
         const metaUserId = document.querySelector('meta[name="user-id"]');
         const esMio = metaUserId && usuario.id === parseInt(metaUserId.content);
         
-        console.log(`[AgregarMensaje] Mensaje ${mensaje.id}: Es mío? ${esMio}`);
+        console.log(`[AgregarMensaje] Mensaje ${mensaje.id_mensaje}: Es mío? ${esMio}`);
 
         const mensajeDiv = document.createElement('div');
         mensajeDiv.className = `reto-message ${esMio ? 'sent' : 'received'}`;
-        mensajeDiv.id = `message-${mensaje.id}`;
+        mensajeDiv.id = `message-${mensaje.id_mensaje}`;
         mensajeDiv.style.cssText = 'display: flex; align-items: flex-start; gap: 10px; margin-bottom: 8px;';
 
         const userImage = document.createElement('img');
@@ -501,10 +501,10 @@ function agregarMensaje(mensaje, usuario) {
 
         // Añadir el mensaje al final del contenedor
         container.appendChild(mensajeDiv);
-        console.log(`[AgregarMensaje] Mensaje ${mensaje.id} agregado exitosamente`);
+        console.log(`[AgregarMensaje] Mensaje ${mensaje.id_mensaje} agregado exitosamente`);
         return true;
     } catch (error) {
-        console.error(`[AgregarMensaje] Error al agregar mensaje ${mensaje.id}:`, error);
+        console.error(`[AgregarMensaje] Error al agregar mensaje ${mensaje.id_mensaje}:`, error);
         return false;
     }
 }
