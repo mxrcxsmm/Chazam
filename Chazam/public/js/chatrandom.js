@@ -207,7 +207,7 @@ async function buscarCompaneroAutomatico() {
             } else {
                  // Si no se encuentra compañero pero no hubo error (ej. no hay disponibles)
                  console.log('No se encontró compañero, reintentando en 8 segundos...');
-                 await new Promise(resolve => setTimeout(resolve, 8000)); // Esperar antes de reintentar
+                 await new Promise(resolve => setTimeout(resolve, 4000)); // Esperar antes de reintentar
             }
 
         } catch (error) {
@@ -216,7 +216,7 @@ async function buscarCompaneroAutomatico() {
              // Solo mostramos un mensaje de error si no estamos buscando activamente (buscandoCompanero = true)
              if (buscandoCompanero) {
                  console.log('Error buscando compañero, reintentando en 8 segundos...');
-                 await new Promise(resolve => setTimeout(resolve, 8000));
+                 await new Promise(resolve => setTimeout(resolve, 4000));
              } else {
                   // Si el error ocurre después de haber encontrado compañero, el verificarEstadoChat lo manejará
                  break; // Salir del bucle si ya no estamos buscando activamente

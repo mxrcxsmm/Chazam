@@ -296,28 +296,19 @@ class RetoController extends Controller
             return response()->json(['error' => 'No tienes acceso a este chat'], 403);
         }
 
-        $mensajes = Mensaje::with(['chatUsuario.usuario'])
-            ->whereHas('chatUsuario', function($query) use ($chatId) {
-                $query->where('id_chat', $chatId);
-            })
+        $lastMessageId = request()->query('last_id', 0);
+
+        // Obtener todos los ChatUsuario IDs asociados a este chat
+        $chatUsuarioIds = ChatUsuario::where('id_chat', $chatId)->pluck('id_chat_usuario');
+
+        $mensajes = Mensaje::whereIn('id_chat_usuario', $chatUsuarioIds)
+            ->where('id_mensaje', '>', $lastMessageId) // Filtrar por last_id
+            ->with(['chatUsuario.usuario']) // Cargar la relación anidada
             ->orderBy('fecha_envio', 'asc')
-            ->get()
-            ->map(function($mensaje) {
-                return [
-                    'id_chat_usuario' => $mensaje->id_chat_usuario,
-                    'contenido' => $mensaje->contenido,
-                    'fecha_envio' => $mensaje->fecha_envio,
-                    'updated_at' => $mensaje->updated_at,
-                    'created_at' => $mensaje->created_at,
-                    'chat_usuario' => [
-                        'usuario' => [
-                            'id' => $mensaje->chatUsuario->usuario->id_usuario,
-                            'username' => $mensaje->chatUsuario->usuario->username,
-                            'imagen' => $mensaje->chatUsuario->usuario->imagen_perfil
-                        ]
-                    ]
-                ];
-            });
+            ->get();
+
+        // La estructura de los mensajes recuperados será:
+        // Mensaje { id_mensaje, contenido, fecha_envio, chat_usuario { id_chat_usuario, id_chat, id_usuario, usuario { ...datos del usuario... } } }
 
         return response()->json($mensajes);
     }
