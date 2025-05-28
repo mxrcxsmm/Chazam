@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         <td class="td-usuario">${pago.usuario}</td>
                         <td class="td-producto">${pago.producto}</td>
                         <td class="td-cantidad">${pago.cantidad}</td>
-                        <td class="td-precio">${pago.precio}</td>
+                        <td class="td-precio">${pago.tipo === 'Donaciones' ? pago.cantidad : pago.precio}</td>
                         <td class="td-tipo">${pago.tipo}</td>
                         <td class="td-fecha">${pago.fecha_pago}</td>
                     </tr>`;

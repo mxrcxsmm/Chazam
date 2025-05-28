@@ -66,8 +66,9 @@
                             <td data-label="Usuario">{{ $user->nombre }} {{ $user->apellido }}</td>
                             <td data-label="Producto">{{ $compra->producto->titulo ?? 'Producto eliminado' }}</td>
                             <td data-label="Descripción">{{ $compra->producto->descripcion ?? '-' }}</td>
-                            <td data-label="Precio">{{ $compra->producto->precio }}
-                                {{ $compra->producto->tipo_valor ?? '' }}</td>
+                            <td data-label="Precio">
+                                {{ $compra->producto->precio ?? 'N/A' }} {{ $compra->producto->tipo_valor ?? '' }}
+                            </td>
                             <td data-label="Fecha de pago">{{ $compra->fecha_pago }}</td>
                             <td data-label="Factura">
                                 @if (($compra->producto->tipo_valor ?? '') === 'puntos')

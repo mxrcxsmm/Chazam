@@ -4,7 +4,7 @@
         <td>{{ $compra->producto->titulo ?? 'Producto eliminado' }}</td>
         <td>{{ $compra->producto->descripcion ?? '-' }}</td>
         <td>
-            {{ $compra->producto->precio }} {{ $compra->producto->tipo_valor ?? '' }}
+            {{ $compra->producto->precio ?? 'N/A' }} {{ $compra->producto->tipo_valor ?? '' }}
         </td>
         <td>{{ $compra->fecha_pago }}</td>
         <td>
