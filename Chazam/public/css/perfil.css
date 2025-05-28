@@ -5,33 +5,6 @@ body {
     color: #4B0082;
 }
 
-
-/* .file-upload-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: 1rem;
-}
-
-input[type="file"] {
-    display: none; // Oculta el input original
-}
-
-.custom-file-upload {
-    background-color: #8750B2;
-    color: white;
-    padding: 0.75rem 2rem;
-    border-radius: 9999px;
-    font-weight: bold;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    text-align: center;
-}
-
-.custom-file-upload:hover {
-    background-color: #4B0082;
-} */
-
 .custom-button {
     background-color: #8750B2;
     color: white;
@@ -512,41 +485,6 @@ input[type="color"]::-webkit-color-swatch {
     cursor: pointer;
 }
 
-
-/*.marco-default {
-    background-image: url('/IMG/bordes/default.svg');
-}
-.marco-azuul {
-    background-image: url('/IMG/bordes/azuul.svg');
-}
-.marco-azul-champions {
-    background-image: url('/IMG/bordes/azul-champions.svg');
-}
-.marco-circle-rojonegro {
-    background-image: url('/IMG/bordes/circle-rojonegro.svg');
-}
-.marco-cromado {
-    background-image: url('/IMG/bordes/cromado.svg');
-}
-.marco-cromado-normal {
-    background-image: url('/IMG/bordes/cromado-normal.svg');
-}
-.marco-cromado-peque {
-    background-image: url('/IMG/bordes/cromado-peque.svg');
-}
-.marco-cutre-estrellas {
-    background-image: url('/IMG/bordes/cutre-estrellas.svg');
-}
-.marco-golden-champions {
-    background-image: url('/IMG/bordes/golden-champions.svg');
-}
-.marco-wave-haikei {
-    background-image: url('/IMG/bordes/wave-haikei.svg');
-}
-.marco-estrellas-haikei {
-    background-image: url('/IMG/bordes/estrellas-haikei.svg');
-}*/
-
 @media (max-width: 768px) {
     #sidebar {
         position: fixed;
@@ -560,5 +498,15 @@ input[type="color"]::-webkit-color-swatch {
     .main-content {
         margin-left: 0 !important;
         padding: 1rem !important;
+    }
+
+    #sidebarToggle {
+      background-color: #4B0082 !important;
+      color: #ccc;
+    }
+    
+    #sidebarToggle i {
+      background-color: #4B0082 !important;
+      color: #ccc;
     }
 }
