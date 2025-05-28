@@ -395,10 +395,14 @@ async function cargarMensajes() {
             console.log(`[Polling] Mensajes agregados exitosamente: ${mensajesAgregados}`);
 
             // Actualizar lastMessageId al ID del último mensaje recibido
-            const maxMessageId = Math.max(...mensajes.map(m => m.id));
+            // Buscar el ID más alto entre todos los mensajes recibidos en este ciclo
+            const maxMessageId = mensajes.reduce((maxId, mensaje) => {
+                 return mensaje.id_mensaje != null && mensaje.id_mensaje > maxId ? mensaje.id_mensaje : maxId;
+            }, lastMessageId);
+
             if (maxMessageId > lastMessageId) {
-                console.log(`[Polling] Actualizando lastMessageId de ${lastMessageId} a ${maxMessageId}`);
-                lastMessageId = maxMessageId;
+                 console.log(`[Polling] Actualizando lastMessageId de ${lastMessageId} a ${maxMessageId}`);
+                 lastMessageId = maxMessageId;
             }
 
             // Hacer scroll al último mensaje solo si se agregaron nuevos
