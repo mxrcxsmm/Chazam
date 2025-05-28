@@ -9,12 +9,13 @@ use App\Models\ChatUsuario;
 use App\Models\Mensaje;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 
 class AmistadController extends Controller
 {
     public function index()
     {
-        $usuario = auth()->user();
+        $usuario = Auth::user();
         
         $amistades = DB::table('solicitudes')
             ->join('users', function($join) use ($usuario) {
@@ -49,7 +50,7 @@ class AmistadController extends Controller
         try {
             DB::beginTransaction();
 
-            $usuario = auth()->user();
+            $usuario = Auth::user();
             
             // Eliminar todas las solicitudes entre ambos usuarios
             $solicitudes = Solicitud::where(function($query) use ($usuario, $idUsuario) {
@@ -108,7 +109,7 @@ class AmistadController extends Controller
         try {
             DB::beginTransaction();
 
-            $usuario = auth()->user();
+            $usuario = Auth::user();
             
             // Encontrar TODAS las solicitudes entre ambos usuarios (en ambas direcciones)
             $solicitudes = Solicitud::where(function($query) use ($usuario, $idUsuario) {
@@ -127,10 +128,14 @@ class AmistadController extends Controller
             }
 
             // Eliminar chats relacionados
-            $chats = Chat::whereHas('chatUsuarios', function($query) use ($usuario, $idUsuario) {
-                $query->where('id_usuario', $usuario->id_usuario)
-                      ->orWhere('id_usuario', $idUsuario);
-            })->get();
+            $chats = Chat::whereNull('id_reto')
+                ->whereHas('chatUsuarios', function($query) use ($usuario, $idUsuario) {
+                    $query->where('id_usuario', $usuario->id_usuario);
+                })
+                ->whereHas('chatUsuarios', function($query) use ($usuario, $idUsuario) {
+                    $query->where('id_usuario', $idUsuario);
+                })
+                ->get();
 
             foreach ($chats as $chat) {
                 // Eliminar mensajes
@@ -159,7 +164,7 @@ class AmistadController extends Controller
     {
         $userId = Auth::id();
         // Busca solicitudes donde el usuario actual bloqueó a otro
-        $bloqueados = \DB::table('solicitudes')
+        $bloqueados = DB::table('solicitudes')
             ->join('users', 'users.id_usuario', '=', 'solicitudes.id_receptor')
             ->where('solicitudes.id_emisor', $userId)
             ->where('solicitudes.estado', 'blockeada')
@@ -175,7 +180,7 @@ class AmistadController extends Controller
         $otroId = $request->input('id_usuario');
 
         // Borra todas las solicitudes de bloqueo entre ambos usuarios
-        \DB::table('solicitudes')
+        DB::table('solicitudes')
             ->where(function($q) use ($userId, $otroId) {
                 $q->where('id_emisor', $userId)->where('id_receptor', $otroId);
             })

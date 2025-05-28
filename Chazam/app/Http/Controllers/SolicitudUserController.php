@@ -151,7 +151,7 @@ class SolicitudUserController extends Controller
     public function verificarSolicitud($id_usuario)
     {
         try {
-            \Log::info('Verificando solicitud entre usuarios', [
+            Log::info('Verificando solicitud entre usuarios', [
                 'usuario_actual' => Auth::id(),
                 'usuario_destino' => $id_usuario
             ]);
@@ -164,7 +164,7 @@ class SolicitudUserController extends Controller
                       ->where('id_receptor', Auth::id());
             })->first();
 
-            \Log::info('Resultado de la verificación', [
+            Log::info('Resultado de la verificación', [
                 'solicitud_encontrada' => $solicitud ? true : false,
                 'estado' => $solicitud ? $solicitud->estado : null
             ]);
@@ -181,7 +181,7 @@ class SolicitudUserController extends Controller
                 'estado' => 'no_existe'
             ]);
         } catch (\Exception $e) {
-            \Log::error('Error al verificar solicitud', [
+            Log::error('Error al verificar solicitud', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
@@ -313,11 +313,15 @@ class SolicitudUserController extends Controller
                     'estado' => 'aceptada'
                 ]);
             } else if ($request->respuesta === 'rechazada') {
-                // Eliminar chats relacionados
-                $chats = \App\Models\Chat::whereHas('chatUsuarios', function($query) use ($solicitud) {
-                    $query->where('id_usuario', $solicitud->id_emisor)
-                          ->orWhere('id_usuario', $solicitud->id_receptor);
-                })->get();
+                // Eliminar solo los chats privados entre estos dos usuarios específicos
+                $chats = \App\Models\Chat::whereNull('id_reto')
+                    ->whereHas('chatUsuarios', function($query) use ($solicitud) {
+                        $query->where('id_usuario', $solicitud->id_emisor);
+                    })
+                    ->whereHas('chatUsuarios', function($query) use ($solicitud) {
+                        $query->where('id_usuario', $solicitud->id_receptor);
+                    })
+                    ->get();
 
                 foreach ($chats as $chat) {
                     // Eliminar mensajes
