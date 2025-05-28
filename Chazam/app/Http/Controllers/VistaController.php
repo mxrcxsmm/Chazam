@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Support\Facades\Auth;         // Para acceder al usuario autenticado
 use Illuminate\Http\Request;                  // Para manejar solicitudes HTTP
 use App\Models\Personalizacion;               // Modelo para la tabla de personalización
+use App\Models\Producto;
+use App\Models\User;
 
 class VistaController extends Controller
 {
@@ -34,7 +36,7 @@ class VistaController extends Controller
     /**
      * Guarda los cambios de personalización realizados por el usuario.
      */
-    public function actualizar(Request $request)
+    /*public function actualizar(Request $request)
     {
         $user = Auth::user(); // Obtiene al usuario autenticado
     
@@ -59,7 +61,7 @@ class VistaController extends Controller
     
         // Si es una petición normal, redirige con mensaje de éxito
         return back()->with('success', 'Personalización actualizada.');
-    }    
+    }*/
 
     public function restablecer(Request $request)
     {
@@ -74,5 +76,70 @@ class VistaController extends Controller
         $p->save();
 
         return response()->json(['message' => 'Personalización restablecida.']);
+    }
+
+    public function actualizar(Request $request)
+    {
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $isPremium = $user->id_rol === 3 || $user->id_rol === 4;
+
+        $p = $user->personalizacion ?? new Personalizacion(['id_usuario' => $user->id_usuario]);
+
+        $precioTotal = 0;
+
+        // === 1. Marco ===
+        $nuevoMarco = $request->input('marco', 'default.svg');
+        if ($nuevoMarco !== $p->marco && !$isPremium) {
+            $producto = Producto::where('descripcion', $nuevoMarco)->first();
+            $precioTotal += $producto->puntos ?? 0;
+        }
+        $p->marco = $nuevoMarco;
+
+        // === 2. Rotación ===
+        $nuevaRotacion = filter_var($request->input('rotacion'), FILTER_VALIDATE_BOOLEAN);
+        // $nuevaRotacion = $request->input('rotacion') == '1';
+        if ($nuevaRotacion !== $p->rotacion && !$isPremium) {
+            $titulo = $nuevaRotacion ? 'Marco Rotatorio' : 'Marco Estático';
+            $producto = Producto::where('titulo', $titulo)->first();
+            $precioTotal += $producto->puntos ?? 0;
+        }
+        $p->rotacion = $nuevaRotacion;
+
+        // === 3. Sidebar ===
+        $nuevoSidebar = $request->input('sidebar', '#4B0082');
+        if ($nuevoSidebar !== $p->sidebar && !$isPremium) {
+            $producto = Producto::where('titulo', 'Color de Sidebar')->first();
+            $precioTotal += $producto->puntos ?? 0;
+        }
+        $p->sidebar = $nuevoSidebar;
+
+        // === 4. Brillo ===
+        if ($request->has('brillo')) {
+            $nuevoBrillo = $request->input('brillo');
+            if ($nuevoBrillo !== $p->brillo && !$isPremium) {
+                $producto = Producto::where('titulo', 'Brillo de Marco')->first();
+                $precioTotal += $producto->puntos ?? 0;
+            }
+            $p->brillo = $nuevoBrillo;
+        }
+
+        // === Comprobación de puntos ===
+        if (!$isPremium && $precioTotal > 0) {
+            if ($user->puntos < $precioTotal) {
+                return response()->json([
+                    'message' => 'No tienes suficientes puntos para esta personalización.',
+                ], 403);
+            }
+
+            $user->gastarPuntos($precioTotal); // Usa tu método
+        }
+
+        $p->save();
+
+        return response()->json([
+            'message' => 'Personalización actualizada.',
+            'puntos_restantes' => $user->puntos
+        ]);
     }
 }

@@ -14,8 +14,15 @@
     <img src="{{ asset($user->imagen_perfil) }}" class="avatar-img">
     </div>
 
-    <form id="personalizacionForm" action="{{ route('perfil.vista.actualizar') }}" method="POST">
-        @csrf
+    <form id="personalizacionForm"
+    action="{{ route('perfil.vista.actualizar') }}"
+    method="POST"
+    data-marco-actual="{{ $personalizacion->marco ?? 'default.svg' }}"
+    data-rotacion-actual="{{ $personalizacion->rotacion ? '1' : '0' }}"
+    data-sidebar-actual="{{ $personalizacion->sidebar ?? '#4B0082' }}"
+    data-brillo-actual="{{ $personalizacion->brillo ?? '#FFD700' }}"
+    data-is-premium="{{ in_array(Auth::user()->id_rol, [3,4]) ? '1' : '0' }}">
+    @csrf
         @method('PUT')
 
         <div id="marcoForm">
