@@ -118,11 +118,13 @@ class ChatManager {
         // Estructura del avatar con marco y brillo
         const glowStyle = brillo ? `--glow-color: ${brillo};` : '';
         const avatarHTML = `
-            <div class="chat-avatar marco-externo marco-glow ${rotacion}"
-                 style="background-image: url('/img/bordes/${marco}'); ${glowStyle}">
-                <img src="${imgPath}" alt="Avatar" onerror="this.src='${CHAT_CONFIG.defaultAvatar}'">
+            <div class="chat-avatar">
+                <div class="marco-externo marco-glow ${rotacion}"
+                    style="background-image: url('/img/bordes/${marco}'); ${glowStyle}">
+                    <img src="${imgPath}" alt="Avatar" onerror="this.src='${CHAT_CONFIG.defaultAvatar}'">
+                </div>
             </div>
-        `;
+        `;    
     
         chatItem.innerHTML = `
             ${avatarHTML}

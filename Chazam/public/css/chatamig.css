@@ -578,15 +578,6 @@ body, html {
     margin-bottom: 20px;
 }
 
-.marco-externo {
-    border-radius: 50%;
-    background-size: cover;
-    background-position: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
 .marco-glow {
     box-shadow: 0 0 10px var(--glow-color, #fff);
 }
@@ -594,6 +585,23 @@ body, html {
 .marco-rotate {
     animation: rotate 10s linear infinite;
 }  
+
+.chat-avatar {
+    width: 48px;
+    height: 48px;
+    position: relative;
+}
+
+.marco-externo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
 /* Responsive para el chat */
 @media (max-width: 768px) {
