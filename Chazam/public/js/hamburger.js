@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnAmistades && modal) {
         btnAmistades.addEventListener('click', () => {
             // Llamar a la función de cargar amistades desde FriendshipManager
-            if (window.FriendshipManager) {
+            if (window.FriendshipManager && window.FriendshipManager.cargarAmistades) {
                  window.FriendshipManager.cargarAmistades();
             }
             modal.show();
@@ -75,3 +75,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Exportar funciones al objeto global
 window.actualizarListaChats = actualizarListaChats;
+// Las funciones de amistad se gestionan ahora centralmente en friendship_modals.js
