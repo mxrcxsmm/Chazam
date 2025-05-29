@@ -11,8 +11,8 @@ const MODAL_CONFIG = {
 };
 
 // Añadir estilos CSS para mejorar la apariencia
-const style = document.createElement('style');
-style.textContent = `
+const modalStyles = document.createElement('style');
+modalStyles.textContent = `
     .user-result {
         display: flex;
         align-items: center;
@@ -141,515 +141,224 @@ style.textContent = `
         border-bottom: 2px solid #9147ff;
         background: none;
     }
+
+    /* Estilos adicionales para los modales */
+    .modal {
+        backdrop-filter: blur(5px);
+    }
+
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-dialog {
+        margin: 1.75rem auto;
+        max-width: 500px;
+    }
+
+    .modal-title {
+        color: #333;
+        font-weight: 600;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .search-input {
+        border-radius: 20px;
+        padding: 0.5rem 1rem;
+        border: 1px solid #ddd;
+        transition: all 0.3s ease;
+    }
+
+    .search-input:focus {
+        border-color: #9147ff;
+        box-shadow: 0 0 0 0.2rem rgba(145, 71, 255, 0.25);
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 2rem;
+        color: #666;
+    }
+
+    .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid #f3f3f3;
+        border-top: 2px solid #9147ff;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
 `;
-document.head.appendChild(style);
+document.head.appendChild(modalStyles);
 
-// Función utilitaria para obtener la ruta correcta de la imagen de perfil
-function getProfileImgPath(img) {
-    if (!img || img === 'avatar-default.png' || img === '/img/profile_img/avatar-default.png') {
-        return `${window.location.origin}/img/profile_img/avatar-default.png`;
-    }
-    if (img.startsWith('http')) {
-        return img;
-    }
-    const cleanImg = img.replace(/^\/?img\/profile_img\//, '');
-    return `${window.location.origin}/img/profile_img/${cleanImg}`;
-}
+// Funciones de utilidad para modales
+const ModalUtils = {
+    limpiarModal(modalId) {
+        const modalEl = document.getElementById(modalId);
+        if (!modalEl) return;
+        
+        const modal = bootstrap.Modal.getInstance(modalEl);
+        if (modal) {
+            // Remover el atributo aria-hidden antes de cerrar
+            modalEl.removeAttribute('aria-hidden');
+            
+            // Asegurarse de que el botón de cierre no tenga el foco
+            const closeButton = modalEl.querySelector('.btn-close');
+            if (closeButton) {
+                closeButton.blur();
+            }
+            
+            modal.hide();
+            
+            // Eliminar el backdrop
+            const backdrop = document.querySelector('.modal-backdrop');
+            if (backdrop) {
+                backdrop.remove();
+            }
+            
+            // Restaurar el scroll del body
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+            
+            // Ocultar el modal
+            modalEl.style.display = 'none';
+            
+            // Remover el atributo aria-modal
+            modalEl.removeAttribute('aria-modal');
+        }
+    },
 
-// Función para limpiar correctamente el modal
-function limpiarModal(modalId) {
-    const modalEl = document.getElementById(modalId);
-    if (!modalEl) return;
-    
-    const modal = bootstrap.Modal.getInstance(modalEl);
-    if (modal) {
-        // Remover el atributo aria-hidden antes de cerrar
+    mostrarModal(modalId) {
+        const modalEl = document.getElementById(modalId);
+        if (!modalEl) return;
+        
+        // Limpiar cualquier modal anterior
+        this.limpiarModal(modalId);
+        
+        // Configurar atributos de accesibilidad
+        modalEl.setAttribute('aria-modal', 'true');
         modalEl.removeAttribute('aria-hidden');
         
-        modal.hide();
-        // Eliminar el backdrop
-        const backdrop = document.querySelector('.modal-backdrop');
-        if (backdrop) {
-            backdrop.remove();
-        }
-        // Restaurar el scroll del body
-        document.body.classList.remove('modal-open');
-        document.body.style.overflow = '';
-        document.body.style.paddingRight = '';
-        // Ocultar el modal
-        modalEl.style.display = 'none';
+        // Mostrar el nuevo modal
+        const modal = new bootstrap.Modal(modalEl);
+        modal.show();
     }
-}
+};
 
-// Función para mostrar un modal
-function mostrarModal(modalId) {
-    const modalEl = document.getElementById(modalId);
-    if (!modalEl) return;
-    
-    // Limpiar cualquier modal anterior
-    limpiarModal(modalId);
-    
-    // Mostrar el nuevo modal
-    const modal = new bootstrap.Modal(modalEl);
-    modal.show();
-}
+// Funciones de búsqueda y amistad
+const FriendshipManager = {
+    async searchUsers(query) {
+        try {
+            const searchResults = document.getElementById('searchResults');
+            if (!searchResults) return;
 
-// Función para cargar solicitudes de amistad
-async function cargarSolicitudesAmistad() {
-    try {
-        const response = await fetch('/solicitudes/pendientes', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Error al cargar las solicitudes');
-        }
-        const data = await response.json();
-        const container = document.getElementById('solicitudesContainer');
-        const noSolicitudes = document.getElementById('noSolicitudes');
-        const solicitudesCount = document.getElementById('solicitudesCount');
-        
-        if (solicitudesCount) solicitudesCount.textContent = data.length;
-        
-        if (data.length === 0) {
-            if (container && noSolicitudes) {
-                noSolicitudes.style.display = 'block';
-                container.innerHTML = '';
-                container.appendChild(noSolicitudes);
-            }
-            return;
-        }
-        
-        if (noSolicitudes) noSolicitudes.style.display = 'none';
-        if (container) container.innerHTML = '';
-        
-        data.forEach(solicitud => {
-            if (!container) return;
-            const solicitudDiv = document.createElement('div');
-            solicitudDiv.className = 'solicitud-item';
-            solicitudDiv.id = `solicitud-${solicitud.id_solicitud}`;
-            const imgPath = getProfileImgPath(solicitud.emisor.img);
-            solicitudDiv.innerHTML = `
-                <div class="solicitud-info">
-                    <div
-                    class="marco-externo marco-glow ${solicitud.emisor.rotacion ? 'marco-rotate' : ''}"
-                    style="
-                        --glow-color: ${solicitud.emisor.brillo || '#fff'};
-                        background-image: url('/img/bordes/${solicitud.emisor.marco ?? 'default.svg'}');
-                        width: 40px;
-                        height: 40px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    "
-                    >
-                    <img
-                        src="${imgPath}"
-                        alt="${solicitud.emisor.username}"
-                        class="rounded-circle"
-                        style="width: 32px; height: 32px; object-fit: cover;"
-                        onerror="this.src='${getProfileImgPath()}'"
-                    />
-                    </div>
-                    <span class="solicitud-username">${solicitud.emisor.username}</span>
-                </div>
-                <div class="solicitud-actions">
-                    <button class="btn btn-success btn-sm" title="Aceptar" onclick="responderSolicitud(${solicitud.id_solicitud}, 'aceptada')">
-                    <i class="fas fa-check"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm" title="Rechazar" onclick="responderSolicitud(${solicitud.id_solicitud}, 'rechazada')">
-                    <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `;
-            container.appendChild(solicitudDiv);
-        });
-    } catch (error) {
-        console.error('Error al cargar solicitudes:', error);
-        const container = document.getElementById('solicitudesContainer');
-        const noSolicitudes = document.getElementById('noSolicitudes');
-        if (container && noSolicitudes && container.children.length === 0) {
-            noSolicitudes.style.display = 'block';
-            container.innerHTML = '';
-            container.appendChild(noSolicitudes);
-        }
-    }
-}
+            // Mostrar spinner de carga
+            searchResults.innerHTML = '<div class="text-center"><div class="loading-spinner"></div></div>';
 
-// Función para responder solicitudes
-async function responderSolicitud(idSolicitud, respuesta) {
-    try {
-        const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
-        if (!solicitudDiv) return;
-        const buttons = solicitudDiv.querySelectorAll('button');
-        buttons.forEach(btn => btn.disabled = true);
-
-        // Cerrar el modal inmediatamente
-        limpiarModal(MODAL_CONFIG.modalIds.solicitudes);
-
-        const response = await fetch('/solicitudes/responder', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({
-                id_solicitud: idSolicitud,
-                respuesta: respuesta
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Error al procesar la solicitud');
-        }
-
-        const data = await response.json();
-        if (data.success) {
-            if (data.estado === 'rechazada') {
-                solicitudDiv.remove();
-                const solicitudesCount = document.getElementById('solicitudesCount');
-                const count = parseInt(solicitudesCount.textContent);
-                solicitudesCount.textContent = Math.max(0, count - 1);
-                const container = document.getElementById('solicitudesContainer');
-                if (container.children.length === 0) {
-                    const noSolicitudes = document.getElementById('noSolicitudes');
-                    if (noSolicitudes) {
-                        container.innerHTML = '';
-                        noSolicitudes.style.display = 'block';
-                        container.appendChild(noSolicitudes);
-                    }
-                }
-            } else {
-                const actionsDiv = solicitudDiv.querySelector('.solicitud-actions');
-                actionsDiv.innerHTML = `
-                    <span class="badge bg-success">Aceptada</span>
-                `;
-            }
-
-            if (window.chatManager) {
-                window.chatManager.loadChats();
-            }
-
-            // Mostrar mensaje de éxito después de un pequeño retraso
-            setTimeout(() => {
-                Swal.fire({
-                    title: data.estado === 'aceptada' ? '¡Solicitud aceptada!' : 'Solicitud rechazada',
-                    text: data.estado === 'aceptada' ? 'Ahora son amigxs' : 'La solicitud ha sido rechazada',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            }, 100);
-        } else {
-            throw new Error(data.message || 'Error al procesar la solicitud');
-        }
-    } catch (error) {
-        console.error('Error al responder solicitud:', error);
-        Swal.fire({
-            title: 'Error',
-            text: error.message || 'Ocurrió un error al procesar la solicitud',
-            icon: 'error'
-        });
-        const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
-        if (solicitudDiv) {
-            const buttons = solicitudDiv.querySelectorAll('button');
-            buttons.forEach(btn => btn.disabled = false);
-        }
-    }
-}
-
-// Función para bloquear usuario
-async function bloquearUsuario(idUsuario) {
-    try {
-        const result = await Swal.fire({
-            title: '¿Bloquear usuario?',
-            text: '¿Estás seguro de que deseas bloquear a este usuario?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, bloquear',
-            cancelButtonText: 'Cancelar'
-        });
-
-        if (result.isConfirmed) {
-            const response = await fetch(`/amistades/${idUsuario}/bloquear`, {
-                method: 'POST',
+            const response = await fetch(`/buscar-usuarios?q=${encodeURIComponent(query)}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
             });
 
-            if (!response.ok) {
-                throw new Error('Error al bloquear al usuario');
-            }
+            if (!response.ok) throw new Error('Error en la búsqueda');
 
             const data = await response.json();
-            
-            if (data.success) {
-                // Actualizar la lista de amigos
-                await cargarAmistades();
-                
-                // Mostrar mensaje de éxito
-                Swal.fire({
-                    title: '¡Usuario bloqueado!',
-                    text: 'El usuario ha sido bloqueado correctamente.',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                throw new Error(data.message || 'Error al bloquear al usuario');
-            }
-        }
-    } catch (error) {
-        console.error('Error al bloquear usuario:', error);
-        Swal.fire({
-            title: 'Error',
-            text: error.message || 'Ocurrió un error al bloquear al usuario',
-            icon: 'error'
-        });
-    }
-}
 
-// Función para desbloquear usuario
-async function desbloquearUsuario(idUsuario) {
-    try {
-        const result = await Swal.fire({
-            title: '¿Desbloquear usuario?',
-            text: '¿Estás seguro de que deseas desbloquear a este usuario?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, desbloquear',
-            cancelButtonText: 'Cancelar'
-        });
-
-        if (result.isConfirmed) {
-            const response = await fetch(`/amistades/${idUsuario}/desbloquear`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Error al desbloquear al usuario');
+            if (data.length === 0) {
+                searchResults.innerHTML = '<div class="no-results">No se encontraron usuarios</div>';
+                return;
             }
 
-            const data = await response.json();
-            
-            if (data.success) {
-                // Actualizar la lista de bloqueados
-                await cargarBloqueados();
-                
-                // Mostrar mensaje de éxito
-                Swal.fire({
-                    title: '¡Usuario desbloqueado!',
-                    text: 'El usuario ha sido desbloqueado correctamente.',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                throw new Error(data.message || 'Error al desbloquear al usuario');
-            }
-        }
-    } catch (error) {
-        console.error('Error al desbloquear usuario:', error);
-        Swal.fire({
-            title: 'Error',
-            text: error.message || 'Ocurrió un error al desbloquear al usuario',
-            icon: 'error'
-        });
-    }
-}
-
-// Función para cargar usuarios bloqueados
-async function cargarBloqueados() {
-    try {
-        const response = await fetch('/amistades/bloqueados');
-        if (!response.ok) throw new Error('Error al cargar usuarios bloqueados');
-        
-        const data = await response.json();
-        const listaBloqueados = document.getElementById('listaBloqueados');
-        
-        if (!listaBloqueados) return;
-        
-        if (data.length === 0) {
-            listaBloqueados.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
-            return;
-        }
-
-        listaBloqueados.innerHTML = data.map(usuario => `
-            <div class="list-group-item d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="marco-externo marco-glow ${usuario.rotacion ? 'marco-rotate' : ''}"
-                         style="--glow-color: ${usuario.brillo || '#fff'}; background-image: url('/img/bordes/${usuario.marco ?? 'default.svg'}');">
-                        <img src="${getProfileImgPath(usuario.img)}" 
-                             alt="${usuario.username}" 
-                             class="rounded-circle"
-                             style="width: 32px; height: 32px; object-fit: cover;"
-                             onerror="this.src='${getProfileImgPath()}'">
+            searchResults.innerHTML = data.map(user => `
+                <div class="user-result">
+                    <div class="marco-externo marco-glow ${user.rotacion ? 'marco-rotate' : ''}"
+                         style="--glow-color: ${user.brillo || '#fff'}; background-image: url('/img/bordes/${user.marco ?? 'default.svg'}');">
+                        <img src="${window.getProfileImgPath(user.img)}" 
+                             alt="${user.username}" 
+                             onerror="this.src='${window.getProfileImgPath()}'">
                     </div>
-                    <span>${usuario.username}</span>
-                </div>
-                <button class="btn btn-sm btn-outline-danger" onclick="window.desbloquearUsuario(${usuario.id_usuario})">
-                    <i class="fas fa-unlock"></i> Desbloquear
-                </button>
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error('Error al cargar usuarios bloqueados:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'No se pudieron cargar los usuarios bloqueados',
-            icon: 'error'
-        });
-    }
-}
-
-// Función para cargar amistades
-async function cargarAmistades() {
-    try {
-        const response = await fetch('/amistades');
-        if (!response.ok) throw new Error('Error al cargar amistades');
-        
-        const data = await response.json();
-        const listaAmistades = document.getElementById('listaAmistades');
-        
-        if (!listaAmistades) return;
-        
-        if (data.length === 0) {
-            listaAmistades.innerHTML = '<div class="text-center text-muted">No tienes amigos aún</div>';
-            return;
-        }
-
-        listaAmistades.innerHTML = data.map(amigo => `
-            <div class="list-group-item d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center gap-2">
-                    <div class="marco-externo marco-glow ${amigo.rotacion ? 'marco-rotate' : ''}"
-                         style="--glow-color: ${amigo.brillo || '#fff'}; background-image: url('/img/bordes/${amigo.marco ?? 'default.svg'}');">
-                        <img src="${getProfileImgPath(amigo.img)}" 
-                             alt="${amigo.username}" 
-                             class="rounded-circle"
-                             style="width: 32px; height: 32px; object-fit: cover;"
-                             onerror="this.src='${getProfileImgPath()}'">
+                    <div class="user-info">
+                        <h6>${user.username}</h6>
+                        <p>${user.nombre_completo || ''}</p>
                     </div>
-                    <span>${amigo.username}</span>
-                </div>
-                <div class="btn-group">
-                    <button class="btn btn-sm btn-outline-primary" onclick="window.chatManager.handleChatSelection(document.querySelector('[data-user-id=\"${amigo.id_usuario}\"]'), ${JSON.stringify(amigo)})">
-                        <i class="fas fa-comment"></i>
-                    </button>
-                    <button class="btn btn-sm btn-outline-danger" onclick="bloquearUsuario(${amigo.id_usuario})">
-                        <i class="fas fa-ban"></i>
+                    <button class="send-request-btn" 
+                            data-user-id="${user.id_usuario}"
+                            onclick="window.FriendshipManager.sendFriendRequest(${user.id_usuario}, this)">
+                        Enviar solicitud
                     </button>
                 </div>
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error('Error al cargar amistades:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'No se pudieron cargar las amistades',
-            icon: 'error'
-        });
-    }
-}
-
-// Función para buscar usuarios
-async function searchUsers(query) {
-    try {
-        const response = await fetch(`/buscar-usuarios?q=${encodeURIComponent(query)}`, {
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            `).join('');
+        } catch (error) {
+            console.error('Error al buscar usuarios:', error);
+            const searchResults = document.getElementById('searchResults');
+            if (searchResults) {
+                searchResults.innerHTML = '<div class="no-results">Error al buscar usuarios</div>';
             }
-        });
-
-        if (!response.ok) throw new Error('Error en la búsqueda');
-
-        const data = await response.json();
-        const searchResults = document.getElementById('searchResults');
-        
-        if (!searchResults) return;
-
-        if (data.length === 0) {
-            searchResults.innerHTML = '<div class="text-center text-muted">No se encontraron usuarios</div>';
-            return;
-        }
-
-        searchResults.innerHTML = data.map(user => `
-            <div class="user-result">
-                <div class="marco-externo marco-glow ${user.rotacion ? 'marco-rotate' : ''}"
-                     style="--glow-color: ${user.brillo || '#fff'}; background-image: url('/img/bordes/${user.marco ?? 'default.svg'}');">
-                    <img src="${getProfileImgPath(user.img)}" 
-                         alt="${user.username}" 
-                         onerror="this.src='${getProfileImgPath()}'">
-                </div>
-                <div class="user-info">
-                    <h6>${user.username}</h6>
-                    <p>${user.nombre_completo || ''}</p>
-                </div>
-                <button class="send-request-btn" 
-                        data-user-id="${user.id_usuario}"
-                        onclick="sendFriendRequest(${user.id_usuario}, this)">
-                    Enviar solicitud
-                </button>
-            </div>
-        `).join('');
-    } catch (error) {
-        console.error('Error al buscar usuarios:', error);
-        Swal.fire({
-            title: 'Error',
-            text: 'No se pudieron buscar usuarios',
-            icon: 'error'
-        });
-    }
-}
-
-// Función para enviar solicitud de amistad
-async function sendFriendRequest(userId, button) {
-    try {
-        const response = await fetch('/solicitudes/enviar', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({
-                id_receptor: userId
-            })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-            button.disabled = true;
-            button.textContent = 'Solicitud enviada';
-            button.classList.add('sent');
             Swal.fire({
-                title: '¡Solicitud enviada!',
-                text: 'La solicitud de amistad ha sido enviada correctamente.',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
+                title: 'Error',
+                text: 'No se pudieron buscar usuarios',
+                icon: 'error'
             });
-        } else {
-            throw new Error(data.message || 'Error al enviar la solicitud');
         }
-    } catch (error) {
-        console.error('Error al enviar solicitud:', error);
-        Swal.fire({
-            title: 'Error',
-            text: error.message || 'No se pudo enviar la solicitud de amistad',
-            icon: 'error'
-        });
+    },
+
+    async sendFriendRequest(userId, button) {
+        try {
+            // Deshabilitar el botón y mostrar spinner
+            button.disabled = true;
+            const originalText = button.textContent;
+            button.innerHTML = '<div class="loading-spinner"></div>';
+
+            const response = await fetch('/solicitudes/enviar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    id_receptor: userId
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                button.textContent = 'Solicitud enviada';
+                button.classList.add('sent');
+                Swal.fire({
+                    title: '¡Solicitud enviada!',
+                    text: 'La solicitud de amistad ha sido enviada correctamente.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                throw new Error(data.message || 'Error al enviar la solicitud');
+            }
+        } catch (error) {
+            console.error('Error al enviar solicitud:', error);
+            button.disabled = false;
+            button.textContent = originalText;
+            Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo enviar la solicitud de amistad',
+                icon: 'error'
+            });
+        }
     }
-}
+};
 
 // Event listeners para abrir los modales de amistad y búsqueda
 document.addEventListener('DOMContentLoaded', async function() {
@@ -657,8 +366,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     const btnAmistades = document.getElementById('btnAmistades');
     if (btnAmistades) {
         btnAmistades.addEventListener('click', () => {
-            mostrarModal(MODAL_CONFIG.modalIds.amistades);
-            cargarAmistades();
+            ModalUtils.mostrarModal(MODAL_CONFIG.modalIds.amistades);
+            window.cargarAmistades();
         });
     }
 
@@ -666,7 +375,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const btnBuscarUsuarios = document.getElementById('btnBuscarUsuarios');
     if (btnBuscarUsuarios) {
         btnBuscarUsuarios.addEventListener('click', () => {
-            mostrarModal(MODAL_CONFIG.modalIds.buscar);
+            ModalUtils.mostrarModal(MODAL_CONFIG.modalIds.buscar);
         });
     }
 
@@ -678,7 +387,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             clearTimeout(searchTimeout);
             searchTimeout = setTimeout(() => {
                 if (e.target.value.length >= MODAL_CONFIG.minSearchLength) {
-                    searchUsers(e.target.value);
+                    FriendshipManager.searchUsers(e.target.value);
                 } else {
                     const searchResults = document.getElementById('searchResults');
                     if (searchResults) {
@@ -692,7 +401,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Configurar las pestañas del modal de amistades
     const bloqueadosTab = document.getElementById('bloqueados-tab');
     if (bloqueadosTab) {
-        bloqueadosTab.addEventListener('click', cargarBloqueados);
+        bloqueadosTab.addEventListener('click', window.cargarBloqueados);
     }
 
     // Configurar los event listeners para limpiar los modales al cerrarse
@@ -700,7 +409,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const modalEl = document.getElementById(modalId);
         if (modalEl) {
             modalEl.addEventListener('hidden.bs.modal', () => {
-                limpiarModal(modalId);
+                ModalUtils.limpiarModal(modalId);
             });
         }
     });
@@ -709,8 +418,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
     if (btnSolicitudesPendientes) {
         btnSolicitudesPendientes.addEventListener('click', () => {
-            mostrarModal(MODAL_CONFIG.modalIds.solicitudes);
-            cargarSolicitudesAmistad();
+            ModalUtils.mostrarModal(MODAL_CONFIG.modalIds.solicitudes);
+            window.cargarSolicitudesAmistad();
         });
     }
 
@@ -719,43 +428,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (solicitudesModal) {
         let solicitudesInterval;
         solicitudesModal.addEventListener('show.bs.modal', () => {
-            solicitudesInterval = setInterval(cargarSolicitudesAmistad, MODAL_CONFIG.solicitudesInterval);
+            solicitudesInterval = setInterval(window.cargarSolicitudesAmistad, MODAL_CONFIG.solicitudesInterval);
         });
         solicitudesModal.addEventListener('hidden.bs.modal', () => {
             clearInterval(solicitudesInterval);
-            limpiarModal(MODAL_CONFIG.modalIds.solicitudes);
+            ModalUtils.limpiarModal(MODAL_CONFIG.modalIds.solicitudes);
         });
     }
-
-    // Vincular evento a los botones de reportar usuario
-    document.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('report-user-btn')) {
-            const userId = e.target.dataset.userId;
-            if (userId) {
-                console.warn('El botón de reportar requiere que la lógica de reporte esté disponible globalmente.');
-            }
-        }
-    });
-
-    // Vincular evento a los botones de bloquear usuario
-    document.addEventListener('click', function(e) {
-        if (e.target && e.target.classList.contains('block-user-btn')) {
-            const userId = e.target.dataset.userId;
-            if (userId) {
-                bloquearUsuario(userId);
-            }
-        }
-    });
 });
 
 // Exportar funciones al objeto global
-window.cargarBloqueados = cargarBloqueados;
-window.desbloquearUsuario = desbloquearUsuario;
-window.cargarAmistades = cargarAmistades;
-window.searchUsers = searchUsers;
-window.sendFriendRequest = sendFriendRequest;
-window.bloquearUsuario = bloquearUsuario;
-window.denunciarUsuario = denunciarUsuario;
-window.mostrarModal = mostrarModal;
-window.cleanupModals = cleanupModals;
-window.getProfileImgPath = getProfileImgPath;
+window.ModalUtils = ModalUtils;
+window.FriendshipManager = FriendshipManager;

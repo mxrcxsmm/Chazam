@@ -833,11 +833,18 @@ class ChatManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.chatManager = new ChatManager();
     window.getProfileImgPath = getProfileImgPath;
+    window.cargarSolicitudesAmistad = cargarSolicitudesAmistad;
+    window.responderSolicitud = responderSolicitud;
+    window.bloquearUsuario = bloquearUsuario;
+    window.cargarBloqueados = cargarBloqueados;
+    window.desbloquearUsuario = desbloquearUsuario;
+    window.denunciarUsuario = denunciarUsuario;
+    window.cargarAmistades = cargarAmistades;
 });
 
 // Añadir estilos CSS para las animaciones
-const style = document.createElement('style');
-style.textContent = `
+const chatStyles = document.createElement('style');
+chatStyles.textContent = `
     .typing-indicator {
         padding: 10px;
         color: #666;
@@ -863,7 +870,7 @@ style.textContent = `
         transform: translateX(5px);
     }
 `;
-document.head.appendChild(style);
+document.head.appendChild(chatStyles);
 
 function cargarBloqueados() {
     fetch('/amistades/bloqueados')
