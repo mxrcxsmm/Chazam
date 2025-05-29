@@ -758,9 +758,9 @@ const FriendshipManager = {
                 // Recargar las solicitudes
                 await this.cargarSolicitudesAmistad();
                 
-                // Si se aceptó, recargar también la lista de amistades
-                if (aceptar) {
-                    await this.cargarAmistades();
+                // Si se aceptó, recargar también la lista de chats
+                if (aceptar && window.chatManager) {
+                    await window.chatManager.loadChats();
                 }
 
                 Swal.fire({
