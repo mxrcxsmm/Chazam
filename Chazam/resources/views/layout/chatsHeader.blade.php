@@ -167,6 +167,8 @@
     <script src="{{ asset('js/estados.js') }}"></script>
     <script src="{{ asset('js/hamburger.js') }}"></script>
     <script src="{{ asset('js/userSearch.js') }}"></script>
+    {{-- Incluimos el script para los modales de amistad y búsqueda --}}
+    <script src="{{ asset('js/friendship_modals.js') }}"></script>
     @stack('scripts')
 
     <!-- Modal de amistades -->

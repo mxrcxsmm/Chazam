@@ -86,6 +86,8 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/sidebar.js') }}"></script>
+    {{-- Incluimos chatamig.js aquí para que sus funciones globales estén disponibles en todas las páginas de usuario --}}
+    <script src="{{ asset('js/chatamig.js') }}"></script>
     @stack('scripts')
 </body>
 
