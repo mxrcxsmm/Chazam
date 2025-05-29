@@ -411,24 +411,20 @@ async function desbloquearUsuario(idUsuario) {
     }
 }
 
-// Llama a cargarBloqueados cuando se abre el modal o se cambia de pestaña
-const bloqueadosTab = document.getElementById('bloqueados-tab');
-if (bloqueadosTab) {
-    bloqueadosTab.addEventListener('click', cargarBloqueados);
-}
-
 // Event listeners para abrir los modales de amistad y búsqueda
 document.addEventListener('DOMContentLoaded', async function() {
+    // Verificar y configurar el botón de amistades
     const btnAmistades = document.getElementById('btnAmistades');
     if (btnAmistades) {
         btnAmistades.addEventListener('click', function() {
             const modalAmistades = new bootstrap.Modal(document.getElementById('modalAmistades'));
             modalAmistades.show();
             // Cargar la lista de amigos al abrir el modal
-            cargarAmistades(); // Necesitas crear esta función
+            cargarAmistades();
         });
     }
 
+    // Verificar y configurar el botón de búsqueda de usuarios
     const btnBuscarUsuarios = document.getElementById('btnBuscarUsuarios');
     if (btnBuscarUsuarios) {
         btnBuscarUsuarios.addEventListener('click', function() {
@@ -437,31 +433,63 @@ document.addEventListener('DOMContentLoaded', async function() {
         });
     }
 
-    // Vincular evento a los botones de reportar usuario dentro de la lista de chats (si existen)
-    // Estos botones deberían estar en los elementos de chat generados dinámicamente
+    // Verificar y configurar el botón de solicitudes pendientes
+    const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
+    if (btnSolicitudesPendientes) {
+        btnSolicitudesPendientes.addEventListener('click', function() {
+            const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
+            solicitudesModal.show();
+            cargarSolicitudesAmistad();
+        });
+    }
+
+    // Configurar el input de búsqueda de usuarios
+    const searchUserInput = document.getElementById('searchUserInput');
+    if (searchUserInput) {
+        let searchTimeout;
+        searchUserInput.addEventListener('input', function(e) {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                if (e.target.value.length >= 2) {
+                    searchUsers(e.target.value);
+                } else {
+                    const searchResults = document.getElementById('searchResults');
+                    if (searchResults) {
+                        searchResults.innerHTML = '';
+                    }
+                }
+            }, 300);
+        });
+    }
+
+    // Configurar las pestañas del modal de amistades
+    const bloqueadosTab = document.getElementById('bloqueados-tab');
+    if (bloqueadosTab) {
+        bloqueadosTab.addEventListener('click', cargarBloqueados);
+    }
+
+    // Vincular evento a los botones de reportar usuario
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('report-user-btn')) {
-            const userId = e.target.dataset.userId; // Asegúrate de que el botón tenga el data-user-id
+            const userId = e.target.dataset.userId;
             if (userId) {
-                // Lógica para reportar (copiar del ChatManager si es necesario, o mantenerla aquí)
-                // Si la lógica de reporte es más compleja, podrías necesitar un objeto global.
-                // Por ahora, asumiré que la lógica de reporte se mantendrá en chatamig.js si es específica de ese chat.
                 console.warn('El botón de reportar requiere que la lógica de reporte esté disponible globalmente.');
-                // Si la lógica de reporte está en ChatManager, necesitarás reestructurarla o llamarla de otra forma.
-                // Por ahora, no moveré la lógica detallada del reporte.
             }
         }
     });
 
-    // Vincular evento a los botones de bloquear usuario dentro del modal de amistades (si existen)
+    // Vincular evento a los botones de bloquear usuario
     document.addEventListener('click', function(e) {
         if (e.target && e.target.classList.contains('block-user-btn')) {
-            const userId = e.target.dataset.userId; // Asegúrate de que el botón tenga el data-user-id
+            const userId = e.target.dataset.userId;
             if (userId) {
                 bloquearUsuario(userId);
             }
         }
     });
+
+    // Cargar solicitudes pendientes al inicio
+    await cargarSolicitudesAmistad();
 });
 
 // Necesitas una función global cargarAmistades() para cargar la lista de amigos

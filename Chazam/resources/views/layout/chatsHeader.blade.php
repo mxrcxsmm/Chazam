@@ -188,7 +188,7 @@
                             <button class="nav-link" id="bloqueados-tab" data-bs-toggle="tab" data-bs-target="#bloqueados" type="button" role="tab">Bloqueados</button>
                         </li>
                     </ul>
-                    <div class="tab-content">
+                    <div class="tab-content mt-3">
                         <div class="tab-pane fade show active" id="amistades" role="tabpanel">
                             <div id="listaAmistades" class="list-group"></div>
                         </div>
@@ -222,6 +222,21 @@
                             <!-- Los resultados se cargarán aquí -->
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Solicitudes -->
+    <div class="modal fade" id="solicitudesModal" tabindex="-1" aria-labelledby="solicitudesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#9147ff; color:#fff;">
+                    <h5 class="modal-title" id="solicitudesModalLabel">Solicitudes de Amistad</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="solicitudesContainer">
+                    <div id="noSolicitudes" style="display:none;">No tienes solicitudes pendientes</div>
                 </div>
             </div>
         </div>
