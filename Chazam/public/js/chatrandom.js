@@ -1034,29 +1034,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Si se queda aquí, asegura que el intervalo de carga sea bajo.
     const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
     if (btnSolicitudesPendientes) {
-        btnSolicitudesPendientes.addEventListener('click', function(e) {
-            e.preventDefault();
+        btnSolicitudesPendientes.addEventListener('click', () => {
             const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
             solicitudesModal.show();
-            // Cargar solicitudes al abrir el modal
-            window.FriendshipManager.cargarSolicitudesAmistad();
+            window.chatManager.cargarSolicitudesAmistad();
         });
     }
 
     // Gestionar el modal de solicitudes - Mover si se centraliza en otro script
     const solicitudesModalEl = document.getElementById('solicitudesModal');
     if (solicitudesModalEl) {
-        solicitudesModalEl.addEventListener('show.bs.modal', function () {
-            // Cargar solicitudes al abrir el modal
-            window.FriendshipManager.cargarSolicitudesAmistad();
+        solicitudesModalEl.addEventListener('show.bs.modal', () => {
+            window.chatManager.cargarSolicitudesAmistad();
             // Iniciar polling de solicitudes solo cuando el modal está abierto
-            solicitudesIntervalId = setInterval(() => window.FriendshipManager.cargarSolicitudesAmistad(), 30000); // Intervalo de 30s
+            window.chatManager.solicitudesIntervalId = setInterval(() => 
+                window.chatManager.cargarSolicitudesAmistad(), 30000);
         });
-        solicitudesModalEl.addEventListener('hidden.bs.modal', function () {
+        solicitudesModalEl.addEventListener('hidden.bs.modal', () => {
             // Limpiar polling de solicitudes al cerrar el modal
-            if (solicitudesIntervalId) {
-                clearInterval(solicitudesIntervalId);
-                solicitudesIntervalId = null;
+            if (window.chatManager.solicitudesIntervalId) {
+                clearInterval(window.chatManager.solicitudesIntervalId);
+                window.chatManager.solicitudesIntervalId = null;
                 console.log('Intervalo de solicitudes detenido al cerrar modal.');
             }
         });
