@@ -310,9 +310,7 @@ class ChatManager {
         this.initializeElements();
         this.setupEventListeners();
         this.startSmartPolling();
-        this.setupSolicitudesHandlers();
         this.setupBlockHandlers();
-        this.setupSearchHandlers();
         this.loadChats();
     }
 
@@ -353,19 +351,17 @@ class ChatManager {
         });
         this.elements.emojiButton.addEventListener('click', () => this.toggleEmojiPicker());
         this.setupEmojiPicker();
-        this.setupSolicitudesHandlers();
         this.setupWindowResizeHandler();
         this.setupReportHandlers();
-        this.setupSearchHandlers();
         
-        // Añadir evento para abrir el modal de búsqueda
-        const searchButton = document.querySelector('.chat-actions .fa-search');
-        if (searchButton) {
-            searchButton.addEventListener('click', () => {
-                const buscarUsuariosModal = new bootstrap.Modal(document.getElementById('buscarUsuariosModal'));
-                buscarUsuariosModal.show();
-            });
-        }
+        // Eliminamos el evento para abrir el modal de búsqueda aquí
+        // const searchButton = document.querySelector('.chat-actions .fa-search');
+        // if (searchButton) {
+        //     searchButton.addEventListener('click', () => {
+        //         const buscarUsuariosModal = new bootstrap.Modal(document.getElementById('buscarUsuariosModal'));
+        //         buscarUsuariosModal.show();
+        //     });
+        // }
     }
 
     // Renderizado de chats
@@ -615,64 +611,58 @@ class ChatManager {
     }
 
     // Configuración de handlers de solicitudes
-    setupSolicitudesHandlers() {
-        if (this.elements.btnSolicitudesPendientes) {
-            this.elements.btnSolicitudesPendientes.addEventListener('click', (e) => {
-                e.preventDefault();
-                
-                // Verificar que el modal existe
-                if (!this.elements.solicitudesModal) {
-                    console.error('El modal de solicitudes no existe');
-                    return;
-                }
+    // setupSolicitudesHandlers() {
+    //     if (this.elements.btnSolicitudesPendientes) {
+    //         this.elements.btnSolicitudesPendientes.addEventListener('click', (e) => {
+    //             e.preventDefault();
+    //             
+    //             if (!this.elements.solicitudesModal) {
+    //                 console.error('El modal de solicitudes no existe');
+    //                 return;
+    //             }
 
-                // Limpiar cualquier modal anterior
-                const oldModal = bootstrap.Modal.getInstance(this.elements.solicitudesModal);
-                if (oldModal) {
-                    oldModal.dispose();
-                }
+    //             const oldModal = bootstrap.Modal.getInstance(this.elements.solicitudesModal);
+    //             if (oldModal) {
+    //                 oldModal.dispose();
+    //             }
 
-                // Eliminar cualquier backdrop residual
-                const oldBackdrop = document.querySelector('.modal-backdrop');
-                if (oldBackdrop) {
-                    oldBackdrop.remove();
-                }
+    //             const oldBackdrop = document.querySelector('.modal-backdrop');
+    //             if (oldBackdrop) {
+    //                 oldBackdrop.remove();
+    //             }
 
-                // Limpiar clases del body
-                document.body.classList.remove('modal-open');
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
+    //             document.body.classList.remove('modal-open');
+    //             document.body.style.overflow = '';
+    //             document.body.style.paddingRight = '';
 
-                // Crear nueva instancia del modal
-                try {
-                    const solicitudesModal = new bootstrap.Modal(this.elements.solicitudesModal);
-                    solicitudesModal.show();
-                    cargarSolicitudesAmistad();
-                } catch (error) {
-                    console.error('Error al inicializar el modal:', error);
-                }
-            });
-            this.actualizarContadorSolicitudes();
-        }
+    //             try {
+    //                 const solicitudesModal = new bootstrap.Modal(this.elements.solicitudesModal);
+    //                 solicitudesModal.show();
+    //                 cargarSolicitudesAmistad();
+    //             } catch (error) {
+    //                 console.error('Error al inicializar el modal:', error);
+    //             }
+    //         });
+    //         this.actualizarContadorSolicitudes();
+    //     }
 
-        if (this.elements.solicitudesModal) {
-            let solicitudesInterval;
-            this.elements.solicitudesModal.addEventListener('show.bs.modal', () => {
-                solicitudesInterval = setInterval(cargarSolicitudesAmistad, CHAT_CONFIG.solicitudesInterval);
-            });
-            this.elements.solicitudesModal.addEventListener('hidden.bs.modal', () => {
-                clearInterval(solicitudesInterval);
-                // Limpiar el modal después de cerrarse
-                const backdrop = document.querySelector('.modal-backdrop');
-                if (backdrop) {
-                    backdrop.remove();
-                }
-                document.body.classList.remove('modal-open');
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-            });
-        }
-    }
+    //     if (this.elements.solicitudesModal) {
+    //         let solicitudesInterval;
+    //         this.elements.solicitudesModal.addEventListener('show.bs.modal', () => {
+    //             solicitudesInterval = setInterval(cargarSolicitudesAmistad, CHAT_CONFIG.solicitudesInterval);
+    //         });
+    //         this.elements.solicitudesModal.addEventListener('hidden.bs.modal', () => {
+    //             clearInterval(solicitudesInterval);
+    //             const backdrop = document.querySelector('.modal-backdrop');
+    //             if (backdrop) {
+    //                 backdrop.remove();
+    //             }
+    //             document.body.classList.remove('modal-open');
+    //             document.body.style.overflow = '';
+    //             document.body.style.paddingRight = '';
+    //         });
+    //     }
+    // }
 
     // Configuración del handler de redimensionamiento
     setupWindowResizeHandler() {
@@ -686,21 +676,22 @@ class ChatManager {
     }
 
     async actualizarContadorSolicitudes() {
-        try {
-            const response = await fetch('/solicitudes/pendientes', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            });
-            if (!response.ok) return;
-            const data = await response.json();
-            const solicitudesCount = document.getElementById('solicitudesCount');
-            if (solicitudesCount) solicitudesCount.textContent = data.length;
-        } catch (error) {
-            // Silenciar error
-        }
+        // Eliminamos esta función duplicada, friendship_modals.js la manejará
+        // try {
+        //     const response = await fetch('/solicitudes/pendientes', {
+        //         method: 'GET',
+        //         headers: {
+        //             'Content-Type': 'application/json',
+        //             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        //         }
+        //     });
+        //     if (!response.ok) return;
+        //     const data = await response.json();
+        //     const solicitudesCount = document.getElementById('solicitudesCount');
+        //     if (solicitudesCount) solicitudesCount.textContent = data.length;
+        // } catch (error) {
+        //     // Silenciar error
+        // }
     }
 
     // Nuevo: Sistema de polling inteligente
@@ -932,110 +923,33 @@ class ChatManager {
     }
 
     // Configuración de handlers de búsqueda
-    setupSearchHandlers() {
-        const searchInput = document.getElementById('searchUserInput');
-        const searchResults = document.getElementById('searchResults');
-        let searchTimeout;
+    // setupSearchHandlers() {
+    //     const searchInput = document.getElementById('searchUserInput');
+    //     const searchResults = document.getElementById('searchResults');
+    //     let searchTimeout;
 
-        if (searchInput) {
-            searchInput.addEventListener('input', (e) => {
-                clearTimeout(searchTimeout);
-                const query = e.target.value.trim();
+    //     if (searchInput) {
+    //         searchInput.addEventListener('input', (e) => {
+    //             clearTimeout(searchTimeout);
+    //             const query = e.target.value.trim();
 
-                if (query.length < 3) {
-                    searchResults.innerHTML = '<div class="text-center text-muted">Ingresa al menos 3 caracteres para buscar</div>';
-                    return;
-                }
+    //             if (query.length < 3) {
+    //                 searchResults.innerHTML = '<div class="text-center text-muted">Ingresa al menos 3 caracteres para buscar</div>';
+    //                 return;
+    //             }
 
-                searchTimeout = setTimeout(() => {
-                    this.searchUsers(query);
-                }, 300);
-            });
-        }
-    }
+    //             searchTimeout = setTimeout(() => {
+    //                 this.searchUsers(query);
+    //             }, 300);
+    //         });
+    //     }
+    // }
 
     // Función para buscar usuarios
-    async searchUsers(query) {
-        try {
-            const response = await fetch(`/buscar-usuarios?q=${encodeURIComponent(query)}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('Error en la búsqueda');
-            }
-
-            const data = await response.json();
-            const searchResults = document.getElementById('searchResults');
-
-            if (data.length === 0) {
-                searchResults.innerHTML = '<div class="text-center text-muted">No se encontraron usuarios</div>';
-                return;
-            }
-
-            searchResults.innerHTML = data.map(user => `
-                <div class="user-result">
-                    <img src="${getProfileImgPath(user.img)}" alt="${user.username}">
-                    <div class="user-info">
-                        <h6>${user.username}</h6>
-                        <p>${user.nombre_completo}</p>
-                    </div>
-                    <button class="send-request-btn" 
-                            data-user-id="${user.id_usuario}"
-                            onclick="window.chatManager.sendFriendRequest(${user.id_usuario}, this)">
-                        Enviar solicitud
-                    </button>
-                </div>
-            `).join('');
-        } catch (error) {
-            console.error('Error al buscar usuarios:', error);
-            const searchResults = document.getElementById('searchResults');
-            searchResults.innerHTML = '<div class="text-center text-danger">Error al buscar usuarios</div>';
-        }
-    }
+    // async searchUsers(query) { ... }
 
     // Función para enviar solicitud de amistad
-    async sendFriendRequest(userId, button) {
-        try {
-            const response = await fetch('/solicitudes/enviar', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({
-                    id_receptor: userId
-                })
-            });
-
-            const data = await response.json();
-
-            if (data.success) {
-                button.disabled = true;
-                button.textContent = 'Solicitud enviada';
-                button.classList.add('sent');
-                Swal.fire({
-                    title: '¡Solicitud enviada!',
-                    text: 'La solicitud de amistad ha sido enviada correctamente.',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                throw new Error(data.message || 'Error al enviar la solicitud');
-            }
-        } catch (error) {
-            console.error('Error al enviar solicitud:', error);
-            Swal.fire({
-                title: 'Error',
-                text: error.message || 'No se pudo enviar la solicitud de amistad',
-                icon: 'error'
-            });
-        }
-    }
+    // async sendFriendRequest(userId, button) { ... }
 }
 
 // Inicialización cuando el DOM está listo
