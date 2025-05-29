@@ -157,7 +157,7 @@ class StripeController extends Controller
         }
 
         // ID fijo del producto de donaciones
-        $id_producto = 14;
+        $id_producto = 12;
 
         // Configurar Stripe
         Stripe::setApiKey(config('services.stripe.secret'));

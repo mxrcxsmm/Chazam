@@ -25,14 +25,6 @@ class ProductosSeeder extends Seeder
 
             // Compras únicas (id_tipo_producto = 2)
             [
-                'titulo' => 'Mejorar skips',
-                'descripcion' => 'Reduce el tiempo de espera para realizar skips.',
-                'precio' => 5.99,
-                'tipo_valor' => 'euros',
-                'puntos' => null,
-                'id_tipo_producto' => 2,
-            ],
-            [
                 'titulo' => 'Combo 1',
                 'descripcion' => 'Incluye 1 mes de suscripción premium y 750 puntos.',
                 'precio' => 14.99,
@@ -104,14 +96,6 @@ class ProductosSeeder extends Seeder
                 'tipo_valor' => 'puntos',
                 'puntos' => 15000,
                 'id_tipo_producto' => 1,
-            ],
-            [
-                'titulo' => 'Mejorar skips con puntos',
-                'descripcion' => 'Mejorar skips con 60000 puntos.',
-                'precio' => 60000,
-                'tipo_valor' => 'puntos',
-                'puntos' => 60000,
-                'id_tipo_producto' => 2,
             ],
             [
                 'titulo' => 'Comunidad',
