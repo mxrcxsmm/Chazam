@@ -402,12 +402,12 @@ const FriendshipManager = {
 
             if (data.length === 0) {
                 listaAmistades.innerHTML = '<div class="text-center text-muted">No tienes amistades</div>';
-             return;
-        }
+                return;
+            }
 
             listaAmistades.innerHTML = data.map(amigo => `
-                    <div class="list-group-item d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-2">
+                <div class="list-group-item d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2">
                         <div class="marco-externo marco-glow ${amigo.rotacion ? 'marco-rotate' : ''}"
                              style="--glow-color: ${amigo.brillo || '#fff'}; background-image: url('/img/bordes/${amigo.marco ?? 'default.svg'}');">
                             <img src="${window.getProfileImgPath(amigo.img)}" 
@@ -418,7 +418,7 @@ const FriendshipManager = {
                         <span>${amigo.username}</span>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-danger" onclick="window.eliminarAmigo(${amigo.id_usuario})">
+                        <button class="btn btn-sm btn-danger" onclick="window.FriendshipManager.eliminarAmigo(${amigo.id_usuario})">
                             <i class="fas fa-user-minus"></i>
                         </button>
                         <button class="btn btn-sm btn-warning" onclick="window.FriendshipManager.bloquearUsuario(${amigo.id_usuario})">
@@ -578,6 +578,96 @@ const FriendshipManager = {
             Swal.fire({
                 title: 'Error',
                 text: 'No se pudo enviar el reporte',
+                icon: 'error'
+            });
+        }
+    },
+
+    async eliminarAmigo(idUsuario) {
+        try {
+            const result = await Swal.fire({
+                title: '¿Eliminar amigo?',
+                text: '¿Estás seguro de que deseas eliminar a este amigo? Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                const response = await fetch(`/amistades/${idUsuario}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        title: '¡Amigo eliminado!',
+                        text: 'El amigo ha sido eliminado correctamente.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    // Recargar la lista de amistades
+                    this.cargarAmistades();
+                } else {
+                    throw new Error(data.message || 'Error al eliminar amigo');
+                }
+            }
+        } catch (error) {
+            console.error('Error al eliminar amigo:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo eliminar al amigo',
+                icon: 'error'
+            });
+        }
+    },
+
+    async bloquearUsuario(idUsuario) {
+        try {
+            const result = await Swal.fire({
+                title: '¿Bloquear usuario?',
+                text: '¿Estás seguro de que deseas bloquear a este usuario? No podrás ver sus mensajes ni interactuar con él.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, bloquear',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                const response = await fetch(`/amistades/${idUsuario}/bloquear`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        title: '¡Usuario bloqueado!',
+                        text: 'El usuario ha sido bloqueado correctamente.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    // Recargar la lista de amistades
+                    this.cargarAmistades();
+                } else {
+                    throw new Error(data.message || 'Error al bloquear usuario');
+                }
+            }
+        } catch (error) {
+            console.error('Error al bloquear usuario:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo bloquear al usuario',
                 icon: 'error'
             });
         }
