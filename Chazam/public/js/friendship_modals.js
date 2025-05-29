@@ -315,80 +315,75 @@ const FriendshipManager = {
     },
 
     async sendFriendRequest(userId, button) {
-        const originalText = button.innerHTML; // Guardar el texto original del botón
-        const idUsuario = button.dataset.userId;
-
+        const originalText = button.innerHTML;
         button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Cargando...';
         button.disabled = true;
 
         try {
-            const response = await fetch(`/solicitudes/enviar`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-                body: JSON.stringify({ id_receptor: idUsuario })
+            const response = await fetch('/solicitudes/enviar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ id_receptor: userId })
             });
 
-            // Revertir el texto y habilitar el botón en caso de error
+            const data = await response.json();
+
             if (!response.ok) {
-                 button.innerHTML = originalText; // Revertir al texto original
-                 button.disabled = false;
-                const errorData = await response.json();
-                const errorMessage = errorData.message || 'Error al enviar solicitud';
-                console.error('Error al enviar solicitud:', errorMessage);
-                 Swal.fire({
-                     title: 'Error',
-                     text: errorMessage,
-                     icon: 'error'
-                 });
-                 //throw new Error(errorMessage);
-                 return; // Salir de la función después de mostrar el error
+                throw new Error(data.message || 'Error al enviar solicitud');
             }
 
-        const data = await response.json();
-
-        if (data.success) {
-                // Actualizar la interfaz de usuario para reflejar la solicitud enviada
+            if (data.success) {
                 button.innerHTML = 'Solicitud enviada';
-            button.disabled = true;
-            Swal.fire({
+                button.disabled = true;
+                Swal.fire({
                     title: '¡Éxito!',
                     text: 'Solicitud de amistad enviada.',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
-            });
-        } else {
-                //button.innerHTML = originalText; // Revertir al texto original
-                //button.disabled = false;
-                const errorMessage = data.message || 'Error al enviar solicitud';
-                console.error('Error al enviar solicitud:', errorMessage);
-                 Swal.fire({
-                     title: 'Error',
-                     text: errorMessage,
-                     icon: 'error'
-                 });
-                 button.innerHTML = originalText; // Revertir al texto original
-                 button.disabled = false;
-        }
-    } catch (error) {
-            console.error('Error en la solicitud:', error);
-        Swal.fire({
-            title: 'Error',
-                 text: 'Ocurrió un error al procesar la solicitud.',
-            icon: 'error'
-        });
-             button.innerHTML = originalText; // Revertir al texto original
-             button.disabled = false;
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                throw new Error(data.message || 'Error al enviar solicitud');
+            }
+        } catch (error) {
+            console.error('Error al enviar solicitud:', error);
+            button.innerHTML = originalText;
+            button.disabled = false;
+            
+            // Mostrar mensaje específico si ya existe una solicitud
+            if (error.message.includes('Ya existe una solicitud')) {
+                Swal.fire({
+                    title: 'Solicitud existente',
+                    text: 'Ya has enviado una solicitud a este usuario',
+                    icon: 'info'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'No se pudo enviar la solicitud',
+                    icon: 'error'
+                });
+            }
         }
     },
 
     async cargarAmistades() {
         try {
-            const response = await fetch('/amistades/lista');
-            if (!response.ok) throw new Error('Error al cargar amistades');
+            const response = await fetch('/amistades/lista', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Error al cargar amistades');
+            }
             
             const data = await response.json();
             const listaAmistades = document.getElementById('listaAmistades');
@@ -409,10 +404,10 @@ const FriendshipManager = {
                         </div>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-outline-primary" onclick="window.FriendshipManager.iniciarChat(${amigo.id})">
+                        <button class="btn btn-sm btn-outline-primary" onclick="window.FriendshipManager.iniciarChat(${amigo.id_usuario})">
                             <i class="fas fa-comment"></i>
                         </button>
-                        <button class="btn btn-sm btn-outline-danger" onclick="window.FriendshipManager.bloquearUsuario(${amigo.id})">
+                        <button class="btn btn-sm btn-outline-danger" onclick="window.FriendshipManager.bloquearUsuario(${amigo.id_usuario})">
                             <i class="fas fa-ban"></i>
                         </button>
                     </div>
@@ -420,9 +415,13 @@ const FriendshipManager = {
             `).join('');
         } catch (error) {
             console.error('Error al cargar amistades:', error);
+            const listaAmistades = document.getElementById('listaAmistades');
+            if (listaAmistades) {
+                listaAmistades.innerHTML = '<div class="text-center text-danger">Error al cargar amistades</div>';
+            }
             Swal.fire({
                 title: 'Error',
-                text: 'No se pudieron cargar las amistades',
+                text: error.message || 'No se pudieron cargar las amistades',
                 icon: 'error'
             });
         }
