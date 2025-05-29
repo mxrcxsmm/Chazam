@@ -21,6 +21,9 @@ class TiendaController extends Controller
         }
 
         $user = Auth::user();
+        
+        // Obtener el rol del usuario
+        $userRole = $user->id_rol;
 
         // Obtener los IDs de los productos de compra única (id_tipo_producto = 2) que el usuario ya ha comprado
         $productosComprados = [];
@@ -39,6 +42,6 @@ class TiendaController extends Controller
         // Obtener todos los productos, excluyendo los de compra única ya comprados por el usuario
         $productos = Producto::whereNotIn('id_producto', $productosComprados)->get();
 
-        return view('tienda.index', compact('categorias', 'productos'));
+        return view('tienda.index', compact('categorias', 'productos', 'userRole'));
     }
 }

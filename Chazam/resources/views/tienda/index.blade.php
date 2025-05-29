@@ -56,50 +56,54 @@
             <h1>Tienda</h1>
             @php
                 $user = Auth::user();
+                $userRole = Auth::user()->id_rol;
             @endphp
 
             @foreach ($categorias as $categoria)
                 {{-- Ocultar visualmente categorías con id_tipo_producto = 4 o 5 --}}
                 @if ($categoria->id_tipo_producto != 5 && $categoria->id_tipo_producto != 4)
-                    <div id="categoria-{{ $categoria->id_tipo_producto }}" class="categoria-section">
-                        <h2>{{ $categoria->tipo_producto }}</h2>
-                        <div class="productos-grid">
-                            @foreach ($productos->where('id_tipo_producto', $categoria->id_tipo_producto) as $producto)
-                                {{-- Si el usuario es Premium (id_rol == 3) y el producto es el id_producto 11, ocultar --}}
-                                @if ($user && $user->id_rol == 3 && $producto->id_producto == 11)
-                                    @continue
-                                @endif
-                                {{-- Ocultar productos con id_tipo_producto = 4 por si acaso --}}
-                                @if ($producto->id_tipo_producto == 4)
-                                    @continue
-                                @endif
-                                <div class="producto-card">
-                                    <a class="producto"
-                                        href="{{ route('producto.comprar', ['id' => $producto->id_producto]) }}">
-                                        <img src="{{ asset('img/' . $producto->titulo . '.png') }}"
-                                            alt="{{ $producto->titulo }}">
-                                        <h3>{{ $producto->titulo }}</h3>
-                                        <p>{{ $producto->descripcion }}</p>
-                                        <div class="precio">
-                                            @if ($producto->tipo_valor == 'puntos')
-                                                <span>{{ number_format($producto->precio, 0, '', '.') }}</span>
-                                                <span>Puntos</span>
-                                            @else
-                                                <span>{{ $producto->precio }}</span>
-                                                <span>€</span>
-                                            @endif
-                                        </div>
-                                    </a>
-                                    @if ($producto->tipo_valor == 'puntos')
-                                        <button class="btn btn-primary comprar-con-puntos"
-                                            data-producto-id="{{ $producto->id_producto }}">
-                                            Comprar con puntos
-                                        </button>
+                    {{-- Ocultar sección de membresía si el usuario es premium --}}
+                    @if (!($userRole == 3 && $categoria->id_tipo_producto == 1))
+                        <div id="categoria-{{ $categoria->id_tipo_producto }}" class="categoria-section">
+                            <h2>{{ $categoria->tipo_producto }}</h2>
+                            <div class="productos-grid">
+                                @foreach ($productos->where('id_tipo_producto', $categoria->id_tipo_producto) as $producto)
+                                    {{-- Si el usuario es Premium (id_rol == 3) y el producto es el id_producto 11, ocultar --}}
+                                    @if ($userRole == 3 && $producto->id_producto == 11)
+                                        @continue
                                     @endif
-                                </div>
-                            @endforeach
+                                    {{-- Ocultar productos con id_tipo_producto = 4 por si acaso --}}
+                                    @if ($producto->id_tipo_producto == 4)
+                                        @continue
+                                    @endif
+                                    <div class="producto-card">
+                                        <a class="producto"
+                                            href="{{ route('producto.comprar', ['id' => $producto->id_producto]) }}">
+                                            <img src="{{ asset('img/' . $producto->titulo . '.png') }}"
+                                                alt="{{ $producto->titulo }}">
+                                            <h3>{{ $producto->titulo }}</h3>
+                                            <p>{{ $producto->descripcion }}</p>
+                                            <div class="precio">
+                                                @if ($producto->tipo_valor == 'puntos')
+                                                    <span>{{ number_format($producto->precio, 0, '', '.') }}</span>
+                                                    <span>Puntos</span>
+                                                @else
+                                                    <span>{{ $producto->precio }}</span>
+                                                    <span>€</span>
+                                                @endif
+                                            </div>
+                                        </a>
+                                        @if ($producto->tipo_valor == 'puntos')
+                                            <button class="btn btn-primary comprar-con-puntos"
+                                                data-producto-id="{{ $producto->id_producto }}">
+                                                Comprar con puntos
+                                            </button>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
                         </div>
-                    </div>
+                    @endif
                 @endif
             @endforeach
 
