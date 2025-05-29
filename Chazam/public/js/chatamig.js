@@ -315,6 +315,31 @@ class ChatManager {
     }
 
     // Actualización del encabezado del chat
+    /*updateChatHeader(companero) {
+        if (!companero) return;
+
+        const defaultAvatar = CHAT_CONFIG.defaultAvatar;
+        const isFriend = !!companero.id_usuario;
+      
+        // Verificar que los elementos existen
+        if (!this.elements.chatHeader || !this.elements.chatStatus || !this.elements.chatImg) {
+            console.error('Elementos del header del chat no encontrados');
+            return;
+        }
+
+        // Actualizar nombre y estado
+        this.elements.chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
+        this.elements.chatStatus.textContent = (companero.id_estado == 1 || companero.id_estado == 5) ? 'en línea' : 'desconectado';
+        this.elements.chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
+        
+        // Construir la ruta de la imagen correctamente
+        const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : defaultAvatar;
+        this.elements.chatImg.src = imgPath;
+        this.elements.chatImg.onerror = () => {
+            this.elements.chatImg.src = defaultAvatar;
+        };
+    }*/
+
     updateChatHeader(companero) {
         if (!companero) return;
     
@@ -350,17 +375,17 @@ class ChatManager {
         // 7) Inyectar el avatar con su marco
         avatarContainer.innerHTML = `
             <div class="marco-externo marco-glow ${rotClass}"
-                 style="
+                    style="
                     background-image: url('${marcoUrl}');
                     background-size: cover;
                     background-position: center;
                     ${glowStyle}
-                 ">
+                    ">
                 <img id="chat-contact-img"
-                     src="${imgSrc}"
-                     alt="Avatar de ${companero.username || companero.nombre}"
-                     onerror="this.src='${defaultAvatar}'"
-                     style="width: 80%; height: 80%; border-radius:50%; object-fit:cover;"
+                        src="${imgSrc}"
+                        alt="Avatar de ${companero.username || companero.nombre}"
+                        onerror="this.src='${defaultAvatar}'"
+                        style="width: 80%; height: 80%; border-radius:50%; object-fit:cover;"
                 >
             </div>
         `;
@@ -370,7 +395,7 @@ class ChatManager {
         nameEl.textContent   = companero.username || companero.nombre || 'Usuario';
         statusEl.textContent = online ? 'en línea' : 'desconectado';
         statusEl.style.color = online ? '#9147ff'  : '#b9bbbe';
-    }    
+    }
 
     // Toggle de opciones
     toggleOptions() {
