@@ -470,18 +470,20 @@ document.addEventListener('DOMContentLoaded', async function() {
     modals.forEach(modalId => {
         const modalEl = document.getElementById(modalId);
         if (modalEl) {
-            // Limpiar cuando se cierra el modal
+            // Limpiar cuando se cierra el modal (usando el evento de Bootstrap)
             modalEl.addEventListener('hidden.bs.modal', function () {
                 limpiarModal(modalId);
             });
             
-            // Limpiar cuando se hace clic en el botón de cierre
-            const closeButtons = modalEl.querySelectorAll('[data-bs-dismiss="modal"]');
-            closeButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    limpiarModal(modalId);
-                });
-            });
+            // Eliminamos los listeners de click en los botones de cierre,
+            // ya que Bootstrap los maneja internamente y dispara 'hidden.bs.modal'.
+            // Esto evita posibles conflictos.
+            // const closeButtons = modalEl.querySelectorAll('[data-bs-dismiss="modal"]');
+            // closeButtons.forEach(button => {
+            //     button.addEventListener('click', function() {
+            //         limpiarModal(modalId);
+            //     });
+            // });
         }
     });
 
@@ -556,8 +558,8 @@ async function cargarAmistades() {
                         <span>${amigo.username}</span>
                     </div>
                     <div>
-                         {{-- Botón para abrir chat (opcional, si quieres abrir chat desde aquí) --}}
-                         {{-- <button class="btn btn-sm btn-primary me-2">Chat</button> --}}
+                         
+                         
                          <button class="btn btn-sm btn-danger" onclick="eliminarAmigo(${amigo.id_usuario})">Eliminar</button>
                          <button class="btn btn-sm btn-warning block-user-btn" data-user-id="${amigo.id_usuario}">Bloquear</button>
                     </div>
