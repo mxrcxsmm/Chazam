@@ -164,6 +164,7 @@
 
     <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('js/friendship_modals.js') }}"></script>
     <script src="{{ asset('js/estados.js') }}"></script>
     <script src="{{ asset('js/hamburger.js') }}"></script>
     <script src="{{ asset('js/userSearch.js') }}"></script>
@@ -265,9 +266,26 @@
 
         // Configurar los event listeners para los modales
         document.addEventListener('DOMContentLoaded', function() {
+            // Configurar el botón de amistades
+            const btnAmistades = document.getElementById('btnAmistades');
+            if (btnAmistades) {
+                btnAmistades.addEventListener('click', () => {
+                    const modalAmistades = new bootstrap.Modal(document.getElementById('modalAmistades'));
+                    modalAmistades.show();
+                    if (window.FriendshipManager) {
+                        window.FriendshipManager.cargarAmistades();
+                    }
+                });
+            }
+
             // Configurar el modal de amistades
             const modalAmistades = document.getElementById('modalAmistades');
             if (modalAmistades) {
+                modalAmistades.addEventListener('show.bs.modal', function () {
+                    if (window.FriendshipManager) {
+                        window.FriendshipManager.cargarAmistades();
+                    }
+                });
                 modalAmistades.addEventListener('hidden.bs.modal', function () {
                     limpiarModal('modalAmistades');
                 });
@@ -286,6 +304,16 @@
             if (solicitudesModal) {
                 solicitudesModal.addEventListener('hidden.bs.modal', function () {
                     limpiarModal('solicitudesModal');
+                });
+            }
+
+            // Configurar las pestañas del modal de amistades
+            const bloqueadosTab = document.getElementById('bloqueados-tab');
+            if (bloqueadosTab) {
+                bloqueadosTab.addEventListener('click', () => {
+                    if (window.FriendshipManager) {
+                        window.FriendshipManager.cargarBloqueados();
+                    }
                 });
             }
         });

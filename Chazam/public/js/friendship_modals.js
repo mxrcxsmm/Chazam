@@ -387,15 +387,9 @@ const FriendshipManager = {
 
     async cargarAmistades() {
         try {
-            const response = await fetch('/amistades', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            });
-
+            const response = await fetch('/amistades/lista');
             if (!response.ok) throw new Error('Error al cargar amistades');
-
+            
             const data = await response.json();
             const listaAmistades = document.getElementById('listaAmistades');
             if (!listaAmistades) return;
@@ -406,22 +400,19 @@ const FriendshipManager = {
             }
 
             listaAmistades.innerHTML = data.map(amigo => `
-                <div class="list-group-item d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="marco-externo marco-glow ${amigo.rotacion ? 'marco-rotate' : ''}"
-                             style="--glow-color: ${amigo.brillo || '#fff'}; background-image: url('/img/bordes/${amigo.marco ?? 'default.svg'}');">
-                            <img src="${window.getProfileImgPath(amigo.img)}" 
-                                 alt="${amigo.username}"
-                                 style="width:32px;height:32px;object-fit:cover;border-radius:50%;"
-                                 onerror="this.src='${window.getProfileImgPath()}'">
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img src="${window.getProfileImgPath(amigo.img)}" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                        <div>
+                            <h6 class="mb-0">${amigo.username}</h6>
+                            <small class="text-muted">${amigo.nombre_completo || ''}</small>
                         </div>
-                        <span>${amigo.username}</span>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-danger" onclick="window.FriendshipManager.eliminarAmigo(${amigo.id_usuario})">
-                            <i class="fas fa-user-minus"></i>
+                        <button class="btn btn-sm btn-outline-primary" onclick="window.FriendshipManager.iniciarChat(${amigo.id})">
+                            <i class="fas fa-comment"></i>
                         </button>
-                        <button class="btn btn-sm btn-warning" onclick="window.FriendshipManager.bloquearUsuario(${amigo.id_usuario})">
+                        <button class="btn btn-sm btn-outline-danger" onclick="window.FriendshipManager.bloquearUsuario(${amigo.id})">
                             <i class="fas fa-ban"></i>
                         </button>
                     </div>
@@ -429,24 +420,19 @@ const FriendshipManager = {
             `).join('');
         } catch (error) {
             console.error('Error al cargar amistades:', error);
-            const listaAmistades = document.getElementById('listaAmistades');
-            if (listaAmistades) {
-                listaAmistades.innerHTML = '<div class="text-center text-danger">Error al cargar amistades</div>';
-            }
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudieron cargar las amistades',
+                icon: 'error'
+            });
         }
     },
 
     async cargarBloqueados() {
         try {
-            const response = await fetch('/amistades/bloqueados', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            });
-
+            const response = await fetch('/amistades/bloqueados');
             if (!response.ok) throw new Error('Error al cargar bloqueados');
-
+            
             const data = await response.json();
             const listaBloqueados = document.getElementById('listaBloqueados');
             if (!listaBloqueados) return;
@@ -456,29 +442,53 @@ const FriendshipManager = {
                 return;
             }
 
-            listaBloqueados.innerHTML = data.map(user => `
-                <div class="list-group-item d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="marco-externo marco-glow ${user.rotacion ? 'marco-rotate' : ''}"
-                             style="--glow-color: ${user.brillo || '#fff'}; background-image: url('/img/bordes/${user.marco ?? 'default.svg'}');">
-                            <img src="${window.getProfileImgPath(user.img)}" 
-                                 alt="${user.username}"
-                                 style="width:32px;height:32px;object-fit:cover;border-radius:50%;"
-                                 onerror="this.src='${window.getProfileImgPath()}'">
+            listaBloqueados.innerHTML = data.map(bloqueado => `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img src="${window.getProfileImgPath(bloqueado.img)}" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                        <div>
+                            <h6 class="mb-0">${bloqueado.username}</h6>
+                            <small class="text-muted">${bloqueado.nombre_completo || ''}</small>
                         </div>
-                        <span>${user.username}</span>
                     </div>
-                    <button class="btn btn-sm btn-success" onclick="window.FriendshipManager.desbloquearUsuario(${user.id_usuario}, this)">
-                        Desbloquear
+                    <button class="btn btn-sm btn-outline-success" onclick="window.FriendshipManager.desbloquearUsuario(${bloqueado.id})">
+                        <i class="fas fa-unlock"></i> Desbloquear
                     </button>
                 </div>
             `).join('');
-    } catch (error) {
-        console.error('Error al cargar bloqueados:', error);
-            const listaBloqueados = document.getElementById('listaBloqueados');
-            if (listaBloqueados) {
-                listaBloqueados.innerHTML = '<div class="text-center text-danger">Error al cargar usuarios bloqueados</div>';
+        } catch (error) {
+            console.error('Error al cargar bloqueados:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudieron cargar los usuarios bloqueados',
+                icon: 'error'
+            });
+        }
+    },
+
+    async iniciarChat(userId) {
+        try {
+            const response = await fetch(`/user/chat/${userId}/iniciar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            if (!response.ok) throw new Error('Error al iniciar chat');
+            
+            const data = await response.json();
+            if (data.success) {
+                window.location.href = '/user/friendchat';
             }
+        } catch (error) {
+            console.error('Error al iniciar chat:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo iniciar el chat',
+                icon: 'error'
+            });
         }
     },
 
