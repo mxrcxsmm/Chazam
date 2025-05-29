@@ -411,6 +411,28 @@ async function desbloquearUsuario(idUsuario) {
     }
 }
 
+// Función para limpiar correctamente el modal
+function limpiarModal(modalId) {
+    const modalEl = document.getElementById(modalId);
+    if (!modalEl) return;
+    
+    const modal = bootstrap.Modal.getInstance(modalEl);
+    if (modal) {
+        modal.hide();
+        // Eliminar el backdrop
+        const backdrop = document.querySelector('.modal-backdrop');
+        if (backdrop) {
+            backdrop.remove();
+        }
+        // Restaurar el scroll del body
+        document.body.classList.remove('modal-open');
+        document.body.style.overflow = '';
+        document.body.style.paddingRight = '';
+        // Ocultar el modal
+        modalEl.style.display = 'none';
+    }
+}
+
 // Event listeners para abrir los modales de amistad y búsqueda
 document.addEventListener('DOMContentLoaded', async function() {
     // Verificar y configurar el botón de amistades
@@ -442,6 +464,26 @@ document.addEventListener('DOMContentLoaded', async function() {
             cargarSolicitudesAmistad();
         });
     }
+
+    // Añadir event listeners para los botones de cierre de los modales
+    const modals = ['modalAmistades', 'buscarUsuariosModal', 'solicitudesModal'];
+    modals.forEach(modalId => {
+        const modalEl = document.getElementById(modalId);
+        if (modalEl) {
+            // Limpiar cuando se cierra el modal
+            modalEl.addEventListener('hidden.bs.modal', function () {
+                limpiarModal(modalId);
+            });
+            
+            // Limpiar cuando se hace clic en el botón de cierre
+            const closeButtons = modalEl.querySelectorAll('[data-bs-dismiss="modal"]');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    limpiarModal(modalId);
+                });
+            });
+        }
+    });
 
     // Configurar el input de búsqueda de usuarios
     const searchUserInput = document.getElementById('searchUserInput');
