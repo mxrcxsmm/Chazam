@@ -10,6 +10,140 @@ const MODAL_CONFIG = {
     }
 };
 
+// Añadir estilos CSS para mejorar la apariencia
+const style = document.createElement('style');
+style.textContent = `
+    .user-result {
+        display: flex;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #eee;
+        transition: all 0.3s ease;
+    }
+
+    .user-result:hover {
+        background-color: #f8f9fa;
+    }
+
+    .user-result img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-right: 15px;
+    }
+
+    .user-info {
+        flex-grow: 1;
+    }
+
+    .user-info h6 {
+        margin: 0;
+        color: #333;
+    }
+
+    .user-info p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9em;
+    }
+
+    .send-request-btn {
+        padding: 5px 15px;
+        border: none;
+        border-radius: 20px;
+        background-color: #9147ff;
+        color: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .send-request-btn:hover {
+        background-color: #7c3bdb;
+    }
+
+    .send-request-btn.sent {
+        background-color: #28a745;
+        cursor: default;
+    }
+
+    .send-request-btn:disabled {
+        background-color: #6c757d;
+        cursor: not-allowed;
+    }
+
+    .list-group-item {
+        transition: all 0.3s ease;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .btn-group .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.875rem;
+    }
+
+    .marco-externo {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-size: cover;
+        background-position: center;
+        transition: all 0.3s ease;
+    }
+
+    .marco-glow {
+        box-shadow: 0 0 10px var(--glow-color, #fff);
+    }
+
+    .marco-rotate {
+        animation: rotate 10s linear infinite;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .modal-header {
+        border-bottom: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .modal-content {
+        border-radius: 15px;
+        box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
+
+    .nav-tabs .nav-link {
+        color: #666;
+        border: none;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .nav-tabs .nav-link:hover {
+        color: #9147ff;
+    }
+
+    .nav-tabs .nav-link.active {
+        color: #9147ff;
+        border-bottom: 2px solid #9147ff;
+        background: none;
+    }
+`;
+document.head.appendChild(style);
+
 // Función utilitaria para obtener la ruta correcta de la imagen de perfil
 function getProfileImgPath(img) {
     if (!img || img === 'avatar-default.png' || img === '/img/profile_img/avatar-default.png') {
@@ -221,6 +355,146 @@ async function responderSolicitud(idSolicitud, respuesta) {
             const buttons = solicitudDiv.querySelectorAll('button');
             buttons.forEach(btn => btn.disabled = false);
         }
+    }
+}
+
+// Función para cargar amistades
+async function cargarAmistades() {
+    try {
+        const response = await fetch('/amistades/lista');
+        if (!response.ok) throw new Error('Error al cargar amistades');
+        
+        const data = await response.json();
+        const listaAmistades = document.getElementById('listaAmistades');
+        
+        if (!listaAmistades) return;
+        
+        if (data.length === 0) {
+            listaAmistades.innerHTML = '<div class="text-center text-muted">No tienes amigos aún</div>';
+            return;
+        }
+
+        listaAmistades.innerHTML = data.map(amigo => `
+            <div class="list-group-item d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="marco-externo marco-glow ${amigo.rotacion ? 'marco-rotate' : ''}"
+                         style="--glow-color: ${amigo.brillo || '#fff'}; background-image: url('/img/bordes/${amigo.marco ?? 'default.svg'}');">
+                        <img src="${getProfileImgPath(amigo.img)}" 
+                             alt="${amigo.username}" 
+                             class="rounded-circle"
+                             style="width: 32px; height: 32px; object-fit: cover;"
+                             onerror="this.src='${getProfileImgPath()}'">
+                    </div>
+                    <span>${amigo.username}</span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn btn-sm btn-outline-primary" onclick="window.chatManager.handleChatSelection(document.querySelector('[data-user-id=\"${amigo.id_usuario}\"]'), ${JSON.stringify(amigo)})">
+                        <i class="fas fa-comment"></i>
+                    </button>
+                    <button class="btn btn-sm btn-outline-danger" onclick="bloquearUsuario(${amigo.id_usuario})">
+                        <i class="fas fa-ban"></i>
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error al cargar amistades:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudieron cargar las amistades',
+            icon: 'error'
+        });
+    }
+}
+
+// Función para buscar usuarios
+async function searchUsers(query) {
+    try {
+        const response = await fetch(`/buscar-usuarios?q=${encodeURIComponent(query)}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
+
+        if (!response.ok) throw new Error('Error en la búsqueda');
+
+        const data = await response.json();
+        const searchResults = document.getElementById('searchResults');
+        
+        if (!searchResults) return;
+
+        if (data.length === 0) {
+            searchResults.innerHTML = '<div class="text-center text-muted">No se encontraron usuarios</div>';
+            return;
+        }
+
+        searchResults.innerHTML = data.map(user => `
+            <div class="user-result">
+                <div class="marco-externo marco-glow ${user.rotacion ? 'marco-rotate' : ''}"
+                     style="--glow-color: ${user.brillo || '#fff'}; background-image: url('/img/bordes/${user.marco ?? 'default.svg'}');">
+                    <img src="${getProfileImgPath(user.img)}" 
+                         alt="${user.username}" 
+                         onerror="this.src='${getProfileImgPath()}'">
+                </div>
+                <div class="user-info">
+                    <h6>${user.username}</h6>
+                    <p>${user.nombre_completo || ''}</p>
+                </div>
+                <button class="send-request-btn" 
+                        data-user-id="${user.id_usuario}"
+                        onclick="sendFriendRequest(${user.id_usuario}, this)">
+                    Enviar solicitud
+                </button>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error al buscar usuarios:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudieron buscar usuarios',
+            icon: 'error'
+        });
+    }
+}
+
+// Función para enviar solicitud de amistad
+async function sendFriendRequest(userId, button) {
+    try {
+        const response = await fetch('/solicitudes/enviar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: JSON.stringify({
+                id_receptor: userId
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            button.disabled = true;
+            button.textContent = 'Solicitud enviada';
+            button.classList.add('sent');
+            Swal.fire({
+                title: '¡Solicitud enviada!',
+                text: 'La solicitud de amistad ha sido enviada correctamente.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } else {
+            throw new Error(data.message || 'Error al enviar la solicitud');
+        }
+    } catch (error) {
+        console.error('Error al enviar solicitud:', error);
+        Swal.fire({
+            title: 'Error',
+            text: error.message || 'No se pudo enviar la solicitud de amistad',
+            icon: 'error'
+        });
     }
 }
 
