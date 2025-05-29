@@ -315,47 +315,73 @@ const FriendshipManager = {
     },
 
     async sendFriendRequest(userId, button) {
-        try {
-            // Deshabilitar el botón y mostrar spinner
-            button.disabled = true;
-            const originalText = button.textContent;
-            button.innerHTML = '<div class="loading-spinner"></div>';
+        const originalText = button.innerHTML; // Guardar el texto original del botón
+        const idUsuario = button.dataset.userId;
 
-            const response = await fetch('/solicitudes/enviar', {
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Cargando...';
+        button.disabled = true;
+
+        try {
+            const response = await fetch(`/solicitudes/enviar`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 },
-                body: JSON.stringify({
-                    id_receptor: userId
-                })
+                body: JSON.stringify({ id_receptor: idUsuario })
             });
+
+            // Revertir el texto y habilitar el botón en caso de error
+            if (!response.ok) {
+                 button.innerHTML = originalText; // Revertir al texto original
+                 button.disabled = false;
+                const errorData = await response.json();
+                const errorMessage = errorData.message || 'Error al enviar solicitud';
+                console.error('Error al enviar solicitud:', errorMessage);
+                 Swal.fire({
+                     title: 'Error',
+                     text: errorMessage,
+                     icon: 'error'
+                 });
+                 //throw new Error(errorMessage);
+                 return; // Salir de la función después de mostrar el error
+            }
 
             const data = await response.json();
 
             if (data.success) {
-                button.textContent = 'Solicitud enviada';
-                button.classList.add('sent');
+                // Actualizar la interfaz de usuario para reflejar la solicitud enviada
+                button.innerHTML = 'Solicitud enviada';
+                button.disabled = true;
                 Swal.fire({
-                    title: '¡Solicitud enviada!',
-                    text: 'La solicitud de amistad ha sido enviada correctamente.',
+                    title: '¡Éxito!',
+                    text: 'Solicitud de amistad enviada.',
                     icon: 'success',
                     timer: 2000,
                     showConfirmButton: false
                 });
             } else {
-                throw new Error(data.message || 'Error al enviar la solicitud');
+                //button.innerHTML = originalText; // Revertir al texto original
+                //button.disabled = false;
+                const errorMessage = data.message || 'Error al enviar solicitud';
+                console.error('Error al enviar solicitud:', errorMessage);
+                 Swal.fire({
+                     title: 'Error',
+                     text: errorMessage,
+                     icon: 'error'
+                 });
+                 button.innerHTML = originalText; // Revertir al texto original
+                 button.disabled = false;
             }
         } catch (error) {
-            console.error('Error al enviar solicitud:', error);
-            button.disabled = false;
-            button.textContent = originalText;
-            Swal.fire({
-                title: 'Error',
-                text: error.message || 'No se pudo enviar la solicitud de amistad',
-                icon: 'error'
-            });
+            console.error('Error en la solicitud:', error);
+             Swal.fire({
+                 title: 'Error',
+                 text: 'Ocurrió un error al procesar la solicitud.',
+                 icon: 'error'
+             });
+             button.innerHTML = originalText; // Revertir al texto original
+             button.disabled = false;
         }
     },
 
