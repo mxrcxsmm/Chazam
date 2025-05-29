@@ -75,11 +75,11 @@ async function cargarSolicitudesAmistad() {
                     "
                     >
                     <img
-                        src="${solicitud.emisor.img}"
+                        src="${getProfileImgPath(solicitud.emisor.img)}"
                         alt="${solicitud.emisor.username}"
                         class="rounded-circle"
                         style="width: 32px; height: 32px; object-fit: cover;"
-                        onerror="this.src='/img/profile_img/avatar-default.png'"
+                        onerror="this.src='${getProfileImgPath()}'"
                     />
                     </div>
                     <span class="solicitud-username">${solicitud.emisor.username}</span>
@@ -354,14 +354,15 @@ class ChatManager {
         this.setupWindowResizeHandler();
         this.setupReportHandlers();
         
-        // Eliminamos el evento para abrir el modal de búsqueda aquí
-        // const searchButton = document.querySelector('.chat-actions .fa-search');
-        // if (searchButton) {
-        //     searchButton.addEventListener('click', () => {
-        //         const buscarUsuariosModal = new bootstrap.Modal(document.getElementById('buscarUsuariosModal'));
-        //         buscarUsuariosModal.show();
-        //     });
-        // }
+        // Manejar el botón de solicitudes pendientes aquí
+        const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
+        if (btnSolicitudesPendientes) {
+            btnSolicitudesPendientes.addEventListener('click', () => {
+                const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
+                solicitudesModal.show();
+                cargarSolicitudesAmistad();
+            });
+        }
     }
 
     // Renderizado de chats
@@ -956,6 +957,8 @@ class ChatManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.chatManager = new ChatManager();
     window.bloquearUsuario = bloquearUsuario;
+    window.cargarSolicitudesAmistad = cargarSolicitudesAmistad;
+    window.responderSolicitud = responderSolicitud;
 });
 
 // Añadir estilos CSS para las animaciones
