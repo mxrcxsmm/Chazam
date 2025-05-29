@@ -412,7 +412,10 @@ async function desbloquearUsuario(idUsuario) {
 }
 
 // Llama a cargarBloqueados cuando se abre el modal o se cambia de pestaña
-document.getElementById('bloqueados-tab').addEventListener('click', cargarBloqueados);
+const bloqueadosTab = document.getElementById('bloqueados-tab');
+if (bloqueadosTab) {
+    bloqueadosTab.addEventListener('click', cargarBloqueados);
+}
 
 // Event listeners para abrir los modales de amistad y búsqueda
 document.addEventListener('DOMContentLoaded', async function() {
