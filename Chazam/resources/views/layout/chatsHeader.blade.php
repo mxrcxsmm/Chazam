@@ -175,9 +175,9 @@
     <div class="modal fade" id="modalAmistades" tabindex="-1" aria-labelledby="modalAmistadesLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header" style="background:#9147ff; color:#fff;">
                     <h5 class="modal-title" id="modalAmistadesLabel">Mis Amistades</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs" id="amistadesTabs" role="tablist">
@@ -243,6 +243,55 @@
     </div>
 
     <script>
+        // Función para limpiar correctamente los modales
+        function limpiarModal(modalId) {
+            const modalEl = document.getElementById(modalId);
+            if (!modalEl) return;
+            
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modal.hide();
+                // Eliminar el backdrop
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                // Restaurar el scroll del body
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+                // Ocultar el modal
+                modalEl.style.display = 'none';
+            }
+        }
+
+        // Configurar los event listeners para los modales
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar el modal de amistades
+            const modalAmistades = document.getElementById('modalAmistades');
+            if (modalAmistades) {
+                modalAmistades.addEventListener('hidden.bs.modal', function () {
+                    limpiarModal('modalAmistades');
+                });
+            }
+
+            // Configurar el modal de búsqueda
+            const buscarUsuariosModal = document.getElementById('buscarUsuariosModal');
+            if (buscarUsuariosModal) {
+                buscarUsuariosModal.addEventListener('hidden.bs.modal', function () {
+                    limpiarModal('buscarUsuariosModal');
+                });
+            }
+
+            // Configurar el modal de solicitudes
+            const solicitudesModal = document.getElementById('solicitudesModal');
+            if (solicitudesModal) {
+                solicitudesModal.addEventListener('hidden.bs.modal', function () {
+                    limpiarModal('solicitudesModal');
+                });
+            }
+        });
+
         function toggleSidebarPerfil(forceClose = false) {
             const sidebar = document.getElementById('sidebarPerfil');
             if (!sidebar) return;

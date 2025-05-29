@@ -5,13 +5,13 @@ const CHAT_CONFIG = {
     sendUrl: (chatId) => `/user/chat/${chatId}/send`,
     pollingInterval: 4000,        // 4 segundos
     headerRefreshInterval: 30000,  // 30 segundos
-    solicitudesInterval: 60000,    // 1 minuto
     smartPolling: {
         enabled: true,
         idleTimeout: 300000,       // 5 minutos de inactividad
         idleInterval: 120000,      // 2 minutos cuando está inactivo
         activeInterval: 4000       // 4 segundos cuando está activo
-    }
+    },
+    defaultAvatar: '/img/profile_img/avatar-default.png'
 };
 
 // Función utilitaria para obtener la ruta correcta de la imagen de perfil
@@ -319,8 +319,6 @@ class ChatManager {
             emojiPicker: document.querySelector('emoji-picker'),
             chatsList: document.getElementById('chats-list'),
             messagesContainer: document.getElementById('messages-container'),
-            btnSolicitudesPendientes: document.getElementById('btnSolicitudesPendientes'),
-            solicitudesModal: document.getElementById('solicitudesModal'),
             chatHeader: document.getElementById('chat-contact-name'),
             chatStatus: document.getElementById('chat-contact-status'),
             chatImg: document.getElementById('chat-contact-img')
@@ -344,16 +342,6 @@ class ChatManager {
         this.setupEmojiPicker();
         this.setupWindowResizeHandler();
         this.setupReportHandlers();
-        
-        // Manejar el botón de solicitudes pendientes aquí
-        const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
-        if (btnSolicitudesPendientes) {
-            btnSolicitudesPendientes.addEventListener('click', () => {
-                const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
-                solicitudesModal.show();
-                cargarSolicitudesAmistad();
-            });
-        }
     }
 
     // Renderizado de chats
@@ -369,7 +357,7 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
-        const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
+        const imgPath = chat.img ? chat.img : CHAT_CONFIG.defaultAvatar;
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
@@ -382,7 +370,7 @@ class ChatManager {
 
         chatItem.innerHTML = `
             <div class="chat-avatar">
-                <img src="${imgPath}" alt="Avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
+                <img src="${imgPath}" alt="Avatar" onerror="this.src='${CHAT_CONFIG.defaultAvatar}'">
             </div>
             <div class="chat-info">
                 <div class="chat-header">
@@ -398,13 +386,12 @@ class ChatManager {
       
         return chatItem;
     }
-      
 
     // Manejo de selección de chat
     handleChatSelection(chatItem, chat) {
         console.log('Chat seleccionado:', chat); // Log para depuración
-                document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
-                chatItem.classList.add('active');
+        document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+        chatItem.classList.add('active');
         this.loadMessages(chat.id_chat);
         this.updateChatHeader(chat);
         this.currentChatId = chat.id_chat;
@@ -456,7 +443,7 @@ class ChatManager {
         msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
         msgDiv.innerHTML = `
             <div class="message-header">
-                <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='${getProfileImgPath()}'">
+                <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='${CHAT_CONFIG.defaultAvatar}'">
                 <span class="message-username">${msg.usuario}</span>
                 <span class="message-time">${msg.fecha_envio}</span>
             </div>
@@ -487,7 +474,7 @@ class ChatManager {
                 }
             }
         } catch (error) {
-                console.error('Error al cargar los chats:', error);
+            console.error('Error al cargar los chats:', error);
         }
     }
 
@@ -527,12 +514,12 @@ class ChatManager {
 
             try {
                 const response = await fetch(CHAT_CONFIG.sendUrl(this.currentChatId), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ contenido: message })
+                    },
+                    body: JSON.stringify({ contenido: message })
                 });
                 
                 const data = await response.json();
@@ -559,7 +546,7 @@ class ChatManager {
     updateChatHeader(companero) {
         if (!companero) return;
 
-        const defaultAvatar = window.CHAT_CONFIG?.defaultAvatar || '/img/profile_img/avatar-default.png';
+        const defaultAvatar = CHAT_CONFIG.defaultAvatar;
         const isFriend = !!companero.id_usuario;
       
         // Verificar que los elementos existen
@@ -602,60 +589,6 @@ class ChatManager {
         });
     }
 
-    // Configuración de handlers de solicitudes
-    // setupSolicitudesHandlers() {
-    //     if (this.elements.btnSolicitudesPendientes) {
-    //         this.elements.btnSolicitudesPendientes.addEventListener('click', (e) => {
-    //             e.preventDefault();
-    //             
-    //             if (!this.elements.solicitudesModal) {
-    //                 console.error('El modal de solicitudes no existe');
-    //                 return;
-    //             }
-
-    //             const oldModal = bootstrap.Modal.getInstance(this.elements.solicitudesModal);
-    //             if (oldModal) {
-    //                 oldModal.dispose();
-    //             }
-
-    //             const oldBackdrop = document.querySelector('.modal-backdrop');
-    //             if (oldBackdrop) {
-    //                 oldBackdrop.remove();
-    //             }
-
-    //             document.body.classList.remove('modal-open');
-    //             document.body.style.overflow = '';
-    //             document.body.style.paddingRight = '';
-
-    //             try {
-    //                 const solicitudesModal = new bootstrap.Modal(this.elements.solicitudesModal);
-    //                 solicitudesModal.show();
-    //                 cargarSolicitudesAmistad();
-    //             } catch (error) {
-    //                 console.error('Error al inicializar el modal:', error);
-    //             }
-    //         });
-    //         this.actualizarContadorSolicitudes();
-    //     }
-
-    //     if (this.elements.solicitudesModal) {
-    //         let solicitudesInterval;
-    //         this.elements.solicitudesModal.addEventListener('show.bs.modal', () => {
-    //             solicitudesInterval = setInterval(cargarSolicitudesAmistad, CHAT_CONFIG.solicitudesInterval);
-    //         });
-    //         this.elements.solicitudesModal.addEventListener('hidden.bs.modal', () => {
-    //             clearInterval(solicitudesInterval);
-    //             const backdrop = document.querySelector('.modal-backdrop');
-    //             if (backdrop) {
-    //                 backdrop.remove();
-    //             }
-    //             document.body.classList.remove('modal-open');
-    //             document.body.style.overflow = '';
-    //             document.body.style.paddingRight = '';
-    //         });
-    //     }
-    // }
-
     // Configuración del handler de redimensionamiento
     setupWindowResizeHandler() {
         window.addEventListener('resize', () => {
@@ -667,26 +600,7 @@ class ChatManager {
         });
     }
 
-    async actualizarContadorSolicitudes() {
-        // Eliminamos esta función duplicada, friendship_modals.js la manejará
-        // try {
-        //     const response = await fetch('/solicitudes/pendientes', {
-        //         method: 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        //         }
-        //     });
-        //     if (!response.ok) return;
-        //     const data = await response.json();
-        //     const solicitudesCount = document.getElementById('solicitudesCount');
-        //     if (solicitudesCount) solicitudesCount.textContent = data.length;
-        // } catch (error) {
-        //     // Silenciar error
-        // }
-    }
-
-    // Nuevo: Sistema de polling inteligente
+    // Sistema de polling inteligente
     startSmartPolling() {
         // Detectar actividad del usuario
         const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
@@ -913,43 +827,12 @@ class ChatManager {
             });
         }
     }
-
-    // Configuración de handlers de búsqueda
-    // setupSearchHandlers() {
-    //     const searchInput = document.getElementById('searchUserInput');
-    //     const searchResults = document.getElementById('searchResults');
-    //     let searchTimeout;
-
-    //     if (searchInput) {
-    //         searchInput.addEventListener('input', (e) => {
-    //             clearTimeout(searchTimeout);
-    //             const query = e.target.value.trim();
-
-    //             if (query.length < 3) {
-    //                 searchResults.innerHTML = '<div class="text-center text-muted">Ingresa al menos 3 caracteres para buscar</div>';
-    //                 return;
-    //             }
-
-    //             searchTimeout = setTimeout(() => {
-    //                 this.searchUsers(query);
-    //             }, 300);
-    //         });
-    //     }
-    // }
-
-    // Función para buscar usuarios
-    // async searchUsers(query) { ... }
-
-    // Función para enviar solicitud de amistad
-    // async sendFriendRequest(userId, button) { ... }
 }
 
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', () => {
     window.chatManager = new ChatManager();
-    window.bloquearUsuario = bloquearUsuario;
-    window.cargarSolicitudesAmistad = cargarSolicitudesAmistad;
-    window.responderSolicitud = responderSolicitud;
+    window.getProfileImgPath = getProfileImgPath;
 });
 
 // Añadir estilos CSS para las animaciones
