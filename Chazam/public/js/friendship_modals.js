@@ -372,24 +372,32 @@ const FriendshipManager = {
 
     async cargarAmistades() {
         try {
-            const response = await fetch('/amistades/lista', {
+            const response = await fetch('/amistades', {
                 method: 'GET',
                 headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
+                },
+                credentials: 'same-origin'
             });
             
             if (!response.ok) {
-                const errorData = await response.json();
+                if (response.status === 405) {
+                    throw new Error('Método no permitido. Por favor, contacta al administrador.');
+                }
+                const errorData = await response.json().catch(() => ({ message: 'Error al cargar amistades' }));
                 throw new Error(errorData.message || 'Error al cargar amistades');
             }
             
             const data = await response.json();
             const listaAmistades = document.getElementById('listaAmistades');
-            if (!listaAmistades) return;
+            if (!listaAmistades) {
+                console.warn('Elemento listaAmistades no encontrado');
+                return;
+            }
 
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 listaAmistades.innerHTML = '<div class="text-center text-muted">No tienes amistades</div>';
                 return;
             }
@@ -417,13 +425,22 @@ const FriendshipManager = {
             console.error('Error al cargar amistades:', error);
             const listaAmistades = document.getElementById('listaAmistades');
             if (listaAmistades) {
-                listaAmistades.innerHTML = '<div class="text-center text-danger">Error al cargar amistades</div>';
+                listaAmistades.innerHTML = `
+                    <div class="text-center text-danger">
+                        <i class="fas fa-exclamation-circle mb-2"></i>
+                        <p>Error al cargar amistades</p>
+                        <small>${error.message}</small>
+                    </div>`;
             }
-            Swal.fire({
-                title: 'Error',
-                text: error.message || 'No se pudieron cargar las amistades',
-                icon: 'error'
-            });
+            
+            // Solo mostrar el SweetAlert si no es un error de método no permitido
+            if (!error.message.includes('Método no permitido')) {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'No se pudieron cargar las amistades',
+                    icon: 'error'
+                });
+            }
         }
     },
 
