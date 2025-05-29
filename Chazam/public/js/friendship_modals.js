@@ -358,6 +358,55 @@ async function responderSolicitud(idSolicitud, respuesta) {
     }
 }
 
+// Función para desbloquear usuario
+async function desbloquearUsuario(idUsuario) {
+    try {
+        const result = await Swal.fire({
+            title: '¿Desbloquear usuario?',
+            text: '¿Estás seguro de que deseas desbloquear a este usuario?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, desbloquear',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            const response = await fetch(`/amistades/${idUsuario}/desbloquear`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Actualizar la lista de bloqueados
+                await cargarBloqueados();
+                
+                // Mostrar mensaje de éxito
+                Swal.fire({
+                    title: '¡Usuario desbloqueado!',
+                    text: 'El usuario ha sido desbloqueado correctamente.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                throw new Error(data.message || 'Error al desbloquear al usuario');
+            }
+        }
+    } catch (error) {
+        console.error('Error al desbloquear usuario:', error);
+        Swal.fire({
+            title: 'Error',
+            text: error.message || 'Ocurrió un error al desbloquear al usuario',
+            icon: 'error'
+        });
+    }
+}
+
 // Función para cargar usuarios bloqueados
 async function cargarBloqueados() {
     try {
@@ -387,7 +436,7 @@ async function cargarBloqueados() {
                     </div>
                     <span>${usuario.username}</span>
                 </div>
-                <button class="btn btn-sm btn-outline-danger" onclick="desbloquearUsuario(${usuario.id_usuario})">
+                <button class="btn btn-sm btn-outline-danger" onclick="window.desbloquearUsuario(${usuario.id_usuario})">
                     <i class="fas fa-unlock"></i> Desbloquear
                 </button>
             </div>
