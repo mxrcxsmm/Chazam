@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Solicitud;
 use App\Models\Chat;
 use App\Models\ChatUsuario;
+use App\Models\Mensaje;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -277,7 +278,7 @@ class SolicitudUserController extends Controller
 
             if ($request->respuesta === 'aceptada') {
                 // Buscar un chat privado (sin id_reto) entre ambos usuarios
-                $chatExistente = \App\Models\Chat::whereNull('id_reto')
+                $chatExistente = Chat::whereNull('id_reto')
                     ->whereHas('chatUsuarios', function($q) use ($solicitud) {
                         $q->where('id_usuario', $solicitud->id_emisor);
                     })
@@ -288,7 +289,7 @@ class SolicitudUserController extends Controller
 
                 if (!$chatExistente) {
                     // Crear nuevo chat privado
-                    $chat = \App\Models\Chat::create([
+                    $chat = Chat::create([
                         'nombre' => 'Chat privado',
                         'fecha_creacion' => now(),
                         'descripcion' => 'Chat entre amigos',
@@ -296,25 +297,25 @@ class SolicitudUserController extends Controller
                     ]);
 
                     // Agregar ambos usuarios al chat
-                    \App\Models\ChatUsuario::create([
+                    ChatUsuario::create([
                         'id_chat' => $chat->id_chat,
                         'id_usuario' => $solicitud->id_emisor
                     ]);
-                    \App\Models\ChatUsuario::create([
+                    ChatUsuario::create([
                         'id_chat' => $chat->id_chat,
                         'id_usuario' => $solicitud->id_receptor
                     ]);
                 }
 
                 // Crear una solicitud recíproca para mantener el registro
-                \App\Models\Solicitud::create([
+                Solicitud::create([
                     'id_emisor' => $solicitud->id_receptor,
                     'id_receptor' => $solicitud->id_emisor,
                     'estado' => 'aceptada'
                 ]);
             } else if ($request->respuesta === 'rechazada') {
                 // Eliminar solo los chats privados entre estos dos usuarios específicos
-                $chats = \App\Models\Chat::whereNull('id_reto')
+                $chats = Chat::whereNull('id_reto')
                     ->whereHas('chatUsuarios', function($query) use ($solicitud) {
                         $query->where('id_usuario', $solicitud->id_emisor);
                     })
@@ -325,14 +326,14 @@ class SolicitudUserController extends Controller
 
                 foreach ($chats as $chat) {
                     // Eliminar mensajes
-                    \App\Models\Mensaje::whereIn('id_chat_usuario', function($query) use ($chat) {
+                    Mensaje::whereIn('id_chat_usuario', function($query) use ($chat) {
                         $query->select('id_chat_usuario')
                               ->from('chat_usuario')
                               ->where('id_chat', $chat->id_chat);
                     })->delete();
 
                     // Eliminar relaciones chat_usuario
-                    \App\Models\ChatUsuario::where('id_chat', $chat->id_chat)->delete();
+                    ChatUsuario::where('id_chat', $chat->id_chat)->delete();
 
                     // Eliminar el chat
                     $chat->delete();

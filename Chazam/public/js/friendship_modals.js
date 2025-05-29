@@ -315,114 +315,108 @@ const FriendshipManager = {
     },
 
     async sendFriendRequest(userId, button) {
-        const originalText = button.innerHTML; // Guardar el texto original del botón
-        const idUsuario = button.dataset.userId;
-
+        const originalText = button.innerHTML;
         button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Cargando...';
         button.disabled = true;
 
         try {
-            const response = await fetch(`/solicitudes/enviar`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-                body: JSON.stringify({ id_receptor: idUsuario })
+            const response = await fetch('/solicitudes/enviar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ id_receptor: userId })
             });
 
-            // Revertir el texto y habilitar el botón en caso de error
+            const data = await response.json();
+
             if (!response.ok) {
-                 button.innerHTML = originalText; // Revertir al texto original
-                 button.disabled = false;
-                const errorData = await response.json();
-                const errorMessage = errorData.message || 'Error al enviar solicitud';
-                console.error('Error al enviar solicitud:', errorMessage);
-                 Swal.fire({
-                     title: 'Error',
-                     text: errorMessage,
-                     icon: 'error'
-                 });
-                 //throw new Error(errorMessage);
-                 return; // Salir de la función después de mostrar el error
+                throw new Error(data.message || 'Error al enviar solicitud');
             }
 
-        const data = await response.json();
-
-        if (data.success) {
-                // Actualizar la interfaz de usuario para reflejar la solicitud enviada
+            if (data.success) {
                 button.innerHTML = 'Solicitud enviada';
-            button.disabled = true;
-            Swal.fire({
+                button.disabled = true;
+                Swal.fire({
                     title: '¡Éxito!',
                     text: 'Solicitud de amistad enviada.',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
-            });
-        } else {
-                //button.innerHTML = originalText; // Revertir al texto original
-                //button.disabled = false;
-                const errorMessage = data.message || 'Error al enviar solicitud';
-                console.error('Error al enviar solicitud:', errorMessage);
-                 Swal.fire({
-                     title: 'Error',
-                     text: errorMessage,
-                     icon: 'error'
-                 });
-                 button.innerHTML = originalText; // Revertir al texto original
-                 button.disabled = false;
-        }
-    } catch (error) {
-            console.error('Error en la solicitud:', error);
-        Swal.fire({
-            title: 'Error',
-                 text: 'Ocurrió un error al procesar la solicitud.',
-            icon: 'error'
-        });
-             button.innerHTML = originalText; // Revertir al texto original
-             button.disabled = false;
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                throw new Error(data.message || 'Error al enviar solicitud');
+            }
+        } catch (error) {
+            console.error('Error al enviar solicitud:', error);
+            button.innerHTML = originalText;
+            button.disabled = false;
+            
+            // Mostrar mensaje específico si ya existe una solicitud
+            if (error.message.includes('Ya existe una solicitud')) {
+                Swal.fire({
+                    title: 'Solicitud existente',
+                    text: 'Ya has enviado una solicitud a este usuario',
+                    icon: 'info'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'No se pudo enviar la solicitud',
+                    icon: 'error'
+                });
+            }
         }
     },
 
     async cargarAmistades() {
         try {
             const response = await fetch('/amistades', {
+                method: 'GET',
                 headers: {
+                    'Accept': 'application/json',
                     'Content-Type': 'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
+                },
+                credentials: 'same-origin'
             });
-
-            if (!response.ok) throw new Error('Error al cargar amistades');
-
+            
+            if (!response.ok) {
+                if (response.status === 405) {
+                    throw new Error('Método no permitido. Por favor, contacta al administrador.');
+                }
+                const errorData = await response.json().catch(() => ({ message: 'Error al cargar amistades' }));
+                throw new Error(errorData.message || 'Error al cargar amistades');
+            }
+            
             const data = await response.json();
             const listaAmistades = document.getElementById('listaAmistades');
-            if (!listaAmistades) return;
+            if (!listaAmistades) {
+                console.warn('Elemento listaAmistades no encontrado');
+                return;
+            }
 
-            if (data.length === 0) {
+            if (!data || data.length === 0) {
                 listaAmistades.innerHTML = '<div class="text-center text-muted">No tienes amistades</div>';
-             return;
-        }
+                return;
+            }
 
             listaAmistades.innerHTML = data.map(amigo => `
-                    <div class="list-group-item d-flex align-items-center justify-content-between">
-                        <div class="d-flex align-items-center gap-2">
-                        <div class="marco-externo marco-glow ${amigo.rotacion ? 'marco-rotate' : ''}"
-                             style="--glow-color: ${amigo.brillo || '#fff'}; background-image: url('/img/bordes/${amigo.marco ?? 'default.svg'}');">
-                            <img src="${window.getProfileImgPath(amigo.img)}" 
-                                 alt="${amigo.username}"
-                                 style="width:32px;height:32px;object-fit:cover;border-radius:50%;"
-                                 onerror="this.src='${window.getProfileImgPath()}'">
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img src="${window.getProfileImgPath(amigo.img)}" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                        <div>
+                            <h6 class="mb-0">${amigo.username}</h6>
+                            <small class="text-muted">${amigo.nombre_completo || ''}</small>
                         </div>
-                        <span>${amigo.username}</span>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-danger" onclick="window.eliminarAmigo(${amigo.id_usuario})">
-                            <i class="fas fa-user-minus"></i>
+                        <button class="btn btn-sm btn-outline-danger" onclick="window.FriendshipManager.eliminarAmigo(${amigo.id_usuario})">
+                            <i class="fas fa-user-minus"></i> Eliminar amistad
                         </button>
-                        <button class="btn btn-sm btn-warning" onclick="window.FriendshipManager.bloquearUsuario(${amigo.id_usuario})">
-                            <i class="fas fa-ban"></i>
+                        <button class="btn btn-sm btn-outline-warning" onclick="window.FriendshipManager.bloquearUsuario(${amigo.id_usuario})">
+                            <i class="fas fa-ban"></i> Bloquear
                         </button>
                     </div>
                 </div>
@@ -431,20 +425,28 @@ const FriendshipManager = {
             console.error('Error al cargar amistades:', error);
             const listaAmistades = document.getElementById('listaAmistades');
             if (listaAmistades) {
-                listaAmistades.innerHTML = '<div class="text-center text-danger">Error al cargar amistades</div>';
+                listaAmistades.innerHTML = `
+                    <div class="text-center text-danger">
+                        <i class="fas fa-exclamation-circle mb-2"></i>
+                        <p>Error al cargar amistades</p>
+                        <small>${error.message}</small>
+                    </div>`;
+            }
+            
+            // Solo mostrar el SweetAlert si no es un error de método no permitido
+            if (!error.message.includes('Método no permitido')) {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'No se pudieron cargar las amistades',
+                    icon: 'error'
+                });
             }
         }
     },
 
     async cargarBloqueados() {
         try {
-            const response = await fetch('/amistades/bloqueados', {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            });
-
+            const response = await fetch('/amistades/bloqueados');
             if (!response.ok) throw new Error('Error al cargar bloqueados');
 
             const data = await response.json();
@@ -456,67 +458,98 @@ const FriendshipManager = {
                 return;
             }
 
-            listaBloqueados.innerHTML = data.map(user => `
-                <div class="list-group-item d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center gap-2">
-                        <div class="marco-externo marco-glow ${user.rotacion ? 'marco-rotate' : ''}"
-                             style="--glow-color: ${user.brillo || '#fff'}; background-image: url('/img/bordes/${user.marco ?? 'default.svg'}');">
-                            <img src="${window.getProfileImgPath(user.img)}" 
-                                 alt="${user.username}"
-                                 style="width:32px;height:32px;object-fit:cover;border-radius:50%;"
-                                 onerror="this.src='${window.getProfileImgPath()}'">
+            listaBloqueados.innerHTML = data.map(bloqueado => `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <img src="${window.getProfileImgPath(bloqueado.img)}" alt="Avatar" class="rounded-circle me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                        <div>
+                            <h6 class="mb-0">${bloqueado.username}</h6>
+                            <small class="text-muted">${bloqueado.nombre_completo || ''}</small>
                         </div>
-                        <span>${user.username}</span>
                     </div>
-                    <button class="btn btn-sm btn-success" onclick="window.FriendshipManager.desbloquearUsuario(${user.id_usuario}, this)">
-                        Desbloquear
+                    <button class="btn btn-sm btn-outline-success" onclick="window.FriendshipManager.desbloquearUsuario(${bloqueado.id_usuario}, this)">
+                        <i class="fas fa-unlock"></i> Desbloquear
                     </button>
                 </div>
             `).join('');
-    } catch (error) {
-        console.error('Error al cargar bloqueados:', error);
-            const listaBloqueados = document.getElementById('listaBloqueados');
-            if (listaBloqueados) {
-                listaBloqueados.innerHTML = '<div class="text-center text-danger">Error al cargar usuarios bloqueados</div>';
+        } catch (error) {
+            console.error('Error al cargar bloqueados:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudieron cargar los usuarios bloqueados',
+                icon: 'error'
+            });
+        }
+    },
+
+    async iniciarChat(userId) {
+        try {
+            const response = await fetch(`/user/chat/${userId}/iniciar`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            if (!response.ok) throw new Error('Error al iniciar chat');
+            
+            const data = await response.json();
+            if (data.success) {
+                window.location.href = '/user/friendchat';
             }
+        } catch (error) {
+            console.error('Error al iniciar chat:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo iniciar el chat',
+                icon: 'error'
+            });
         }
     },
 
     async desbloquearUsuario(idUsuario, button) {
         try {
             const response = await fetch(`/amistades/desbloquear/${idUsuario}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
-        });
+            });
 
             if (!response.ok) throw new Error('Error al desbloquear usuario');
 
-        const data = await response.json();
-        if (data.success) {
-                button.closest('.list-group-item').remove();
+            const data = await response.json();
+            if (data.success) {
+                // Eliminar el elemento de la lista
+                const listItem = button.closest('.list-group-item');
+                if (listItem) {
+                    listItem.remove();
+                }
+                
+                // Verificar si quedan elementos en la lista
                 const listaBloqueados = document.getElementById('listaBloqueados');
                 if (listaBloqueados && listaBloqueados.children.length === 0) {
                     listaBloqueados.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
                 }
+
                 Swal.fire({
-                title: '¡Usuario desbloqueado!',
-                text: 'El usuario ha sido desbloqueado correctamente.',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
+                    title: '¡Usuario desbloqueado!',
+                    text: 'El usuario ha sido desbloqueado correctamente.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        } catch (error) {
+            console.error('Error al desbloquear usuario:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo desbloquear al usuario',
+                icon: 'error'
             });
         }
-    } catch (error) {
-        console.error('Error al desbloquear usuario:', error);
-        Swal.fire({
-            title: 'Error',
-                text: 'No se pudo desbloquear al usuario',
-            icon: 'error'
-        });
-    }
     },
 
     async denunciarUsuario(idUsuario) {
@@ -581,7 +614,207 @@ const FriendshipManager = {
                 icon: 'error'
             });
         }
-    }
+    },
+
+    async eliminarAmigo(idUsuario) {
+        try {
+            const result = await Swal.fire({
+                title: '¿Eliminar amigo?',
+                text: '¿Estás seguro de que deseas eliminar a este amigo? Esta acción no se puede deshacer.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                const response = await fetch(`/amistades/${idUsuario}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        title: '¡Amigo eliminado!',
+                        text: 'El amigo ha sido eliminado correctamente.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    // Recargar la lista de amistades
+                    this.cargarAmistades();
+                } else {
+                    throw new Error(data.message || 'Error al eliminar amigo');
+                }
+            }
+        } catch (error) {
+            console.error('Error al eliminar amigo:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo eliminar al amigo',
+                icon: 'error'
+            });
+        }
+    },
+
+    async bloquearUsuario(idUsuario) {
+        try {
+            const result = await Swal.fire({
+                title: '¿Bloquear usuario?',
+                text: '¿Estás seguro de que deseas bloquear a este usuario? No podrás ver sus mensajes ni interactuar con él.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Sí, bloquear',
+                cancelButtonText: 'Cancelar'
+            });
+
+            if (result.isConfirmed) {
+                const response = await fetch(`/amistades/${idUsuario}/bloquear`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    }
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        title: '¡Usuario bloqueado!',
+                        text: 'El usuario ha sido bloqueado correctamente.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                    // Recargar la lista de amistades
+                    this.cargarAmistades();
+                } else {
+                    throw new Error(data.message || 'Error al bloquear usuario');
+                }
+            }
+        } catch (error) {
+            console.error('Error al bloquear usuario:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo bloquear al usuario',
+                icon: 'error'
+            });
+        }
+    },
+
+    async cargarSolicitudesAmistad() {
+        try {
+            const response = await fetch('/solicitudes/pendientes', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            if (!response.ok) throw new Error('Error al cargar solicitudes');
+
+            const data = await response.json();
+            const solicitudesContainer = document.getElementById('solicitudesContainer');
+            const noSolicitudes = document.getElementById('noSolicitudes');
+            
+            if (!solicitudesContainer || !noSolicitudes) return;
+
+            if (data.length === 0) {
+                solicitudesContainer.innerHTML = '';
+                noSolicitudes.style.display = 'block';
+                return;
+            }
+
+            noSolicitudes.style.display = 'none';
+            solicitudesContainer.innerHTML = data.map(solicitud => `
+                <div class="solicitud-item">
+                    <div class="solicitud-info">
+                        <div class="marco-externo marco-glow ${solicitud.emisor.rotacion ? 'marco-rotate' : ''}"
+                             style="--glow-color: ${solicitud.emisor.brillo || '#fff'}; background-image: url('/img/bordes/${solicitud.emisor.marco ?? 'default.svg'}');">
+                            <img src="${window.getProfileImgPath(solicitud.emisor.img)}" 
+                                 alt="${solicitud.emisor.username}"
+                                 style="width:40px;height:40px;object-fit:cover;border-radius:50%;"
+                                 onerror="this.src='${window.getProfileImgPath()}'">
+                        </div>
+                        <div>
+                            <div class="solicitud-username">${solicitud.emisor.username}</div>
+                        </div>
+                    </div>
+                    <div class="solicitud-actions">
+                        <button class="btn btn-success btn-sm" onclick="window.FriendshipManager.responderSolicitud(${solicitud.id_solicitud}, true)">
+                            <i class="fas fa-check"></i> Aceptar
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="window.FriendshipManager.responderSolicitud(${solicitud.id_solicitud}, false)">
+                            <i class="fas fa-times"></i> Rechazar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Actualizar el contador de solicitudes
+            const solicitudesCount = document.getElementById('solicitudesCount');
+            if (solicitudesCount) {
+                solicitudesCount.textContent = data.length;
+                solicitudesCount.style.display = data.length > 0 ? 'block' : 'none';
+            }
+        } catch (error) {
+            console.error('Error al cargar solicitudes:', error);
+            const solicitudesContainer = document.getElementById('solicitudesContainer');
+            if (solicitudesContainer) {
+                solicitudesContainer.innerHTML = '<div class="text-center text-danger">Error al cargar solicitudes</div>';
+            }
+        }
+    },
+
+    async responderSolicitud(idSolicitud, aceptar) {
+        try {
+            const response = await fetch('/solicitudes/responder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    id_solicitud: idSolicitud,
+                    respuesta: aceptar ? 'aceptada' : 'rechazada'
+                })
+            });
+
+            if (!response.ok) throw new Error('Error al responder solicitud');
+
+            const data = await response.json();
+            if (data.success) {
+                // Recargar las solicitudes
+                await this.cargarSolicitudesAmistad();
+                
+                // Si se aceptó, recargar también la lista de chats
+                if (aceptar && window.chatManager) {
+                    await window.chatManager.loadChats();
+                }
+
+                Swal.fire({
+                    title: aceptar ? '¡Solicitud aceptada!' : 'Solicitud rechazada',
+                    text: aceptar ? 'Ahora son amigos' : 'La solicitud ha sido rechazada',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                throw new Error(data.message || 'Error al procesar la respuesta');
+            }
+        } catch (error) {
+            console.error('Error al responder solicitud:', error);
+            Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo procesar la solicitud',
+                icon: 'error'
+            });
+        }
+    },
 };
 
 // Event listeners para abrir los modales de amistad y búsqueda
@@ -645,7 +878,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (btnSolicitudesPendientes) {
         btnSolicitudesPendientes.addEventListener('click', () => {
             ModalUtils.mostrarModal(MODAL_CONFIG.modalIds.solicitudes);
-            window.cargarSolicitudesAmistad();
+            // Usar la referencia desde el objeto global si es necesario, aunque cargarSolicitudesAmistad debería estar dentro de FriendshipManager
+            if (window.FriendshipManager && window.FriendshipManager.cargarSolicitudesAmistad) {
+                 window.FriendshipManager.cargarSolicitudesAmistad();
+            } else if (window.cargarSolicitudesAmistad) { // Mantener por si acaso aún se usa la función global antigua
+                 window.cargarSolicitudesAmistad();
+            }
         });
     }
 
@@ -654,7 +892,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (solicitudesModal) {
         let solicitudesInterval;
         solicitudesModal.addEventListener('show.bs.modal', () => {
-            solicitudesInterval = setInterval(window.cargarSolicitudesAmistad, MODAL_CONFIG.solicitudesInterval);
+             // Usar la referencia desde el objeto global si es necesario
+             if (window.FriendshipManager && window.FriendshipManager.cargarSolicitudesAmistad) {
+                  solicitudesInterval = setInterval(window.FriendshipManager.cargarSolicitudesAmistad, MODAL_CONFIG.solicitudesInterval);
+             } else if (window.cargarSolicitudesAmistad) { // Mantener por si acaso
+                  solicitudesInterval = setInterval(window.cargarSolicitudesAmistad, MODAL_CONFIG.solicitudesInterval);
+             }
         });
         solicitudesModal.addEventListener('hidden.bs.modal', () => {
             clearInterval(solicitudesInterval);
@@ -663,10 +906,15 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 
-// Exportar objetos al objeto global
+// Asegurar que los objetos globales existan antes de asignar funciones a window
+window.ModalUtils = window.ModalUtils || {};
+window.FriendshipManager = window.FriendshipManager || {};
+
+// Exportar objetos al objeto global (redundante pero por seguridad)
 window.ModalUtils = ModalUtils;
 window.FriendshipManager = FriendshipManager;
-// Exportar funciones de amistad individuales para compatibilidad con onclick en algunos blade files si es necesario
+
+// Exportar funciones de amistad individuales para compatibilidad con onclick en algunos blade files
 window.cargarAmistades = FriendshipManager.cargarAmistades;
 window.eliminarAmigo = FriendshipManager.eliminarAmigo;
 window.bloquearUsuario = FriendshipManager.bloquearUsuario;
@@ -679,4 +927,7 @@ window.mostrarModal = ModalUtils.mostrarModal;
 window.limpiarModal = ModalUtils.limpiarModal;
 
 // Si getProfileImgPath se usa fuera de FriendshipManager o ModalUtils y no está en otro archivo central, exportarla aquí también.
-// window.getProfileImgPath = getProfileImgPath; // Asumiendo que ya está en otro archivo base o se moverá allí
+// Ya la exportamos desde hamburger.js, pero por si acaso para otras vistas:
+if (!window.getProfileImgPath && typeof getProfileImgPath !== 'undefined') {
+     window.getProfileImgPath = getProfileImgPath;
+}
