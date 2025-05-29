@@ -120,15 +120,6 @@ async function responderSolicitud(idSolicitud, respuesta) {
         const modal = bootstrap.Modal.getInstance(modalEl);
         if (modal) {
             modal.hide();
-            // Forzar la eliminación del backdrop y clases
-            const backdrop = document.querySelector('.modal-backdrop');
-            if (backdrop) {
-                backdrop.remove();
-            }
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-            modalEl.style.display = 'none';
         }
 
         const response = await fetch('/solicitudes/responder', {
