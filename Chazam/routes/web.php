@@ -232,7 +232,7 @@ Route::middleware(['auth', \App\Http\Middleware\CheckUserStatus::class])->group(
     Route::delete('/amistades/{idUsuario}', [AmistadController::class, 'destroy'])->name('amistades.destroy');
     Route::post('/amistades/{idUsuario}/bloquear', [AmistadController::class, 'bloquear'])->name('amistades.bloquear');
     Route::get('/amistades/bloqueados', [AmistadController::class, 'getBloqueados'])->name('amistades.bloqueados');
-    Route::post('/amistades/desbloquear', [AmistadController::class, 'desbloquearUsuario'])->name('amistades.desbloquear');
+    Route::post('/amistades/desbloquear/{idUsuario}', [AmistadController::class, 'desbloquearUsuario'])->name('amistades.desbloquear');
 });
 
 Route::get('/chats', [FriendChatController::class, 'index'])->name('chats.index');

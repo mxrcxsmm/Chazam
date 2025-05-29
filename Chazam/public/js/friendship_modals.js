@@ -265,44 +265,44 @@ const FriendshipManager = {
             // Mostrar spinner de carga
             searchResults.innerHTML = '<div class="text-center"><div class="loading-spinner"></div></div>';
 
-            const response = await fetch(`/buscar-usuarios?q=${encodeURIComponent(query)}`, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            });
+        const response = await fetch(`/buscar-usuarios?q=${encodeURIComponent(query)}`, {
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        });
 
             if (!response.ok) throw new Error('Error en la búsqueda');
 
-            const data = await response.json();
+        const data = await response.json();
 
-            if (data.length === 0) {
+        if (data.length === 0) {
                 searchResults.innerHTML = '<div class="no-results">No se encontraron usuarios</div>';
-                return;
-            }
+            return;
+        }
 
-            searchResults.innerHTML = data.map(user => `
-                <div class="user-result">
+        searchResults.innerHTML = data.map(user => `
+            <div class="user-result">
                     <div class="marco-externo marco-glow ${user.rotacion ? 'marco-rotate' : ''}"
                          style="--glow-color: ${user.brillo || '#fff'}; background-image: url('/img/bordes/${user.marco ?? 'default.svg'}');">
                         <img src="${window.getProfileImgPath(user.img)}" 
                              alt="${user.username}" 
                              onerror="this.src='${window.getProfileImgPath()}'">
                     </div>
-                    <div class="user-info">
-                        <h6>${user.username}</h6>
-                        <p>${user.nombre_completo || ''}</p>
-                    </div>
-                    <button class="send-request-btn" 
-                            data-user-id="${user.id_usuario}"
-                            onclick="window.FriendshipManager.sendFriendRequest(${user.id_usuario}, this)">
-                        Enviar solicitud
-                    </button>
+                <div class="user-info">
+                    <h6>${user.username}</h6>
+                    <p>${user.nombre_completo || ''}</p>
                 </div>
-            `).join('');
-        } catch (error) {
-            console.error('Error al buscar usuarios:', error);
-            const searchResults = document.getElementById('searchResults');
+                <button class="send-request-btn" 
+                        data-user-id="${user.id_usuario}"
+                            onclick="window.FriendshipManager.sendFriendRequest(${user.id_usuario}, this)">
+                    Enviar solicitud
+                </button>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error al buscar usuarios:', error);
+        const searchResults = document.getElementById('searchResults');
             if (searchResults) {
                 searchResults.innerHTML = '<div class="no-results">Error al buscar usuarios</div>';
             }
@@ -323,11 +323,11 @@ const FriendshipManager = {
 
         try {
             const response = await fetch(`/solicitudes/enviar`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
                 body: JSON.stringify({ id_receptor: idUsuario })
             });
 
@@ -347,20 +347,20 @@ const FriendshipManager = {
                  return; // Salir de la función después de mostrar el error
             }
 
-            const data = await response.json();
+        const data = await response.json();
 
-            if (data.success) {
+        if (data.success) {
                 // Actualizar la interfaz de usuario para reflejar la solicitud enviada
                 button.innerHTML = 'Solicitud enviada';
-                button.disabled = true;
-                Swal.fire({
+            button.disabled = true;
+            Swal.fire({
                     title: '¡Éxito!',
                     text: 'Solicitud de amistad enviada.',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        } else {
                 //button.innerHTML = originalText; // Revertir al texto original
                 //button.disabled = false;
                 const errorMessage = data.message || 'Error al enviar solicitud';
@@ -372,14 +372,14 @@ const FriendshipManager = {
                  });
                  button.innerHTML = originalText; // Revertir al texto original
                  button.disabled = false;
-            }
-        } catch (error) {
+        }
+    } catch (error) {
             console.error('Error en la solicitud:', error);
-             Swal.fire({
-                 title: 'Error',
+        Swal.fire({
+            title: 'Error',
                  text: 'Ocurrió un error al procesar la solicitud.',
-                 icon: 'error'
-             });
+            icon: 'error'
+        });
              button.innerHTML = originalText; // Revertir al texto original
              button.disabled = false;
         }
@@ -402,12 +402,12 @@ const FriendshipManager = {
 
             if (data.length === 0) {
                 listaAmistades.innerHTML = '<div class="text-center text-muted">No tienes amistades</div>';
-                return;
-            }
+             return;
+        }
 
             listaAmistades.innerHTML = data.map(amigo => `
-                <div class="list-group-item d-flex align-items-center justify-content-between">
-                    <div class="d-flex align-items-center gap-2">
+                    <div class="list-group-item d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
                         <div class="marco-externo marco-glow ${amigo.rotacion ? 'marco-rotate' : ''}"
                              style="--glow-color: ${amigo.brillo || '#fff'}; background-image: url('/img/bordes/${amigo.marco ?? 'default.svg'}');">
                             <img src="${window.getProfileImgPath(amigo.img)}" 
@@ -473,8 +473,8 @@ const FriendshipManager = {
                     </button>
                 </div>
             `).join('');
-        } catch (error) {
-            console.error('Error al cargar bloqueados:', error);
+    } catch (error) {
+        console.error('Error al cargar bloqueados:', error);
             const listaBloqueados = document.getElementById('listaBloqueados');
             if (listaBloqueados) {
                 listaBloqueados.innerHTML = '<div class="text-center text-danger">Error al cargar usuarios bloqueados</div>';
@@ -485,38 +485,38 @@ const FriendshipManager = {
     async desbloquearUsuario(idUsuario, button) {
         try {
             const response = await fetch(`/amistades/desbloquear/${idUsuario}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
-            });
+        });
 
             if (!response.ok) throw new Error('Error al desbloquear usuario');
 
-            const data = await response.json();
-            if (data.success) {
+        const data = await response.json();
+        if (data.success) {
                 button.closest('.list-group-item').remove();
                 const listaBloqueados = document.getElementById('listaBloqueados');
                 if (listaBloqueados && listaBloqueados.children.length === 0) {
                     listaBloqueados.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
                 }
                 Swal.fire({
-                    title: '¡Usuario desbloqueado!',
-                    text: 'El usuario ha sido desbloqueado correctamente.',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            }
-        } catch (error) {
-            console.error('Error al desbloquear usuario:', error);
-            Swal.fire({
-                title: 'Error',
-                text: 'No se pudo desbloquear al usuario',
-                icon: 'error'
+                title: '¡Usuario desbloqueado!',
+                text: 'El usuario ha sido desbloqueado correctamente.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
             });
         }
+    } catch (error) {
+        console.error('Error al desbloquear usuario:', error);
+        Swal.fire({
+            title: 'Error',
+                text: 'No se pudo desbloquear al usuario',
+            icon: 'error'
+        });
+    }
     },
 
     async denunciarUsuario(idUsuario) {
