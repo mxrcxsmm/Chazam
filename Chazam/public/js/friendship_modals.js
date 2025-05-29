@@ -341,24 +341,27 @@ async function cargarBloqueados() {
              console.error("Element #listaBloqueados not found");
              return;
         }
-        lista.innerHTML = '';
+
+        let bloqueadosHtml = '';
         if (bloqueados.length === 0) {
-            lista.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
+            bloqueadosHtml = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
         } else {
-            bloqueados.forEach(user => {
+            bloqueadosHtml = bloqueados.map(user => {
                 const imgPath = getProfileImgPath(user.img); // Usar función global
-                const item = document.createElement('div');
-                item.className = 'list-group-item d-flex align-items-center justify-content-between';
-                item.innerHTML = `
-                    <div class="d-flex align-items-center gap-2">
-                        <img src="${imgPath}" style="width:32px;height:32px;object-fit:cover;border-radius:50%;">
-                        <span>${user.username}</span>
+                return `
+                    <div class="list-group-item d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="${imgPath}" style="width:32px;height:32px;object-fit:cover;border-radius:50%;">
+                            <span>${user.username}</span>
+                        </div>
+                        <button class="btn btn-sm btn-danger" onclick="desbloquearUsuario(${user.id_usuario})">Desbloquear</button>
                     </div>
-                    <button class="btn btn-sm btn-danger" onclick="desbloquearUsuario(${user.id_usuario})">Desbloquear</button>
                 `;
-                lista.appendChild(item);
-            });
+            }).join('');
         }
+
+        lista.innerHTML = bloqueadosHtml;
+
     } catch (error) {
         console.error('Error al cargar bloqueados:', error);
         const lista = document.getElementById('listaBloqueados');
@@ -543,34 +546,40 @@ async function cargarAmistades() {
         if (!response.ok) throw new Error('Error al cargar las amistades');
         const amistades = await response.json();
         const listaAmistades = document.getElementById('listaAmistades');
-        listaAmistades.innerHTML = '';
+        if (!listaAmistades) return; // Asegúrate de que el elemento existe
+
+        let amistadesHtml = '';
         if (amistades.length === 0) {
-            listaAmistades.innerHTML = '<div class="text-center text-muted">No tienes amistades</div>';
+            amistadesHtml = '<div class="text-center text-muted">No tienes amistades</div>';
         } else {
-            amistades.forEach(amigo => {
+            amistadesHtml = amistades.map(amigo => {
                 // Asegúrate de que el objeto amigo tenga la estructura correcta (id_usuario, username, img, etc.)
                 const imgPath = getProfileImgPath(amigo.img); // Usar la función global
-                const item = document.createElement('div');
-                item.className = 'list-group-item d-flex align-items-center justify-content-between';
-                item.innerHTML = `
-                    <div class="d-flex align-items-center gap-2">
-                        <img src="${imgPath}" style="width:32px;height:32px;object-fit:cover;border-radius:50%;">
-                        <span>${amigo.username}</span>
-                    </div>
-                    <div>
-                         
-                         
-                         <button class="btn btn-sm btn-danger" onclick="eliminarAmigo(${amigo.id_usuario})">Eliminar</button>
-                         <button class="btn btn-sm btn-warning block-user-btn" data-user-id="${amigo.id_usuario}">Bloquear</button>
+                return `
+                    <div class="list-group-item d-flex align-items-center justify-content-between">
+                        <div class="d-flex align-items-center gap-2">
+                            <img src="${imgPath}" style="width:32px;height:32px;object-fit:cover;border-radius:50%;">
+                            <span>${amigo.username}</span>
+                        </div>
+                        <div>
+                            
+                            
+                            <button class="btn btn-sm btn-danger" onclick="eliminarAmigo(${amigo.id_usuario})">Eliminar</button>
+                            <button class="btn btn-sm btn-warning block-user-btn" data-user-id="${amigo.id_usuario}">Bloquear</button>
+                        </div>
                     </div>
                 `;
-                listaAmistades.appendChild(item);
-            });
+            }).join('');
         }
+        
+        listaAmistades.innerHTML = amistadesHtml;
+
     } catch (error) {
         console.error('Error al cargar amistades:', error);
         const listaAmistades = document.getElementById('listaAmistades');
-        listaAmistades.innerHTML = '<div class="text-center text-danger">Error al cargar amistades</div>';
+        if (listaAmistades) { // Añadir verificación
+            listaAmistades.innerHTML = '<div class="text-center text-danger">Error al cargar amistades</div>';
+        }
     }
 }
 
