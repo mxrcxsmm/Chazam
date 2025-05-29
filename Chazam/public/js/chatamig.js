@@ -317,28 +317,56 @@ class ChatManager {
     // Actualización del encabezado del chat
     updateChatHeader(companero) {
         if (!companero) return;
-
-        const defaultAvatar = CHAT_CONFIG.defaultAvatar;
-        const isFriend = !!companero.id_usuario;
-      
-        // Verificar que los elementos existen
-        if (!this.elements.chatHeader || !this.elements.chatStatus || !this.elements.chatImg) {
-            console.error('Elementos del header del chat no encontrados');
+    
+        // 1) Origen de la app para montar URLs absolutas
+        const origin = window.location.origin;
+    
+        // 2) Leer personalización del amigo
+        const marcoFile = companero.marco || 'default.svg';
+        const brillo    = companero.brillo;               // puede ser null
+        const rotacion  = Boolean(companero.rotacion);
+    
+        // 3) Crear URL absoluta al SVG del marco
+        const marcoUrl = `${origin}/img/bordes/${marcoFile}`;
+    
+        // 4) Clases y estilos CSS
+        const rotClass  = rotacion ? 'marco-rotate' : '';
+        const glowStyle = brillo ? `--glow-color: ${brillo};` : '';
+    
+        // 5) Fallback de avatar y contenedor
+        const defaultAvatar    = CHAT_CONFIG.defaultAvatar;
+        const imgSrc           = companero.img || defaultAvatar;
+        const avatarContainer  = this.elements.chatImgContainer;
+        if (!avatarContainer) {
+            console.error('No se encontró el contenedor #chat-contact-avatar');
             return;
         }
-
-        // Actualizar nombre y estado
+    
+        // 6) Renderizar el avatar con marco, glow y rotación
+        avatarContainer.innerHTML = `
+            <div class="marco-externo marco-glow ${rotClass}"
+                 style="
+                   background-image: url('${marcoUrl}');
+                   background-size: cover;
+                   background-position: center;
+                   ${glowStyle}
+                 ">
+                <img
+                  id="chat-contact-img"
+                  src="${imgSrc}"
+                  alt="Avatar"
+                  onerror="this.src='${defaultAvatar}'"
+                  style="width:80%; height:80%; border-radius:50%; object-fit:cover;"
+                />
+            </div>
+        `;
+    
+        // 7) Nombre y estado
+        const online = [1, 5].includes(companero.id_estado);
         this.elements.chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
-        this.elements.chatStatus.textContent = (companero.id_estado == 1 || companero.id_estado == 5) ? 'en línea' : 'desconectado';
-        this.elements.chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
-        
-        // Construir la ruta de la imagen correctamente
-        const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : defaultAvatar;
-        this.elements.chatImg.src = imgPath;
-        this.elements.chatImg.onerror = () => {
-            this.elements.chatImg.src = defaultAvatar;
-        };
-    }
+        this.elements.chatStatus.textContent = online ? 'en línea' : 'desconectado';
+        this.elements.chatStatus.style.color = online ? '#9147ff' : '#b9bbbe';
+    }    
 
     // Toggle de opciones
     toggleOptions() {
