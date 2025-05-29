@@ -357,6 +357,204 @@ const FriendshipManager = {
                 icon: 'error'
             });
         }
+    },
+
+    async cargarAmistades() {
+        try {
+            const response = await fetch('/amistades', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            if (!response.ok) throw new Error('Error al cargar amistades');
+
+            const data = await response.json();
+            const listaAmistades = document.getElementById('listaAmistades');
+            if (!listaAmistades) return;
+
+            if (data.length === 0) {
+                listaAmistades.innerHTML = '<div class="text-center text-muted">No tienes amistades</div>';
+                return;
+            }
+
+            listaAmistades.innerHTML = data.map(amigo => `
+                <div class="list-group-item d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="marco-externo marco-glow ${amigo.rotacion ? 'marco-rotate' : ''}"
+                             style="--glow-color: ${amigo.brillo || '#fff'}; background-image: url('/img/bordes/${amigo.marco ?? 'default.svg'}');">
+                            <img src="${window.getProfileImgPath(amigo.img)}" 
+                                 alt="${amigo.username}"
+                                 style="width:32px;height:32px;object-fit:cover;border-radius:50%;"
+                                 onerror="this.src='${window.getProfileImgPath()}'">
+                        </div>
+                        <span>${amigo.username}</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-sm btn-danger" onclick="window.FriendshipManager.bloquearUsuario(${amigo.id_usuario})">
+                            <i class="fas fa-ban"></i>
+                        </button>
+                        <button class="btn btn-sm btn-warning" onclick="window.FriendshipManager.denunciarUsuario(${amigo.id_usuario})">
+                            <i class="fas fa-flag"></i>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Error al cargar amistades:', error);
+            const listaAmistades = document.getElementById('listaAmistades');
+            if (listaAmistades) {
+                listaAmistades.innerHTML = '<div class="text-center text-danger">Error al cargar amistades</div>';
+            }
+        }
+    },
+
+    async cargarBloqueados() {
+        try {
+            const response = await fetch('/amistades/bloqueados', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            if (!response.ok) throw new Error('Error al cargar bloqueados');
+
+            const data = await response.json();
+            const listaBloqueados = document.getElementById('listaBloqueados');
+            if (!listaBloqueados) return;
+
+            if (data.length === 0) {
+                listaBloqueados.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
+                return;
+            }
+
+            listaBloqueados.innerHTML = data.map(user => `
+                <div class="list-group-item d-flex align-items-center justify-content-between">
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="marco-externo marco-glow ${user.rotacion ? 'marco-rotate' : ''}"
+                             style="--glow-color: ${user.brillo || '#fff'}; background-image: url('/img/bordes/${user.marco ?? 'default.svg'}');">
+                            <img src="${window.getProfileImgPath(user.img)}" 
+                                 alt="${user.username}"
+                                 style="width:32px;height:32px;object-fit:cover;border-radius:50%;"
+                                 onerror="this.src='${window.getProfileImgPath()}'">
+                        </div>
+                        <span>${user.username}</span>
+                    </div>
+                    <button class="btn btn-sm btn-success" onclick="window.FriendshipManager.desbloquearUsuario(${user.id_usuario}, this)">
+                        Desbloquear
+                    </button>
+                </div>
+            `).join('');
+        } catch (error) {
+            console.error('Error al cargar bloqueados:', error);
+            const listaBloqueados = document.getElementById('listaBloqueados');
+            if (listaBloqueados) {
+                listaBloqueados.innerHTML = '<div class="text-center text-danger">Error al cargar usuarios bloqueados</div>';
+            }
+        }
+    },
+
+    async desbloquearUsuario(idUsuario, button) {
+        try {
+            const response = await fetch(`/amistades/desbloquear/${idUsuario}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            if (!response.ok) throw new Error('Error al desbloquear usuario');
+
+            const data = await response.json();
+            if (data.success) {
+                button.closest('.list-group-item').remove();
+                const listaBloqueados = document.getElementById('listaBloqueados');
+                if (listaBloqueados && listaBloqueados.children.length === 0) {
+                    listaBloqueados.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
+                }
+                Swal.fire({
+                    title: '¡Usuario desbloqueado!',
+                    text: 'El usuario ha sido desbloqueado correctamente.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        } catch (error) {
+            console.error('Error al desbloquear usuario:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo desbloquear al usuario',
+                icon: 'error'
+            });
+        }
+    },
+
+    async denunciarUsuario(idUsuario) {
+        try {
+            const { value: formValues } = await Swal.fire({
+                title: 'Reportar usuario',
+                html: `
+                    <div class="mb-3">
+                        <label for="reportTitle" class="form-label">Título del reporte</label>
+                        <input type="text" class="form-control" id="reportTitle" placeholder="Ingrese un título">
+                    </div>
+                    <div class="mb-3">
+                        <label for="reportDescription" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="reportDescription" rows="3" placeholder="Describa el motivo del reporte"></textarea>
+                    </div>
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Enviar reporte',
+                cancelButtonText: 'Cancelar',
+                preConfirm: () => {
+                    const title = document.getElementById('reportTitle').value;
+                    const description = document.getElementById('reportDescription').value;
+                    if (!title || !description) {
+                        Swal.showValidationMessage('Por favor complete todos los campos');
+                        return false;
+                    }
+                    return { title, description };
+                }
+            });
+
+            if (formValues) {
+                const response = await fetch('/reportes/crear', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: JSON.stringify({
+                        id_reportado: idUsuario,
+                        titulo: formValues.title,
+                        descripcion: formValues.description
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    Swal.fire({
+                        title: '¡Reporte enviado!',
+                        text: 'El reporte ha sido enviado correctamente.',
+                        icon: 'success'
+                    });
+                } else {
+                    throw new Error(data.message || 'Error al enviar el reporte');
+                }
+            }
+        } catch (error) {
+            console.error('Error al reportar usuario:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo enviar el reporte',
+                icon: 'error'
+            });
+        }
     }
 };
 
@@ -367,7 +565,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (btnAmistades) {
         btnAmistades.addEventListener('click', () => {
             ModalUtils.mostrarModal(MODAL_CONFIG.modalIds.amistades);
-            window.cargarAmistades();
+            FriendshipManager.cargarAmistades();
         });
     }
 
@@ -401,7 +599,9 @@ document.addEventListener('DOMContentLoaded', async function() {
     // Configurar las pestañas del modal de amistades
     const bloqueadosTab = document.getElementById('bloqueados-tab');
     if (bloqueadosTab) {
-        bloqueadosTab.addEventListener('click', window.cargarBloqueados);
+        bloqueadosTab.addEventListener('click', () => {
+            FriendshipManager.cargarBloqueados();
+        });
     }
 
     // Configurar los event listeners para limpiar los modales al cerrarse
