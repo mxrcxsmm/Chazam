@@ -548,7 +548,7 @@ class ChatManager {
                 },
                 body: JSON.stringify({
                     id_solicitud: idSolicitud,
-                    respuesta: aceptar ? 'aceptar' : 'rechazar'
+                    respuesta: aceptar ? 'aceptada' : 'rechazada'
                 })
             });
 
