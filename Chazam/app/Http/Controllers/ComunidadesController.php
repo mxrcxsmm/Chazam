@@ -246,7 +246,7 @@ class ComunidadesController extends Controller
             // Registrar el pago en la tabla pagos
             \App\Models\Pago::create([
                 'id_comprador' => Auth::id(),
-                'id_producto' => 11, // ID del producto "Crear comunidad"
+                'id_producto' => 13, // ID del producto "Crear comunidad"
                 'fecha_pago' => now()
             ]);
 
