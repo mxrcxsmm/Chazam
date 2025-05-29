@@ -5,13 +5,13 @@ const CHAT_CONFIG = {
     sendUrl: (chatId) => `/user/chat/${chatId}/send`,
     pollingInterval: 4000,        // 4 segundos
     headerRefreshInterval: 30000,  // 30 segundos
-    solicitudesInterval: 60000,    // 1 minuto
     smartPolling: {
         enabled: true,
         idleTimeout: 300000,       // 5 minutos de inactividad
         idleInterval: 120000,      // 2 minutos cuando está inactivo
         activeInterval: 4000       // 4 segundos cuando está activo
-    }
+    },
+    defaultAvatar: '/img/profile_img/avatar-default.png'
 };
 
 // Función utilitaria para obtener la ruta correcta de la imagen de perfil
@@ -26,259 +26,6 @@ function getProfileImgPath(img) {
     return `${window.location.origin}/img/profile_img/${cleanImg}`;
 }
 
-// Función global para cargar solicitudes
-async function cargarSolicitudesAmistad() {
-    try {
-        const response = await fetch('/solicitudes/pendientes', {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            }
-        });
-        if (!response.ok) {
-            throw new Error('Error al cargar las solicitudes');
-        }
-        const data = await response.json();
-        const container = document.getElementById('solicitudesContainer');
-        const noSolicitudes = document.getElementById('noSolicitudes');
-        const solicitudesCount = document.getElementById('solicitudesCount');
-        if (solicitudesCount) solicitudesCount.textContent = data.length;
-        if (data.length === 0) {
-            if (container && noSolicitudes) {
-                noSolicitudes.style.display = 'block';
-                container.innerHTML = '';
-                container.appendChild(noSolicitudes);
-            }
-            return;
-        }
-        if (noSolicitudes) noSolicitudes.style.display = 'none';
-        if (container) container.innerHTML = '';
-        data.forEach(solicitud => {
-            if (!container) return;
-            const solicitudDiv = document.createElement('div');
-            solicitudDiv.className = 'solicitud-item';
-            solicitudDiv.id = `solicitud-${solicitud.id_solicitud}`;
-            const imgPath = getProfileImgPath(solicitud.emisor.img);
-            solicitudDiv.innerHTML = `
-                <div class="solicitud-info">
-                    <div
-                    class="marco-externo marco-glow ${solicitud.emisor.rotacion ? 'marco-rotate' : ''}"
-                    style="
-                        --glow-color: ${solicitud.emisor.brillo || '#fff'};
-                        background-image: url('/img/bordes/${solicitud.emisor.marco ?? 'default.svg'}');
-                        width: 40px;
-                        height: 40px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                    "
-                    >
-                    <img
-                        src="${getProfileImgPath(solicitud.emisor.img)}"
-                        alt="${solicitud.emisor.username}"
-                        class="rounded-circle"
-                        style="width: 32px; height: 32px; object-fit: cover;"
-                        onerror="this.src='${getProfileImgPath()}'"
-                    />
-                    </div>
-                    <span class="solicitud-username">${solicitud.emisor.username}</span>
-                </div>
-                <div class="solicitud-actions">
-                    <button class="btn btn-success btn-sm" title="Aceptar" onclick="responderSolicitud(${solicitud.id_solicitud}, 'aceptada')">
-                    <i class="fas fa-check"></i>
-                    </button>
-                    <button class="btn btn-danger btn-sm" title="Rechazar" onclick="responderSolicitud(${solicitud.id_solicitud}, 'rechazada')">
-                    <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            `;
-            container.appendChild(solicitudDiv);
-        });
-    } catch (error) {
-        console.error('Error al cargar solicitudes:', error);
-        const container = document.getElementById('solicitudesContainer');
-        const noSolicitudes = document.getElementById('noSolicitudes');
-        if (container && noSolicitudes && container.children.length === 0) {
-            noSolicitudes.style.display = 'block';
-            container.innerHTML = '';
-            container.appendChild(noSolicitudes);
-        }
-    }
-}
-
-// Función global para responder solicitudes
-async function responderSolicitud(idSolicitud, respuesta) {
-    try {
-        const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
-        if (!solicitudDiv) return;
-        const buttons = solicitudDiv.querySelectorAll('button');
-        buttons.forEach(btn => btn.disabled = true);
-
-        // Cerrar el modal inmediatamente
-        const modalEl = document.getElementById('solicitudesModal');
-        const modal = bootstrap.Modal.getInstance(modalEl);
-        if (modal) {
-            modal.hide();
-        }
-
-        const response = await fetch('/solicitudes/responder', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-            },
-            body: JSON.stringify({
-                id_solicitud: idSolicitud,
-                respuesta: respuesta
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error('Error al procesar la solicitud');
-        }
-
-        const data = await response.json();
-        if (data.success) {
-            if (data.estado === 'rechazada') {
-                solicitudDiv.remove();
-                const solicitudesCount = document.getElementById('solicitudesCount');
-                const count = parseInt(solicitudesCount.textContent);
-                solicitudesCount.textContent = Math.max(0, count - 1);
-                const container = document.getElementById('solicitudesContainer');
-                if (container.children.length === 0) {
-                    const noSolicitudes = document.getElementById('noSolicitudes');
-                    if (noSolicitudes) {
-                        container.innerHTML = '';
-                        noSolicitudes.style.display = 'block';
-                        container.appendChild(noSolicitudes);
-                    }
-                }
-            } else {
-                const actionsDiv = solicitudDiv.querySelector('.solicitud-actions');
-                actionsDiv.innerHTML = `
-                    <span class="badge bg-success">Aceptada</span>
-                `;
-            }
-
-            if (window.chatManager) {
-                window.chatManager.loadChats();
-            }
-
-            // Mostrar mensaje de éxito después de un pequeño retraso
-            setTimeout(() => {
-                Swal.fire({
-                    title: data.estado === 'aceptada' ? '¡Solicitud aceptada!' : 'Solicitud rechazada',
-                    text: data.estado === 'aceptada' ? 'Ahora son amigxs' : 'La solicitud ha sido rechazada',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            }, 100);
-        } else {
-            throw new Error(data.message || 'Error al procesar la solicitud');
-        }
-    } catch (error) {
-        console.error('Error al responder solicitud:', error);
-        Swal.fire({
-            title: 'Error',
-            text: error.message || 'Ocurrió un error al procesar la solicitud',
-            icon: 'error'
-        });
-        const solicitudDiv = document.getElementById(`solicitud-${idSolicitud}`);
-        if (solicitudDiv) {
-            const buttons = solicitudDiv.querySelectorAll('button');
-            buttons.forEach(btn => btn.disabled = false);
-        }
-    }
-}
-
-// Función global para bloquear usuario
-async function bloquearUsuario(idUsuario) {
-    try {
-        const result = await Swal.fire({
-            title: '¿Bloquear usuario?',
-            text: '¿Estás seguro de que deseas bloquear a este usuario? No podrás ver sus mensajes ni interactuar con él.',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Sí, bloquear',
-            cancelButtonText: 'Cancelar'
-        });
-
-        if (result.isConfirmed) {
-            const response = await fetch(`/amistades/${idUsuario}/bloquear`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                }
-            });
-
-            const data = await response.json();
-            
-            if (data.success) {
-                // Eliminar el chat de la lista
-                const chatItem = document.querySelector(`.chat-item[data-chat-id="${idUsuario}"]`);
-                if (chatItem) {
-                    chatItem.remove();
-                }
-
-                // Actualizar la lista de chats
-                if (window.chatManager) {
-                    await window.chatManager.loadChats();
-                    
-                    // Si estamos en el chat del usuario bloqueado, redirigir a la lista de chats
-                    if (window.chatManager.currentChatId === idUsuario) {
-                        // Limpiar el contenedor de mensajes
-                        const messagesContainer = document.getElementById('messages-container');
-                        if (messagesContainer) {
-                            messagesContainer.innerHTML = '';
-                        }
-                        
-                        // Limpiar el header del chat
-                        const chatHeader = document.getElementById('chat-contact-name');
-                        const chatStatus = document.getElementById('chat-contact-status');
-                        const chatImg = document.getElementById('chat-contact-img');
-                        
-                        if (chatHeader) chatHeader.textContent = 'Selecciona un chat';
-                        if (chatStatus) {
-                            chatStatus.textContent = '';
-                            chatStatus.style.color = '#b9bbbe';
-                        }
-                        if (chatImg) chatImg.src = '/img/profile_img/avatar-default.png';
-                        
-                        // Desactivar el chat actual
-                        window.chatManager.currentChatId = null;
-                        
-                        // Remover la clase active de todos los chats
-                        document.querySelectorAll('.chat-item').forEach(item => {
-                            item.classList.remove('active');
-                        });
-                    }
-                }
-
-                // Mostrar mensaje de éxito
-                await Swal.fire({
-                    title: '¡Usuario bloqueado!',
-                    text: 'El usuario ha sido bloqueado correctamente.',
-                    icon: 'success',
-                    timer: 2000,
-                    showConfirmButton: false
-                });
-            } else {
-                throw new Error(data.message || 'Error al bloquear al usuario');
-            }
-        }
-    } catch (error) {
-        console.error('Error al bloquear usuario:', error);
-        Swal.fire({
-            title: 'Error',
-            text: error.message || 'Ocurrió un error al bloquear al usuario',
-            icon: 'error'
-        });
-    }
-}
-
 // Clase principal del chat
 class ChatManager {
     constructor() {
@@ -288,6 +35,7 @@ class ChatManager {
         this.lastActivity = Date.now();
         this.isActive = true;
         this.elements = {};
+        this.solicitudesIntervalId = null;
         
         // Esperar a que el DOM esté completamente cargado
         if (document.readyState === 'loading') {
@@ -319,8 +67,6 @@ class ChatManager {
             emojiPicker: document.querySelector('emoji-picker'),
             chatsList: document.getElementById('chats-list'),
             messagesContainer: document.getElementById('messages-container'),
-            btnSolicitudesPendientes: document.getElementById('btnSolicitudesPendientes'),
-            solicitudesModal: document.getElementById('solicitudesModal'),
             chatHeader: document.getElementById('chat-contact-name'),
             chatStatus: document.getElementById('chat-contact-status'),
             chatImg: document.getElementById('chat-contact-img')
@@ -344,16 +90,6 @@ class ChatManager {
         this.setupEmojiPicker();
         this.setupWindowResizeHandler();
         this.setupReportHandlers();
-        
-        // Manejar el botón de solicitudes pendientes aquí
-        const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
-        if (btnSolicitudesPendientes) {
-            btnSolicitudesPendientes.addEventListener('click', () => {
-                const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
-                solicitudesModal.show();
-                cargarSolicitudesAmistad();
-            });
-        }
     }
 
     // Renderizado de chats
@@ -369,7 +105,7 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
-        const imgPath = chat.img ? chat.img : '/img/profile_img/avatar-default.png';
+        const imgPath = chat.img ? chat.img : CHAT_CONFIG.defaultAvatar;
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
@@ -382,7 +118,7 @@ class ChatManager {
 
         chatItem.innerHTML = `
             <div class="chat-avatar">
-                <img src="${imgPath}" alt="Avatar" onerror="this.src='/img/profile_img/avatar-default.png'">
+                <img src="${imgPath}" alt="Avatar" onerror="this.src='${CHAT_CONFIG.defaultAvatar}'">
             </div>
             <div class="chat-info">
                 <div class="chat-header">
@@ -398,17 +134,17 @@ class ChatManager {
       
         return chatItem;
     }
-      
 
     // Manejo de selección de chat
     handleChatSelection(chatItem, chat) {
         console.log('Chat seleccionado:', chat); // Log para depuración
-                document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
-                chatItem.classList.add('active');
+        document.querySelectorAll('.chat-item').forEach(item => item.classList.remove('active'));
+        chatItem.classList.add('active');
         this.loadMessages(chat.id_chat);
         this.updateChatHeader(chat);
         this.currentChatId = chat.id_chat;
-        this.currentUserId = chat.id_usuario; // Guardar el ID del usuario actual
+        this.currentUserId = chat.id_usuario || chat.usuario_id || chat.user_id; // Guardar el ID del usuario actual
+        console.log('ID de usuario actual:', this.currentUserId); // Log para depuración
     }
 
     // Renderizado de mensajes
@@ -456,7 +192,7 @@ class ChatManager {
         msgDiv.className = `message ${msg.es_mio ? 'message-own' : ''}`;
         msgDiv.innerHTML = `
             <div class="message-header">
-                <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='${getProfileImgPath()}'">
+                <img src="${imgSrc}" alt="Avatar" class="message-avatar" onerror="this.src='${CHAT_CONFIG.defaultAvatar}'">
                 <span class="message-username">${msg.usuario}</span>
                 <span class="message-time">${msg.fecha_envio}</span>
             </div>
@@ -487,7 +223,7 @@ class ChatManager {
                 }
             }
         } catch (error) {
-                console.error('Error al cargar los chats:', error);
+            console.error('Error al cargar los chats:', error);
         }
     }
 
@@ -527,12 +263,12 @@ class ChatManager {
 
             try {
                 const response = await fetch(CHAT_CONFIG.sendUrl(this.currentChatId), {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: JSON.stringify({ contenido: message })
+                    },
+                    body: JSON.stringify({ contenido: message })
                 });
                 
                 const data = await response.json();
@@ -559,7 +295,7 @@ class ChatManager {
     updateChatHeader(companero) {
         if (!companero) return;
 
-        const defaultAvatar = window.CHAT_CONFIG?.defaultAvatar || '/img/profile_img/avatar-default.png';
+        const defaultAvatar = CHAT_CONFIG.defaultAvatar;
         const isFriend = !!companero.id_usuario;
       
         // Verificar que los elementos existen
@@ -602,60 +338,6 @@ class ChatManager {
         });
     }
 
-    // Configuración de handlers de solicitudes
-    // setupSolicitudesHandlers() {
-    //     if (this.elements.btnSolicitudesPendientes) {
-    //         this.elements.btnSolicitudesPendientes.addEventListener('click', (e) => {
-    //             e.preventDefault();
-    //             
-    //             if (!this.elements.solicitudesModal) {
-    //                 console.error('El modal de solicitudes no existe');
-    //                 return;
-    //             }
-
-    //             const oldModal = bootstrap.Modal.getInstance(this.elements.solicitudesModal);
-    //             if (oldModal) {
-    //                 oldModal.dispose();
-    //             }
-
-    //             const oldBackdrop = document.querySelector('.modal-backdrop');
-    //             if (oldBackdrop) {
-    //                 oldBackdrop.remove();
-    //             }
-
-    //             document.body.classList.remove('modal-open');
-    //             document.body.style.overflow = '';
-    //             document.body.style.paddingRight = '';
-
-    //             try {
-    //                 const solicitudesModal = new bootstrap.Modal(this.elements.solicitudesModal);
-    //                 solicitudesModal.show();
-    //                 cargarSolicitudesAmistad();
-    //             } catch (error) {
-    //                 console.error('Error al inicializar el modal:', error);
-    //             }
-    //         });
-    //         this.actualizarContadorSolicitudes();
-    //     }
-
-    //     if (this.elements.solicitudesModal) {
-    //         let solicitudesInterval;
-    //         this.elements.solicitudesModal.addEventListener('show.bs.modal', () => {
-    //             solicitudesInterval = setInterval(cargarSolicitudesAmistad, CHAT_CONFIG.solicitudesInterval);
-    //         });
-    //         this.elements.solicitudesModal.addEventListener('hidden.bs.modal', () => {
-    //             clearInterval(solicitudesInterval);
-    //             const backdrop = document.querySelector('.modal-backdrop');
-    //             if (backdrop) {
-    //                 backdrop.remove();
-    //             }
-    //             document.body.classList.remove('modal-open');
-    //             document.body.style.overflow = '';
-    //             document.body.style.paddingRight = '';
-    //         });
-    //     }
-    // }
-
     // Configuración del handler de redimensionamiento
     setupWindowResizeHandler() {
         window.addEventListener('resize', () => {
@@ -667,26 +349,7 @@ class ChatManager {
         });
     }
 
-    async actualizarContadorSolicitudes() {
-        // Eliminamos esta función duplicada, friendship_modals.js la manejará
-        // try {
-        //     const response = await fetch('/solicitudes/pendientes', {
-        //         method: 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json',
-        //             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        //         }
-        //     });
-        //     if (!response.ok) return;
-        //     const data = await response.json();
-        //     const solicitudesCount = document.getElementById('solicitudesCount');
-        //     if (solicitudesCount) solicitudesCount.textContent = data.length;
-        // } catch (error) {
-        //     // Silenciar error
-        // }
-    }
-
-    // Nuevo: Sistema de polling inteligente
+    // Sistema de polling inteligente
     startSmartPolling() {
         // Detectar actividad del usuario
         const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
@@ -792,169 +455,150 @@ class ChatManager {
 
     // Configuración de handlers de bloqueo
     setupBlockHandlers() {
-        const blockButtons = document.querySelectorAll('.block-user-btn');
-        blockButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.preventDefault();
-                const userId = button.dataset.userId;
-                if (userId) {
-                    bloquearUsuario(userId);
-                }
-            });
-        });
+        // Eliminar esta sección si la lógica de bloqueo se maneja en friendship_modals.js
     }
 
     // Configuración de handlers de reporte
     setupReportHandlers() {
         const reportButton = document.querySelector('.report-user-btn');
         if (reportButton) {
-            reportButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (!this.currentChatId) return;
-
-                // Obtener el chat actual
-                const currentChat = this.chats.find(chat => chat.id_chat === this.currentChatId);
-                console.log('Chat actual para reporte:', currentChat); // Log para depuración
-
-                if (!currentChat) {
+            reportButton.addEventListener('click', async () => {
+                if (!this.currentUserId) {
                     Swal.fire({
                         title: 'Error',
-                        text: 'No se pudo encontrar la información del usuario',
-                        icon: 'error'
+                        text: 'Selecciona un chat para reportar al usuario',
+                        icon: 'warning'
                     });
                     return;
                 }
 
-                // Obtener el ID del usuario reportado del elemento del chat
-                const chatElement = document.querySelector(`.chat-item[data-chat-id="${this.currentChatId}"]`);
-                const idReportado = chatElement ? chatElement.dataset.userId : null;
-                console.log('ID del usuario a reportar:', idReportado); // Log para depuración
-
-                if (!idReportado) {
-                    // Si no encontramos el ID en el dataset, intentar obtenerlo del chat actual
-                    const idFromChat = currentChat.id_usuario || currentChat.usuario_id || currentChat.user_id;
-                    if (!idFromChat) {
-                        Swal.fire({
-                            title: 'Error',
-                            text: 'No se pudo identificar al usuario a reportar',
-                            icon: 'error'
-                        });
-                        return;
-                    }
-                    idReportado = idFromChat;
-                }
-
-                Swal.fire({
-                    title: 'Reportar usuario',
-                    html: `
-                        <div class="mb-3">
-                            <label for="reportTitle" class="form-label">Título del reporte</label>
-                            <input type="text" class="form-control" id="reportTitle" placeholder="Ingrese un título">
-                        </div>
-                        <div class="mb-3">
-                            <label for="reportDescription" class="form-label">Descripción</label>
-                            <textarea class="form-control" id="reportDescription" rows="3" placeholder="Describa el motivo del reporte"></textarea>
-                        </div>
-                    `,
-                    showCancelButton: true,
-                    confirmButtonText: 'Enviar reporte',
-                    cancelButtonText: 'Cancelar',
-                    preConfirm: () => {
-                        const title = document.getElementById('reportTitle').value;
-                        const description = document.getElementById('reportDescription').value;
-                        if (!title || !description) {
-                            Swal.showValidationMessage('Por favor complete todos los campos');
-                            return false;
+                try {
+                    const { value: formValues } = await Swal.fire({
+                        title: 'Reportar usuario',
+                        html: `
+                            <div class="mb-3">
+                                <label for="reportTitle" class="form-label">Título del reporte</label>
+                                <input type="text" class="form-control" id="reportTitle" placeholder="Ingrese un título">
+                            </div>
+                            <div class="mb-3">
+                                <label for="reportDescription" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="reportDescription" rows="3" placeholder="Describa el motivo del reporte"></textarea>
+                            </div>
+                        `,
+                        focusConfirm: false,
+                        showCancelButton: true,
+                        confirmButtonText: 'Enviar reporte',
+                        cancelButtonText: 'Cancelar',
+                        preConfirm: () => {
+                            const title = document.getElementById('reportTitle').value;
+                            const description = document.getElementById('reportDescription').value;
+                            if (!title || !description) {
+                                Swal.showValidationMessage('Por favor complete todos los campos');
+                                return false;
+                            }
+                            return { title, description };
                         }
-                        return { title, description };
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        console.log('Enviando reporte para usuario:', idReportado); // Log para depuración
-                        fetch('/reportes/crear', {
+                    });
+
+                    if (formValues) {
+                        const response = await fetch('/reportes/crear', {
                             method: 'POST',
                             headers: {
                                 'Content-Type': 'application/json',
                                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                             },
                             body: JSON.stringify({
-                                id_reportado: idReportado,
-                                titulo: result.value.title,
-                                descripcion: result.value.description
+                                id_reportado: this.currentUserId,
+                                titulo: formValues.title,
+                                descripcion: formValues.description
                             })
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            console.log('Respuesta del servidor:', data); // Log para depuración
-                            if (data.success) {
-                                Swal.fire({
-                                    title: '¡Reporte enviado!',
-                                    text: 'El reporte ha sido enviado correctamente.',
-                                    icon: 'success'
-                                });
-                            } else {
-                                Swal.fire({
-                                    title: 'Error',
-                                    text: data.message || 'No se pudo enviar el reporte.',
-                                    icon: 'error'
-                                });
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error al enviar reporte:', error);
-                            Swal.fire({
-                                title: 'Error',
-                                text: 'Ocurrió un error al enviar el reporte.',
-                                icon: 'error'
-                            });
                         });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            Swal.fire({
+                                title: '¡Reporte enviado!',
+                                text: 'El reporte ha sido enviado correctamente.',
+                                icon: 'success'
+                            });
+                        } else {
+                            throw new Error(data.message || 'Error al enviar el reporte');
+                        }
                     }
-                });
+                } catch (error) {
+                    console.error('Error al reportar usuario:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'No se pudo enviar el reporte',
+                        icon: 'error'
+                    });
+                }
             });
         }
     }
 
-    // Configuración de handlers de búsqueda
-    // setupSearchHandlers() {
-    //     const searchInput = document.getElementById('searchUserInput');
-    //     const searchResults = document.getElementById('searchResults');
-    //     let searchTimeout;
+    async cargarSolicitudesAmistad() {
+        if (window.FriendshipManager && window.FriendshipManager.cargarSolicitudesAmistad) {
+            return window.FriendshipManager.cargarSolicitudesAmistad();
+        }
+        console.warn('FriendshipManager no está disponible');
+    }
 
-    //     if (searchInput) {
-    //         searchInput.addEventListener('input', (e) => {
-    //             clearTimeout(searchTimeout);
-    //             const query = e.target.value.trim();
-
-    //             if (query.length < 3) {
-    //                 searchResults.innerHTML = '<div class="text-center text-muted">Ingresa al menos 3 caracteres para buscar</div>';
-    //                 return;
-    //             }
-
-    //             searchTimeout = setTimeout(() => {
-    //                 this.searchUsers(query);
-    //             }, 300);
-    //         });
-    //     }
-    // }
-
-    // Función para buscar usuarios
-    // async searchUsers(query) { ... }
-
-    // Función para enviar solicitud de amistad
-    // async sendFriendRequest(userId, button) { ... }
+    async responderSolicitud(idSolicitud, aceptar) {
+        if (window.FriendshipManager && window.FriendshipManager.responderSolicitud) {
+            return window.FriendshipManager.responderSolicitud(idSolicitud, aceptar);
+        }
+        console.warn('FriendshipManager no está disponible');
+    }
 }
 
 // Inicialización cuando el DOM está listo
 document.addEventListener('DOMContentLoaded', () => {
     window.chatManager = new ChatManager();
-    window.bloquearUsuario = bloquearUsuario;
-    window.cargarSolicitudesAmistad = cargarSolicitudesAmistad;
-    window.responderSolicitud = responderSolicitud;
+
+    // Configurar el modal de solicitudes
+    const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
+    if (btnSolicitudesPendientes) {
+        btnSolicitudesPendientes.addEventListener('click', () => {
+            const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
+            solicitudesModal.show();
+            if (window.FriendshipManager) {
+                window.FriendshipManager.cargarSolicitudesAmistad();
+            }
+        });
+    }
+
+    // Gestionar el modal de solicitudes
+    const solicitudesModalEl = document.getElementById('solicitudesModal');
+    if (solicitudesModalEl) {
+        let solicitudesInterval;
+        solicitudesModalEl.addEventListener('show.bs.modal', () => {
+            if (window.FriendshipManager) {
+                window.FriendshipManager.cargarSolicitudesAmistad();
+                // Iniciar polling de solicitudes solo cuando el modal está abierto
+                solicitudesInterval = setInterval(() => 
+                    window.FriendshipManager.cargarSolicitudesAmistad(), 30000);
+            }
+        });
+        solicitudesModalEl.addEventListener('hidden.bs.modal', () => {
+            // Limpiar polling de solicitudes al cerrar el modal
+            if (solicitudesInterval) {
+                clearInterval(solicitudesInterval);
+                solicitudesInterval = null;
+                console.log('Intervalo de solicitudes detenido al cerrar modal.');
+            }
+        });
+    }
+
+    // Cargar solicitudes inicialmente
+    if (window.FriendshipManager) {
+        window.FriendshipManager.cargarSolicitudesAmistad();
+    }
 });
 
 // Añadir estilos CSS para las animaciones
-const style = document.createElement('style');
-style.textContent = `
+const chatStyles = document.createElement('style');
+chatStyles.textContent = `
     .typing-indicator {
         padding: 10px;
         color: #666;
@@ -980,49 +624,4 @@ style.textContent = `
         transform: translateX(5px);
     }
 `;
-document.head.appendChild(style);
-
-function cargarBloqueados() {
-    fetch('/amistades/bloqueados')
-        .then(res => res.json())
-        .then(bloqueados => {
-            const lista = document.getElementById('listaBloqueados');
-            lista.innerHTML = '';
-            if (bloqueados.length === 0) {
-                lista.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
-            } else {
-                bloqueados.forEach(user => {
-                    const imgPath = getProfileImgPath(user.img);
-                    const item = document.createElement('div');
-                    item.className = 'list-group-item d-flex align-items-center justify-content-between';
-                    item.innerHTML = `
-                        <div class="d-flex align-items-center gap-2">
-                            <img src="${imgPath}" style="width:32px;height:32px;object-fit:cover;border-radius:50%;">
-                            <span>${user.username}</span>
-                        </div>
-                        <button class="btn btn-sm btn-danger" onclick="desbloquearUsuario(${user.id_usuario}, this)">Desbloquear</button>
-                    `;
-                    lista.appendChild(item);
-                });
-            }
-        });
-}
-function desbloquearUsuario(id, btn) {
-    fetch('/amistades/desbloquear', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': document.querySelector('meta[name=\"csrf-token\"]').content
-        },
-        body: JSON.stringify({id_usuario: id})
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            btn.closest('.list-group-item').remove();
-        }
-    });
-}
-
-// Llama a cargarBloqueados cuando se abre el modal o se cambia de pestaña
-document.getElementById('bloqueados-tab').addEventListener('click', cargarBloqueados);
+document.head.appendChild(chatStyles);

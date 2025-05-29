@@ -103,21 +103,6 @@
     </div>
 </div>
 
-<!-- Modal de Solicitudes optimizado -->
-<div class="modal fade" id="solicitudesModal" tabindex="-1" aria-labelledby="solicitudesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header" style="background:#9147ff; color:#fff;">
-                <h5 class="modal-title" id="solicitudesModalLabel">Solicitudes de Amistad</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="solicitudesContainer">
-                <div id="noSolicitudes" style="display:none;">No tienes solicitudes pendientes</div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Modal de confirmación -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -132,6 +117,26 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                 <button type="button" class="btn btn-primary" id="confirmActionBtn">Confirmar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de solicitudes -->
+<div class="modal fade" id="solicitudesModal" tabindex="-1" aria-labelledby="solicitudesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="solicitudesModalLabel">Solicitudes de amistad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="solicitudesContainer">
+                    <!-- Las solicitudes se cargarán aquí dinámicamente -->
+                </div>
+                <div id="noSolicitudes" class="text-center text-muted" style="display: none;">
+                    No tienes solicitudes pendientes
+                </div>
             </div>
         </div>
     </div>
@@ -161,14 +166,35 @@
   .btn-icon:hover {
     color: #fff; background: #9147ff33; border-radius: 50%;
   }
+  .marco-externo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    transition: all 0.3s ease;
+  }
+  .marco-glow {
+    box-shadow: 0 0 10px var(--glow-color, #fff);
+  }
+  .marco-rotate {
+    animation: rotate 10s linear infinite;
+  }
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 </style>
 
 <!-- Scripts -->
+<script src="{{ asset('js/friendship_modals.js') }}"></script>
 <script src="{{ asset('js/chatamig.js') }}"></script>
 <script src="{{ asset('js/hamburgerAmig.js') }}"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
 @push('scripts')
-    <script src="{{ asset('js/chatamig.js') }}"></script>
     {{-- Otros scripts específicos de friendchat --}}
 @endpush
