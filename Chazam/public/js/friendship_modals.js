@@ -663,6 +663,20 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 
-// Exportar funciones al objeto global
+// Exportar objetos al objeto global
 window.ModalUtils = ModalUtils;
 window.FriendshipManager = FriendshipManager;
+// Exportar funciones de amistad individuales para compatibilidad con onclick en algunos blade files si es necesario
+window.cargarAmistades = FriendshipManager.cargarAmistades;
+window.eliminarAmigo = FriendshipManager.eliminarAmigo;
+window.bloquearUsuario = FriendshipManager.bloquearUsuario;
+window.desbloquearUsuario = FriendshipManager.desbloquearUsuario;
+window.denunciarUsuario = FriendshipManager.denunciarUsuario;
+window.searchUsers = FriendshipManager.searchUsers;
+window.sendFriendRequest = FriendshipManager.sendFriendRequest;
+window.cargarBloqueados = FriendshipManager.cargarBloqueados;
+window.mostrarModal = ModalUtils.mostrarModal;
+window.limpiarModal = ModalUtils.limpiarModal;
+
+// Si getProfileImgPath se usa fuera de FriendshipManager o ModalUtils y no está en otro archivo central, exportarla aquí también.
+// window.getProfileImgPath = getProfileImgPath; // Asumiendo que ya está en otro archivo base o se moverá allí

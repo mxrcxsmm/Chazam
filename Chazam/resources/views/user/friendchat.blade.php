@@ -154,6 +154,6 @@
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
 @push('scripts')
-    <script src="{{ asset('js/chatamig.js') }}"></script>
+    {{-- <script src="{{ asset('js/chatamig.js') }}"></script> --}}
     {{-- Otros scripts específicos de friendchat --}}
 @endpush
