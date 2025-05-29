@@ -163,6 +163,9 @@ function limpiarModal(modalId) {
     
     const modal = bootstrap.Modal.getInstance(modalEl);
     if (modal) {
+        // Remover el atributo aria-hidden antes de cerrar
+        modalEl.removeAttribute('aria-hidden');
+        
         modal.hide();
         // Eliminar el backdrop
         const backdrop = document.querySelector('.modal-backdrop');
@@ -358,6 +361,59 @@ async function responderSolicitud(idSolicitud, respuesta) {
     }
 }
 
+// Función para bloquear usuario
+async function bloquearUsuario(idUsuario) {
+    try {
+        const result = await Swal.fire({
+            title: '¿Bloquear usuario?',
+            text: '¿Estás seguro de que deseas bloquear a este usuario?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, bloquear',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            const response = await fetch(`/amistades/${idUsuario}/bloquear`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Error al bloquear al usuario');
+            }
+
+            const data = await response.json();
+            
+            if (data.success) {
+                // Actualizar la lista de amigos
+                await cargarAmistades();
+                
+                // Mostrar mensaje de éxito
+                Swal.fire({
+                    title: '¡Usuario bloqueado!',
+                    text: 'El usuario ha sido bloqueado correctamente.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            } else {
+                throw new Error(data.message || 'Error al bloquear al usuario');
+            }
+        }
+    } catch (error) {
+        console.error('Error al bloquear usuario:', error);
+        Swal.fire({
+            title: 'Error',
+            text: error.message || 'Ocurrió un error al bloquear al usuario',
+            icon: 'error'
+        });
+    }
+}
+
 // Función para desbloquear usuario
 async function desbloquearUsuario(idUsuario) {
     try {
@@ -378,6 +434,10 @@ async function desbloquearUsuario(idUsuario) {
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
             });
+
+            if (!response.ok) {
+                throw new Error('Error al desbloquear al usuario');
+            }
 
             const data = await response.json();
             
