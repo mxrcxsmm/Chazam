@@ -139,8 +139,7 @@ class ChatManager {
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
     
         return chatItem;
-    }
-    
+    }    
 
     // Manejo de selección de chat
     handleChatSelection(chatItem, chat) {
