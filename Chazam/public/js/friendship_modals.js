@@ -645,7 +645,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (btnSolicitudesPendientes) {
         btnSolicitudesPendientes.addEventListener('click', () => {
             ModalUtils.mostrarModal(MODAL_CONFIG.modalIds.solicitudes);
-            window.cargarSolicitudesAmistad();
+            // Usar la referencia desde el objeto global si es necesario, aunque cargarSolicitudesAmistad debería estar dentro de FriendshipManager
+            if (window.FriendshipManager && window.FriendshipManager.cargarSolicitudesAmistad) {
+                 window.FriendshipManager.cargarSolicitudesAmistad();
+            } else if (window.cargarSolicitudesAmistad) { // Mantener por si acaso aún se usa la función global antigua
+                 window.cargarSolicitudesAmistad();
+            }
         });
     }
 
@@ -654,7 +659,12 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (solicitudesModal) {
         let solicitudesInterval;
         solicitudesModal.addEventListener('show.bs.modal', () => {
-            solicitudesInterval = setInterval(window.cargarSolicitudesAmistad, MODAL_CONFIG.solicitudesInterval);
+             // Usar la referencia desde el objeto global si es necesario
+             if (window.FriendshipManager && window.FriendshipManager.cargarSolicitudesAmistad) {
+                  solicitudesInterval = setInterval(window.FriendshipManager.cargarSolicitudesAmistad, MODAL_CONFIG.solicitudesInterval);
+             } else if (window.cargarSolicitudesAmistad) { // Mantener por si acaso
+                  solicitudesInterval = setInterval(window.cargarSolicitudesAmistad, MODAL_CONFIG.solicitudesInterval);
+             }
         });
         solicitudesModal.addEventListener('hidden.bs.modal', () => {
             clearInterval(solicitudesInterval);
@@ -663,7 +673,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 });
 
-// Exportar objetos al objeto global
+// Asegurar que los objetos globales existan antes de asignar funciones a window
+window.ModalUtils = window.ModalUtils || {};
+window.FriendshipManager = window.FriendshipManager || {};
+
+// Exportar objetos al objeto global (redundante pero por seguridad)
 window.ModalUtils = ModalUtils;
 window.FriendshipManager = FriendshipManager;
 // Exportar funciones de amistad individuales para compatibilidad con onclick en algunos blade files si es necesario
