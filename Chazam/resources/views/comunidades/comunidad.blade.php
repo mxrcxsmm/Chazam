@@ -517,6 +517,11 @@ body, html {
 <!-- Scripts para el chat -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    // Función para obtener la ruta correcta de la imagen de perfil
+    function getProfileImagePath(imgName) {
+        return `/img/profile_img/${imgName}`;
+    }
+
     const messageForm = document.getElementById('message-form');
     const messageInput = document.getElementById('message-input');
     const chatMessages = document.getElementById('chat-messages');
@@ -556,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h3>Creador</h3>
                 <div class="member-creator ${data.creator.id_usuario == {{ Auth::id() }} ? 'online' : data.creator.status}">
                     <div class="member-info">
-                        <img src="${data.creator.img}" alt="${data.creator.username}">
+                        <img src="${getProfileImagePath(data.creator.img)}" alt="${data.creator.username}" onerror="this.src='/img/profile_img/avatar-default.png'">
                         <div class="member-details">
                             <span class="member-name">${data.creator.username}</span>
                             <span class="member-role">Creador</span>
@@ -575,7 +580,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     ${data.members.map(member => `
                         <div class="member-item ${member.id_usuario == {{ Auth::id() }} ? 'online' : member.status}">
                             <div class="member-info">
-                                <img src="${member.img}" alt="${member.username}">
+                                <img src="${getProfileImagePath(member.img)}" alt="${member.username}" onerror="this.src='/img/profile_img/avatar-default.png'">
                                 <div class="member-details">
                                     <span class="member-name">${member.username}</span>
                                 </div>
@@ -628,7 +633,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <h3>Creador</h3>
                 <div class="member-creator ${creator.id_usuario == {{ Auth::id() }} ? 'online' : creator.status}">
                     <div class="member-info">
-                        <img src="${creator.img}" alt="${creator.username}">
+                        <img src="${getProfileImagePath(creator.img)}" alt="${creator.username}" onerror="this.src='/img/profile_img/avatar-default.png'">
                         <div class="member-details">
                             <span class="member-name">${creator.username}</span>
                             <span class="member-role">Creador</span>
@@ -648,7 +653,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 ${members.map(member => `
                     <div class="member-item ${member.id_usuario == {{ Auth::id() }} ? 'online' : member.status}">
                         <div class="member-info">
-                            <img src="${member.img}" alt="${member.username}">
+                            <img src="${getProfileImagePath(member.img)}" alt="${member.username}" onerror="this.src='/img/profile_img/avatar-default.png'">
                             <div class="member-details">
                                 <span class="member-name">${member.username}</span>
                             </div>
@@ -732,7 +737,7 @@ document.addEventListener('DOMContentLoaded', function() {
         messageElement.className = 'message';
         messageElement.innerHTML = `
             <div class="message-avatar">
-                <img src="${message.img}" alt="${message.usuario}">
+                <img src="${getProfileImagePath(message.img)}" alt="${message.usuario}" onerror="this.src='/img/profile_img/avatar-default.png'">
             </div>
             <div class="message-content">
                 <div class="message-header">
