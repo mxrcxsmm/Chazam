@@ -105,27 +105,42 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
+        // 1) Ruta del avatar (fondo por defecto si no hay img)
         const imgPath = chat.img || CHAT_CONFIG.defaultAvatar;
-        const marco = chat.marco || 'default.svg';
-        const brillo = chat.brillo || null;
-        const rotacion = chat.rotacion ? 'marco-rotate' : '';
     
+        // 2) Nombre de archivo del marco, con fallback
+        const marcoFile = chat.marco || 'default.svg';
+    
+        // 3) Origen del dominio (p.ej. "https://g04.daw2j23.es")
+        const origin = window.location.origin;
+    
+        // 4) URL absoluta al SVG del marco
+        const marcoUrl = `${origin}/img/bordes/${marcoFile}`;
+    
+        // 5) Brillo y rotación
+        const brillo = chat.brillo || null;
+        const rotacionClass = chat.rotacion ? 'marco-rotate' : '';
+        const glowStyle = brillo ? `--glow-color: ${brillo};` : '';
+    
+        // 6) Construcción del elemento
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
         chatItem.dataset.userId = chat.id_usuario || chat.usuario_id || chat.user_id;
     
-        // Estructura del avatar con marco y brillo
-        const glowStyle = brillo ? `--glow-color: ${brillo};` : '';
+        // 7) HTML del avatar con marco
         const avatarHTML = `
             <div class="chat-avatar">
-                <div class="marco-externo marco-glow ${rotacion}"
-                    style="background-image: url('/img/bordes/${marco}'); ${glowStyle}">
-                    <img src="${imgPath}" alt="Avatar" onerror="this.src='${CHAT_CONFIG.defaultAvatar}'">
+                <div class="marco-externo marco-glow ${rotacionClass}"
+                     style="background-image: url('${marcoUrl}'); ${glowStyle}">
+                    <img src="${imgPath}"
+                         alt="Avatar"
+                         onerror="this.src='${CHAT_CONFIG.defaultAvatar}'">
                 </div>
             </div>
-        `;    
+        `;
     
+        // 8) Resto de la info del chat
         chatItem.innerHTML = `
             ${avatarHTML}
             <div class="chat-info">
@@ -137,11 +152,11 @@ class ChatManager {
             </div>
         `;
     
-        // Click handler
+        // 9) Handler de click
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
     
         return chatItem;
-    }    
+    }       
 
     // Manejo de selección de chat
     handleChatSelection(chatItem, chat) {
