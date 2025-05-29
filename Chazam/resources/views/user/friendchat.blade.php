@@ -122,6 +122,26 @@
     </div>
 </div>
 
+<!-- Modal de solicitudes -->
+<div class="modal fade" id="solicitudesModal" tabindex="-1" aria-labelledby="solicitudesModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="solicitudesModalLabel">Solicitudes de amistad</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="solicitudesContainer">
+                    <!-- Las solicitudes se cargarán aquí dinámicamente -->
+                </div>
+                <div id="noSolicitudes" class="text-center text-muted" style="display: none;">
+                    No tienes solicitudes pendientes
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- Recursos externos optimizados -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <link rel="stylesheet" href="{{ asset('css/chatamig.css') }}">
@@ -151,6 +171,7 @@
 <!-- Scripts -->
 <script src="{{ asset('js/chatamig.js') }}"></script>
 <script src="{{ asset('js/hamburgerAmig.js') }}"></script>
+<script src="{{ asset('js/friendship_modals.js') }}"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
 @push('scripts')
