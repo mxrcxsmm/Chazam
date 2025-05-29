@@ -358,10 +358,54 @@ async function responderSolicitud(idSolicitud, respuesta) {
     }
 }
 
+// Función para cargar usuarios bloqueados
+async function cargarBloqueados() {
+    try {
+        const response = await fetch('/amistades/bloqueados');
+        if (!response.ok) throw new Error('Error al cargar usuarios bloqueados');
+        
+        const data = await response.json();
+        const listaBloqueados = document.getElementById('listaBloqueados');
+        
+        if (!listaBloqueados) return;
+        
+        if (data.length === 0) {
+            listaBloqueados.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
+            return;
+        }
+
+        listaBloqueados.innerHTML = data.map(usuario => `
+            <div class="list-group-item d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="marco-externo marco-glow ${usuario.rotacion ? 'marco-rotate' : ''}"
+                         style="--glow-color: ${usuario.brillo || '#fff'}; background-image: url('/img/bordes/${usuario.marco ?? 'default.svg'}');">
+                        <img src="${getProfileImgPath(usuario.img)}" 
+                             alt="${usuario.username}" 
+                             class="rounded-circle"
+                             style="width: 32px; height: 32px; object-fit: cover;"
+                             onerror="this.src='${getProfileImgPath()}'">
+                    </div>
+                    <span>${usuario.username}</span>
+                </div>
+                <button class="btn btn-sm btn-outline-danger" onclick="desbloquearUsuario(${usuario.id_usuario})">
+                    <i class="fas fa-unlock"></i> Desbloquear
+                </button>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error al cargar usuarios bloqueados:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'No se pudieron cargar los usuarios bloqueados',
+            icon: 'error'
+        });
+    }
+}
+
 // Función para cargar amistades
 async function cargarAmistades() {
     try {
-        const response = await fetch('/amistades/lista');
+        const response = await fetch('/amistades');
         if (!response.ok) throw new Error('Error al cargar amistades');
         
         const data = await response.json();
@@ -595,16 +639,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     });
 });
 
-// Exportar funciones necesarias globalmente
-window.cargarSolicitudesAmistad = cargarSolicitudesAmistad;
-window.responderSolicitud = responderSolicitud;
-window.limpiarModal = limpiarModal;
-window.mostrarModal = mostrarModal;
-window.searchUsers = searchUsers;
-window.cargarAmistades = cargarAmistades;
+// Exportar funciones al objeto global
 window.cargarBloqueados = cargarBloqueados;
-window.bloquearUsuario = bloquearUsuario;
 window.desbloquearUsuario = desbloquearUsuario;
-window.eliminarAmigo = eliminarAmigo;
+window.cargarAmistades = cargarAmistades;
+window.searchUsers = searchUsers;
 window.sendFriendRequest = sendFriendRequest;
+window.bloquearUsuario = bloquearUsuario;
+window.denunciarUsuario = denunciarUsuario;
+window.mostrarModal = mostrarModal;
+window.cleanupModals = cleanupModals;
 window.getProfileImgPath = getProfileImgPath;
