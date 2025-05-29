@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1:3306
--- Tiempo de generación: 28-05-2025 a las 16:31:16
--- Versión del servidor: 9.1.0
--- Versión de PHP: 8.3.14
+-- Tiempo de generación: 29-05-2025 a las 09:01:19
+-- Versión del servidor: 8.3.0
+-- Versión de PHP: 8.2.18
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -79,10 +79,10 @@ CREATE TABLE IF NOT EXISTS `chats` (
 --
 
 INSERT INTO `chats` (`id_chat`, `creator`, `fecha_creacion`, `img`, `nombre`, `tipocomunidad`, `codigo`, `descripcion`, `id_reto`, `created_at`, `updated_at`) VALUES
-(1, 1, '2025-05-28 18:31:02', 'php.jpg', 'Programadores PHP', 'publica', NULL, 'Comunidad para discutir sobre desarrollo en PHP, Laravel y frameworks relacionados.', NULL, '2025-05-28 16:31:02', '2025-05-28 16:31:02'),
-(2, 1, '2025-05-28 18:31:02', 'gamers.jpg', 'Gamers Chazam', 'publica', NULL, 'Comunidad para gamers que quieren compartir sus experiencias y organizar partidas.', NULL, '2025-05-28 16:31:02', '2025-05-28 16:31:02'),
-(3, 1, '2025-05-28 18:31:02', 'music_art.jpg', 'Música y Arte', 'publica', NULL, 'Espacio para compartir y discutir sobre música, arte y cultura en general.', NULL, '2025-05-28 16:31:02', '2025-05-28 16:31:02'),
-(4, 1, '2025-05-28 18:31:02', 'secret.jpg', 'Comunidad Cerrada', 'privada', 'CHAZAM2024', 'Comunidad privada para miembros selectos.', NULL, '2025-05-28 16:31:02', '2025-05-28 16:31:02');
+(1, 1, '2025-05-29 10:59:33', 'php.jpg', 'Programadores PHP', 'publica', NULL, 'Comunidad para discutir sobre desarrollo en PHP, Laravel y frameworks relacionados.', NULL, '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(2, 1, '2025-05-29 10:59:33', 'gamers.jpg', 'Gamers Chazam', 'publica', NULL, 'Comunidad para gamers que quieren compartir sus experiencias y organizar partidas.', NULL, '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(3, 1, '2025-05-29 10:59:33', 'music_art.jpg', 'Música y Arte', 'publica', NULL, 'Espacio para compartir y discutir sobre música, arte y cultura en general.', NULL, '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(4, 1, '2025-05-29 10:59:33', 'secret.jpg', 'Comunidad Cerrada', 'privada', 'CHAZAM2024', 'Comunidad privada para miembros selectos.', NULL, '2025-05-29 08:59:33', '2025-05-29 08:59:33');
 
 -- --------------------------------------------------------
 
@@ -360,7 +360,21 @@ CREATE TABLE IF NOT EXISTS `personalizacion` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id_personalizacion`),
   KEY `personalizacion_id_usuario_foreign` (`id_usuario`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+--
+-- Volcado de datos para la tabla `personalizacion`
+--
+
+INSERT INTO `personalizacion` (`id_personalizacion`, `id_usuario`, `marco`, `rotacion`, `brillo`, `sidebar`, `created_at`, `updated_at`) VALUES
+(1, 1, 'default.svg', 0, NULL, '#4B0082', '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(2, 2, 'default.svg', 0, NULL, '#4B0082', '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(3, 7, 'default.svg', 0, NULL, '#4B0082', '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(4, 3, 'default.svg', 0, NULL, '#4B0082', '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(5, 4, 'default.svg', 0, NULL, '#4B0082', '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(6, 5, 'default.svg', 0, NULL, '#4B0082', '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(7, 6, 'default.svg', 0, NULL, '#4B0082', '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(8, 8, 'default.svg', 0, NULL, '#4B0082', '2025-05-29 08:59:33', '2025-05-29 08:59:33');
 
 -- --------------------------------------------------------
 
@@ -381,7 +395,7 @@ CREATE TABLE IF NOT EXISTS `productos` (
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id_producto`),
   KEY `productos_id_tipo_producto_foreign` (`id_tipo_producto`)
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `productos`
@@ -401,7 +415,22 @@ INSERT INTO `productos` (`id_producto`, `titulo`, `descripcion`, `precio`, `tipo
 (11, 'Usuario miembro con puntos', 'Usuario miembro con 15000 puntos.', 15000.00, 'puntos', 15000, 1, NULL, NULL),
 (12, 'Mejorar skips con puntos', 'Mejorar skips con 60000 puntos.', 60000.00, 'puntos', 60000, 2, NULL, NULL),
 (13, 'Comunidad', 'Creación de una comunidad.', 75000.00, 'puntos', NULL, 5, NULL, NULL),
-(14, 'Donacion', 'Donacion a la plataforma.', 0.00, 'euros', NULL, 4, NULL, NULL);
+(14, 'Donacion', 'Donacion a la plataforma.', 0.00, 'euros', NULL, 4, NULL, NULL),
+(15, 'Marco Clásico', 'default.svg', 0.00, 'puntos', 0, 4, NULL, NULL),
+(16, 'Marco Azul Suave', 'azuul.svg', 120.00, 'puntos', 120, 4, NULL, NULL),
+(17, 'Marco Azul Champions', 'azul-champions.svg', 120.00, 'puntos', 120, 4, NULL, NULL),
+(18, 'Marco Rojinegro', 'circle-rojonegro.svg', 130.00, 'puntos', 130, 4, NULL, NULL),
+(19, 'Marco Cromado', 'cromado.svg', 150.00, 'puntos', 150, 4, NULL, NULL),
+(20, 'Marco Cromado Normal', 'cromado-normal.svg', 140.00, 'puntos', 140, 4, NULL, NULL),
+(21, 'Marco Cromado Pequeño', 'cromado-peque.svg', 130.00, 'puntos', 130, 4, NULL, NULL),
+(22, 'Marco Estrellas Cutres', 'cutre-estrellas.svg', 110.00, 'puntos', 110, 4, NULL, NULL),
+(23, 'Marco Golden Champions', 'golden-champions.svg', 160.00, 'puntos', 160, 4, NULL, NULL),
+(24, 'Marco Wave Haikei', 'wave-haikei.svg', 125.00, 'puntos', 125, 4, NULL, NULL),
+(25, 'Marco Estrellas Haikei', 'estrellas-haikei.svg', 125.00, 'puntos', 125, 4, NULL, NULL),
+(26, 'Marco Rotatorio', 'Activa la rotación de tu marco.', 80.00, 'puntos', 80, 4, NULL, NULL),
+(27, 'Marco Estático', 'Desactiva la rotación de tu marco.', 0.00, 'puntos', 0, 4, NULL, NULL),
+(28, 'Brillo de Marco', 'Añade un resplandor de color a tu marco.', 90.00, 'puntos', 90, 4, NULL, NULL),
+(29, 'Color de Sidebar', 'Personaliza el color de tu menú lateral.', 100.00, 'puntos', 100, 4, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -445,10 +474,10 @@ CREATE TABLE IF NOT EXISTS `retos` (
 --
 
 INSERT INTO `retos` (`id_reto`, `nom_reto`, `desc_reto`, `created_at`, `updated_at`) VALUES
-(1, 'Hoy toca hablar con emojis', 'Usa SOLO emojis para comunicarte. ¿Podrán entenderte? ¡Sé creativo con tus combinaciones!', '2025-05-28 16:31:02', '2025-05-28 16:31:02'),
-(2, 'Mensaje encriptado', '¡Algunos carácteres están cifrados! ¿Podrás conseguir comunicarte con tu pareja?', '2025-05-28 16:31:02', '2025-05-28 16:31:02'),
-(3, 'Desorden absoluto', 'Vuestras frases se enviarán desordenadas, intentad descifrar el mensaje original', '2025-05-28 16:31:02', '2025-05-28 16:31:02'),
-(4, 'Boca abajo', 'Vuestro texto estará boca abajo ¡no forzéis mucho el cuello!', '2025-05-28 16:31:02', '2025-05-28 16:31:02');
+(1, 'Hoy toca hablar con emojis', 'Usa SOLO emojis para comunicarte. ¿Podrán entenderte? ¡Sé creativo con tus combinaciones!', '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(2, 'Mensaje encriptado', '¡Algunos carácteres están cifrados! ¿Podrás conseguir comunicarte con tu pareja?', '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(3, 'Desorden absoluto', 'Vuestras frases se enviarán desordenadas, intentad descifrar el mensaje original', '2025-05-29 08:59:33', '2025-05-29 08:59:33'),
+(4, 'Boca abajo', 'Vuestro texto estará boca abajo ¡no forzéis mucho el cuello!', '2025-05-29 08:59:33', '2025-05-29 08:59:33');
 
 -- --------------------------------------------------------
 
@@ -544,7 +573,7 @@ CREATE TABLE IF NOT EXISTS `tipo_producto` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id_tipo_producto`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Volcado de datos para la tabla `tipo_producto`
@@ -554,8 +583,9 @@ INSERT INTO `tipo_producto` (`id_tipo_producto`, `tipo_producto`, `created_at`, 
 (1, 'Membresía', NULL, NULL),
 (2, 'Compras únicas', NULL, NULL),
 (3, 'Packs de puntos', NULL, NULL),
-(4, 'Donaciones', NULL, NULL),
-(5, 'Comunidad', NULL, NULL);
+(4, 'Personalización', NULL, NULL),
+(5, 'Comunidad', NULL, NULL),
+(6, 'Donaciones', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -603,14 +633,14 @@ CREATE TABLE IF NOT EXISTS `users` (
 --
 
 INSERT INTO `users` (`id_usuario`, `username`, `nombre`, `apellido`, `fecha_nacimiento`, `genero`, `email`, `email_verified_at`, `password`, `puntos`, `racha`, `id_nacionalidad`, `id_rol`, `id_estado`, `img`, `descripcion`, `strikes`, `inicio_ban`, `fin_ban`, `ultimo_login`, `puntos_diarios`, `skip_time`, `remember_token`, `created_at`, `updated_at`) VALUES
-(1, 'admin', 'Administrador', 'Sistema', '1990-01-01', 'hombre', 'admin@example.com', NULL, '$2y$12$0T16e4U2kF2SakCYGgs3qe/0lKfyc8HRMfh31vVbNqP08pG0AYH1C', 1000, 0, 1, 1, 2, NULL, 'Administrador del sistema', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
-(2, 'moderador', 'Moderador', 'Sistema', '1990-01-01', 'hombre', 'moderador@example.com', NULL, '$2y$12$Q2LodoOqBhzArUHiwZo2s.2I4p5fPruWjHbUS.dM3qX1tLX.Hbj/.', 800, 0, 1, 2, 2, NULL, 'Moderador del sistema', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
-(3, 'usuario1', 'Usuario', 'Ejemplo', '1995-05-15', 'hombre', 'usuario1@example.com', NULL, '$2y$12$ftKuUZ8AfMqFF4FzJeu0HOPrd4fJcPMWbtxWxviUavGU7P8sqFsH2', 500, 0, 2, 3, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
-(4, 'usuario2', 'Carlos', 'Gómez', '1992-07-20', 'hombre', 'carlos@example.com', NULL, '$2y$12$IVceVIxIELvuplBG/dIXhOpuAeaPlXuF1tP9q/8St/MD/VJJCN1y6', 100000000, 0, 3, 3, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
-(5, 'usuario3', 'Ana', 'Martínez', '1993-08-15', 'mujer', 'ana@example.com', NULL, '$2y$12$WiDDiPAv3DtGfiMoGhQKfeZet03dmRU6NowGWTTCShtfWSVgr/m0O', 100000000, 0, 4, 3, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
-(6, 'usuario4', 'Luis', 'Fernández', '1994-09-10', 'hombre', 'luis@example.com', NULL, '$2y$12$n5zPP97Zuzg5ju14TPB.Me0Yh2yzCHlhSc33vHtfpWCG/v0hGK9Gm', 480, 0, 5, 3, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
-(7, 'usuario5', 'María', 'López', '1995-10-05', 'mujer', 'maria@example.com', NULL, '$2y$12$xpbQ9CyYZlHgAF3pQfCzuOq2UB9VJ4dsGgCxGP0rfH2hzcoWfkLMu', 490, 0, 6, 2, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
-(8, 'usuario6', 'Jorge', 'Pérez', '1996-11-25', 'hombre', 'jorge@example.com', NULL, '$2y$12$RzS7ihtbT/I0xXKexltJCu8Wo0mUapD0xckkmdh1OkYt.zrLrgFE.', 500, 0, 7, 3, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL);
+(1, 'admin', 'Administrador', 'Sistema', '1990-01-01', 'hombre', 'admin@example.com', NULL, '$2y$12$KHLc7vu1jwYBxcCx7Bd4muPTykKB.c082RlyAbJAxOOYhaXL6Pxv6', 1000, 0, 1, 1, 2, NULL, 'Administrador del sistema', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
+(2, 'moderador', 'Moderador', 'Sistema', '1990-01-01', 'hombre', 'moderador@example.com', NULL, '$2y$12$63sGGV3I00xyC38KfVh7e.IYZzNxhYpgyWpdhk1t3X/ejneDeVdlS', 800, 0, 1, 2, 2, NULL, 'Moderador del sistema', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
+(3, 'usuario1', 'Usuario', 'Ejemplo', '1995-05-15', 'hombre', 'usuario1@example.com', NULL, '$2y$12$RTnuPxrXx75WXJNmAKTlHO/iPl8bAgaa3WforR.JBhdNvHuPV495.', 500, 0, 2, 3, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
+(4, 'usuario2', 'Carlos', 'Gómez', '1992-07-20', 'hombre', 'carlos@example.com', NULL, '$2y$12$PgDzaFbOHgeyX.bqiYrrnO9LH6YXThK2VcYHGOFEc.wXjXaLRqL7K', 100000000, 0, 3, 3, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
+(5, 'usuario3', 'Ana', 'Martínez', '1993-08-15', 'mujer', 'ana@example.com', NULL, '$2y$12$snJZAb6u..tCmtsI0RFsAegXK2BSmrkGVllnejlt6b3MfRgQKL..2', 100000000, 0, 4, 3, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
+(6, 'usuario4', 'Luis', 'Fernández', '1994-09-10', 'hombre', 'luis@example.com', NULL, '$2y$12$mfIdUQ8vH1lvFy1xQQZmIuJJYZ/GgzGZLmC4jg4Dxh502ozCu/lwq', 480, 0, 5, 3, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
+(7, 'usuario5', 'María', 'López', '1995-10-05', 'mujer', 'maria@example.com', NULL, '$2y$12$b58aqsenMmJzdVpVMGfQ8O9uru6PcsaUG6HYwdvbjzK3KtBotwtW6', 490, 0, 6, 2, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL),
+(8, 'usuario6', 'Jorge', 'Pérez', '1996-11-25', 'hombre', 'jorge@example.com', NULL, '$2y$12$6xvihLROJ/3.PY6sUc.O/eHqECNv17hN9Y8cPcfTnhjbPANpb1d9a', 500, 0, 7, 3, 2, NULL, 'Usuario de ejemplo', 0, NULL, NULL, NULL, 0, '00:00:00', NULL, NULL, NULL);
 
 --
 -- Restricciones para tablas volcadas
