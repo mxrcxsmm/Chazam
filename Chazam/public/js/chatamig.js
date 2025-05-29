@@ -105,21 +105,27 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
-        const imgPath = chat.img ? chat.img : CHAT_CONFIG.defaultAvatar;
+        const imgPath = chat.img || CHAT_CONFIG.defaultAvatar;
+        const marco = chat.marco || 'default.svg';
+        const brillo = chat.brillo || null;
+        const rotacion = chat.rotacion ? 'marco-rotate' : '';
+    
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
+        chatItem.dataset.userId = chat.id_usuario || chat.usuario_id || chat.user_id;
     
-        // Guardar el ID del usuario en el elemento
-        const userId = chat.id_usuario || chat.usuario_id || chat.user_id;
-        if (userId) {
-            chatItem.dataset.userId = userId;
-        }
-
-        chatItem.innerHTML = `
-            <div class="chat-avatar">
+        // Estructura del avatar con marco y brillo
+        const glowStyle = brillo ? `--glow-color: ${brillo};` : '';
+        const avatarHTML = `
+            <div class="chat-avatar marco-externo marco-glow ${rotacion}"
+                 style="background-image: url('/img/bordes/${marco}'); ${glowStyle}">
                 <img src="${imgPath}" alt="Avatar" onerror="this.src='${CHAT_CONFIG.defaultAvatar}'">
             </div>
+        `;
+    
+        chatItem.innerHTML = `
+            ${avatarHTML}
             <div class="chat-info">
                 <div class="chat-header">
                     <h3>${chat.username || chat.nombre}</h3>
@@ -128,12 +134,13 @@ class ChatManager {
                 <p class="last-message">${chat.last_message || ''}</p>
             </div>
         `;
-      
+    
         // Click handler
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
-      
+    
         return chatItem;
     }
+    
 
     // Manejo de selección de chat
     handleChatSelection(chatItem, chat) {
