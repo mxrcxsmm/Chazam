@@ -418,11 +418,11 @@ const FriendshipManager = {
                         <span>${amigo.username}</span>
                     </div>
                     <div class="btn-group">
-                        <button class="btn btn-sm btn-danger" onclick="window.FriendshipManager.bloquearUsuario(${amigo.id_usuario})">
-                            <i class="fas fa-ban"></i>
+                        <button class="btn btn-sm btn-danger" onclick="window.eliminarAmigo(${amigo.id_usuario})">
+                            <i class="fas fa-user-minus"></i>
                         </button>
-                        <button class="btn btn-sm btn-warning" onclick="window.FriendshipManager.denunciarUsuario(${amigo.id_usuario})">
-                            <i class="fas fa-flag"></i>
+                        <button class="btn btn-sm btn-warning" onclick="window.FriendshipManager.bloquearUsuario(${amigo.id_usuario})">
+                            <i class="fas fa-ban"></i>
                         </button>
                     </div>
                 </div>
