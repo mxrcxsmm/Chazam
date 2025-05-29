@@ -680,7 +680,8 @@ window.FriendshipManager = window.FriendshipManager || {};
 // Exportar objetos al objeto global (redundante pero por seguridad)
 window.ModalUtils = ModalUtils;
 window.FriendshipManager = FriendshipManager;
-// Exportar funciones de amistad individuales para compatibilidad con onclick en algunos blade files si es necesario
+
+// Exportar funciones de amistad individuales para compatibilidad con onclick en algunos blade files
 window.cargarAmistades = FriendshipManager.cargarAmistades;
 window.eliminarAmigo = FriendshipManager.eliminarAmigo;
 window.bloquearUsuario = FriendshipManager.bloquearUsuario;
@@ -693,4 +694,7 @@ window.mostrarModal = ModalUtils.mostrarModal;
 window.limpiarModal = ModalUtils.limpiarModal;
 
 // Si getProfileImgPath se usa fuera de FriendshipManager o ModalUtils y no está en otro archivo central, exportarla aquí también.
-// window.getProfileImgPath = getProfileImgPath; // Asumiendo que ya está en otro archivo base o se moverá allí
+// Ya la exportamos desde hamburger.js, pero por si acaso para otras vistas:
+if (!window.getProfileImgPath && typeof getProfileImgPath !== 'undefined') {
+     window.getProfileImgPath = getProfileImgPath;
+}
