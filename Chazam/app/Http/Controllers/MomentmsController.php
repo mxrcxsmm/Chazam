@@ -25,22 +25,19 @@ class MomentmsController extends Controller
         // Recolectar IDs de amigos
         $amigosIds = collect();
         foreach ($solicitudesAceptadas as $solicitud) {
-            if ($solicitud->id_usuario_solicitante == $user->id_usuario) {
-                $amigosIds->push($solicitud->id_usuario_solicitado);
+            if ($solicitud->id_emisor == $user->id_usuario) {
+                $amigosIds->push($solicitud->id_receptor);
             } else {
-                $amigosIds->push($solicitud->id_usuario_solicitante);
+                $amigosIds->push($solicitud->id_emisor);
             }
         }
 
-        // Obtener usuarios amigos
-        $amigos = User::whereIn('id_usuario', $amigosIds)->get();
-
-        // Obtener momentms del usuario y sus amigos que no hayan pasado 24h desde su última modificación
+        // Obtener momentms del usuario y sus amigos que no hayan pasado 24h desde su fecha_inicio
         $momentms = Historia::where(function($query) use ($user, $amigosIds) {
             $query->whereIn('id_usuario', $amigosIds)
                   ->orWhere('id_usuario', $user->id_usuario);
         })
-        ->where('updated_at', '>=', now()->subDay())
+        ->where('fecha_inicio', '>=', now()->subDay())
         ->orderBy('fecha_inicio', 'desc')
         ->with('usuario')
         ->get();
@@ -48,7 +45,7 @@ class MomentmsController extends Controller
         return view('user.momentms', [
             'momentms' => $momentms,
             'user' => $user,
-            'amigos' => $amigos
+            'amigos' => $amigosIds
         ]);
     }
 
@@ -183,10 +180,10 @@ class MomentmsController extends Controller
 
         $amigosIds = collect();
         foreach ($solicitudesAceptadas as $solicitud) {
-            if ($solicitud->id_usuario_solicitante == $user->id_usuario) {
-                $amigosIds->push($solicitud->id_usuario_solicitado);
+            if ($solicitud->id_emisor == $user->id_usuario) {
+                $amigosIds->push($solicitud->id_receptor);
             } else {
-                $amigosIds->push($solicitud->id_usuario_solicitante);
+                $amigosIds->push($solicitud->id_emisor);
             }
         }
 

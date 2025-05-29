@@ -25,12 +25,16 @@ document.addEventListener('DOMContentLoaded', function() {
     let progressTimer;
     const MOMENTM_DURATION = 5000; // 5 segundos por momentm
 
+    // Asegura que una ruta de imagen sea válida.
+    // Si empieza por http o /, la devuelve igual.
+    // Si no, antepone / para que funcione como ruta absoluta.
+    // Esto es importante para que las imágenes se carguen correctamente.
     function getAssetUrl(path) {
         if (path.startsWith('http')) return path;
         if (path.startsWith('/')) return path;
         return '/' + path;
     }
-
+    // Pillar bien la imagen de perfil.
     function getProfileImgPath(img) {
         if (!img || img === 'avatar-default.png' || img === '/img/profile_img/avatar-default.png') {
             return `${window.location.origin}/img/profile_img/avatar-default.png`;
@@ -43,6 +47,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Obtener todos los momentms al cargar
+    // Recolecta todos los elementos .momentm-card del DOM.
+    // Llena el array currentMomentms con los IDs de los Momentms disponibles.
     function getAllMomentms() {
         const cards = document.querySelectorAll('.momentm-card');
         currentMomentms = Array.from(cards).map(card => ({
@@ -133,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function() {
         resetProgress();
     }
 
-    // Navegación
+    // Navegación de Momentms Modal (flechita prev)
     function prevMomentm() {
         if (currentIndex > 0) {
             currentIndex--;
