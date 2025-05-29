@@ -168,7 +168,6 @@
     <script src="{{ asset('js/estados.js') }}"></script>
     <script src="{{ asset('js/hamburger.js') }}"></script>
     <script src="{{ asset('js/userSearch.js') }}"></script>
-    <script src="{{ asset('js/vista.js') }}"></script>
     @stack('scripts')
 
     <!-- Modal de amistades -->
