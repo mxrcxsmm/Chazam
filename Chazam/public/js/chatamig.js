@@ -317,28 +317,60 @@ class ChatManager {
     // Actualización del encabezado del chat
     updateChatHeader(companero) {
         if (!companero) return;
-
-        const defaultAvatar = CHAT_CONFIG.defaultAvatar;
-        const isFriend = !!companero.id_usuario;
-      
-        // Verificar que los elementos existen
-        if (!this.elements.chatHeader || !this.elements.chatStatus || !this.elements.chatImg) {
-            console.error('Elementos del header del chat no encontrados');
+    
+        // 1) Obtener origen para URLs absolutas
+        const origin = window.location.origin;
+    
+        // 2) Personalización del amigo
+        const marcoFile    = companero.marco    || 'default.svg';
+        const brillo       = companero.brillo    || null;
+        const rotacion     = companero.rotacion  ? true : false;
+    
+        // 3) Construir URL absoluta del SVG del marco
+        const marcoUrl = `${origin}/img/bordes/${marcoFile}`;
+    
+        // 4) Clases y estilos de glow/rotación
+        const rotClass  = rotacion ? 'marco-rotate' : '';
+        const glowStyle = brillo    ? `--glow-color: ${brillo};` : '';
+    
+        // 5) Elementos del DOM
+        const avatarContainer = document.getElementById('chat-contact-avatar');
+        const nameEl          = document.getElementById('chat-contact-name');
+        const statusEl        = document.getElementById('chat-contact-status');
+    
+        if (!avatarContainer || !nameEl || !statusEl) {
+            console.error('Elementos del header no encontrados');
             return;
         }
-
-        // Actualizar nombre y estado
-        this.elements.chatHeader.textContent = companero.username || companero.nombre || 'Usuario';
-        this.elements.chatStatus.textContent = (companero.id_estado == 1 || companero.id_estado == 5) ? 'en línea' : 'desconectado';
-        this.elements.chatStatus.style.color = (companero.id_estado == 1 || companero.id_estado == 5) ? '#9147ff' : '#b9bbbe';
-        
-        // Construir la ruta de la imagen correctamente
-        const imgPath = companero.img ? companero.img.replace('/img/profile_img/img/profile_img/', '/img/profile_img/') : defaultAvatar;
-        this.elements.chatImg.src = imgPath;
-        this.elements.chatImg.onerror = () => {
-            this.elements.chatImg.src = defaultAvatar;
-        };
-    }
+    
+        // 6) Ruta de la imagen de perfil del amigo
+        const defaultAvatar = CHAT_CONFIG.defaultAvatar;
+        const imgSrc = getProfileImgPath(companero.img);
+    
+        // 7) Inyectar el avatar con su marco
+        avatarContainer.innerHTML = `
+            <div class="marco-externo marco-glow ${rotClass}"
+                 style="
+                    background-image: url('${marcoUrl}');
+                    background-size: cover;
+                    background-position: center;
+                    ${glowStyle}
+                 ">
+                <img id="chat-contact-img"
+                     src="${imgSrc}"
+                     alt="Avatar de ${companero.username || companero.nombre}"
+                     onerror="this.src='${defaultAvatar}'"
+                     style="width: 80%; height: 80%; border-radius:50%; object-fit:cover;"
+                >
+            </div>
+        `;
+    
+        // 8) Nombre y estado
+        const online = [1,5].includes(companero.id_estado);
+        nameEl.textContent   = companero.username || companero.nombre || 'Usuario';
+        statusEl.textContent = online ? 'en línea' : 'desconectado';
+        statusEl.style.color = online ? '#9147ff'  : '#b9bbbe';
+    }    
 
     // Toggle de opciones
     toggleOptions() {
