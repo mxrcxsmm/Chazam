@@ -671,6 +671,110 @@ const FriendshipManager = {
                 icon: 'error'
             });
         }
+    },
+
+    async cargarSolicitudesAmistad() {
+        try {
+            const response = await fetch('/solicitudes/pendientes', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            if (!response.ok) throw new Error('Error al cargar solicitudes');
+
+            const data = await response.json();
+            const solicitudesContainer = document.getElementById('solicitudesContainer');
+            const noSolicitudes = document.getElementById('noSolicitudes');
+            
+            if (!solicitudesContainer) return;
+
+            if (data.length === 0) {
+                noSolicitudes.style.display = 'block';
+                solicitudesContainer.innerHTML = '';
+                return;
+            }
+
+            noSolicitudes.style.display = 'none';
+            solicitudesContainer.innerHTML = data.map(solicitud => `
+                <div class="solicitud-item">
+                    <div class="solicitud-info">
+                        <div class="marco-externo marco-glow ${solicitud.emisor.rotacion ? 'marco-rotate' : ''}"
+                             style="--glow-color: ${solicitud.emisor.brillo || '#fff'}; background-image: url('/img/bordes/${solicitud.emisor.marco ?? 'default.svg'}');">
+                            <img src="${window.getProfileImgPath(solicitud.emisor.img)}" 
+                                 alt="${solicitud.emisor.username}"
+                                 style="width:32px;height:32px;object-fit:cover;border-radius:50%;"
+                                 onerror="this.src='${window.getProfileImgPath()}'">
+                        </div>
+                        <div class="solicitud-username">${solicitud.emisor.username}</div>
+                    </div>
+                    <div class="solicitud-actions">
+                        <button class="btn btn-success btn-sm" onclick="window.FriendshipManager.responderSolicitud(${solicitud.id_solicitud}, true)">
+                            <i class="fas fa-check"></i> Aceptar
+                        </button>
+                        <button class="btn btn-danger btn-sm" onclick="window.FriendshipManager.responderSolicitud(${solicitud.id_solicitud}, false)">
+                            <i class="fas fa-times"></i> Rechazar
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Actualizar el contador de solicitudes
+            const solicitudesCount = document.getElementById('solicitudesCount');
+            if (solicitudesCount) {
+                solicitudesCount.textContent = data.length;
+                solicitudesCount.style.display = data.length > 0 ? 'block' : 'none';
+            }
+        } catch (error) {
+            console.error('Error al cargar solicitudes:', error);
+            const solicitudesContainer = document.getElementById('solicitudesContainer');
+            if (solicitudesContainer) {
+                solicitudesContainer.innerHTML = '<div class="text-center text-danger">Error al cargar solicitudes</div>';
+            }
+        }
+    },
+
+    async responderSolicitud(idSolicitud, aceptar) {
+        try {
+            const response = await fetch('/solicitudes/responder', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({
+                    id_solicitud: idSolicitud,
+                    aceptar: aceptar
+                })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                Swal.fire({
+                    title: aceptar ? '¡Solicitud aceptada!' : 'Solicitud rechazada',
+                    text: aceptar ? 'Ahora son amigos' : 'La solicitud ha sido rechazada',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+                // Recargar la lista de solicitudes
+                this.cargarSolicitudesAmistad();
+                // Si se aceptó, también recargar la lista de amistades
+                if (aceptar) {
+                    this.cargarAmistades();
+                }
+            } else {
+                throw new Error(data.message || 'Error al responder la solicitud');
+            }
+        } catch (error) {
+            console.error('Error al responder solicitud:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo procesar la solicitud',
+                icon: 'error'
+            });
+        }
     }
 };
 

@@ -1038,24 +1038,26 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
             solicitudesModal.show();
-            // cargarSolicitudesAmistad(); // Llama a cargar al abrir
+            // Cargar solicitudes al abrir el modal
+            window.FriendshipManager.cargarSolicitudesAmistad();
         });
-        // actualizarContadorSolicitudes(); // Llama al cargar la página
     }
 
     // Gestionar el modal de solicitudes - Mover si se centraliza en otro script
     const solicitudesModalEl = document.getElementById('solicitudesModal');
     if (solicitudesModalEl) {
         solicitudesModalEl.addEventListener('show.bs.modal', function () {
+            // Cargar solicitudes al abrir el modal
+            window.FriendshipManager.cargarSolicitudesAmistad();
             // Iniciar polling de solicitudes solo cuando el modal está abierto
-             // solicitudesIntervalId = setInterval(cargarSolicitudesAmistad, 30000); // Intervalo de 30s
+            solicitudesIntervalId = setInterval(() => window.FriendshipManager.cargarSolicitudesAmistad(), 30000); // Intervalo de 30s
         });
         solicitudesModalEl.addEventListener('hidden.bs.modal', function () {
             // Limpiar polling de solicitudes al cerrar el modal
             if (solicitudesIntervalId) {
                 clearInterval(solicitudesIntervalId);
                 solicitudesIntervalId = null;
-                 console.log('Intervalo de solicitudes detenido al cerrar modal.');
+                console.log('Intervalo de solicitudes detenido al cerrar modal.');
             }
         });
     }
