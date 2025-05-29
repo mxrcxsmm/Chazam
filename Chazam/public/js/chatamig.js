@@ -481,43 +481,44 @@ class ChatManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.chatManager = new ChatManager();
 
-    // Asegurarse de que FriendshipManager esté disponible
-    if (!window.FriendshipManager) {
-        console.error('FriendshipManager no está disponible. Asegúrate de que friendship_modals.js esté cargado.');
-        return;
-    }
-
     // Configurar el modal de solicitudes
     const btnSolicitudesPendientes = document.getElementById('btnSolicitudesPendientes');
     if (btnSolicitudesPendientes) {
         btnSolicitudesPendientes.addEventListener('click', () => {
             const solicitudesModal = new bootstrap.Modal(document.getElementById('solicitudesModal'));
             solicitudesModal.show();
-            window.FriendshipManager.cargarSolicitudesAmistad();
+            if (window.FriendshipManager) {
+                window.FriendshipManager.cargarSolicitudesAmistad();
+            }
         });
     }
 
     // Gestionar el modal de solicitudes
     const solicitudesModalEl = document.getElementById('solicitudesModal');
     if (solicitudesModalEl) {
+        let solicitudesInterval;
         solicitudesModalEl.addEventListener('show.bs.modal', () => {
-            window.FriendshipManager.cargarSolicitudesAmistad();
-            // Iniciar polling de solicitudes solo cuando el modal está abierto
-            window.FriendshipManager.solicitudesIntervalId = setInterval(() => 
-                window.FriendshipManager.cargarSolicitudesAmistad(), 30000);
+            if (window.FriendshipManager) {
+                window.FriendshipManager.cargarSolicitudesAmistad();
+                // Iniciar polling de solicitudes solo cuando el modal está abierto
+                solicitudesInterval = setInterval(() => 
+                    window.FriendshipManager.cargarSolicitudesAmistad(), 30000);
+            }
         });
         solicitudesModalEl.addEventListener('hidden.bs.modal', () => {
             // Limpiar polling de solicitudes al cerrar el modal
-            if (window.FriendshipManager.solicitudesIntervalId) {
-                clearInterval(window.FriendshipManager.solicitudesIntervalId);
-                window.FriendshipManager.solicitudesIntervalId = null;
+            if (solicitudesInterval) {
+                clearInterval(solicitudesInterval);
+                solicitudesInterval = null;
                 console.log('Intervalo de solicitudes detenido al cerrar modal.');
             }
         });
     }
 
     // Cargar solicitudes inicialmente
-    window.FriendshipManager.cargarSolicitudesAmistad();
+    if (window.FriendshipManager) {
+        window.FriendshipManager.cargarSolicitudesAmistad();
+    }
 });
 
 // Añadir estilos CSS para las animaciones
@@ -549,6 +550,3 @@ chatStyles.textContent = `
     }
 `;
 document.head.appendChild(chatStyles);
-
-// Eliminar definiciones de funciones de bloqueados de aquí
-// Estas funciones deben estar centralizadas en friendship_modals.js

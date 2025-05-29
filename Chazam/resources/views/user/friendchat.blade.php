@@ -166,15 +166,35 @@
   .btn-icon:hover {
     color: #fff; background: #9147ff33; border-radius: 50%;
   }
+  .marco-externo {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-size: cover;
+    background-position: center;
+    transition: all 0.3s ease;
+  }
+  .marco-glow {
+    box-shadow: 0 0 10px var(--glow-color, #fff);
+  }
+  .marco-rotate {
+    animation: rotate 10s linear infinite;
+  }
+  @keyframes rotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
 </style>
 
 <!-- Scripts -->
+<script src="{{ asset('js/friendship_modals.js') }}"></script>
 <script src="{{ asset('js/chatamig.js') }}"></script>
 <script src="{{ asset('js/hamburgerAmig.js') }}"></script>
-<script src="{{ asset('js/friendship_modals.js') }}"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
 
 @push('scripts')
-    {{-- <script src="{{ asset('js/chatamig.js') }}"></script> --}}
     {{-- Otros scripts específicos de friendchat --}}
 @endpush
