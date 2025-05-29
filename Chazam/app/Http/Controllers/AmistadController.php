@@ -174,10 +174,11 @@ class AmistadController extends Controller
         return response()->json($bloqueados);
     }
 
-    public function desbloquearUsuario(Request $request)
+    public function desbloquearUsuario(Request $request, $idUsuario)
     {
         $userId = Auth::id();
-        $otroId = $request->input('id_usuario');
+        // $otroId = $request->input('id_usuario'); // Ya no necesitamos esto
+        $otroId = $idUsuario; // Obtenemos el ID de la ruta
 
         // Borra todas las solicitudes de bloqueo entre ambos usuarios
         DB::table('solicitudes')

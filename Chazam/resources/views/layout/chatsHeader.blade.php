@@ -167,15 +167,17 @@
     <script src="{{ asset('js/estados.js') }}"></script>
     <script src="{{ asset('js/hamburger.js') }}"></script>
     <script src="{{ asset('js/userSearch.js') }}"></script>
+    {{-- Incluimos el script para los modales de amistad y búsqueda --}}
+    <script src="{{ asset('js/friendship_modals.js') }}"></script>
     @stack('scripts')
 
     <!-- Modal de amistades -->
     <div class="modal fade" id="modalAmistades" tabindex="-1" aria-labelledby="modalAmistadesLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header" style="background:#9147ff; color:#fff;">
                     <h5 class="modal-title" id="modalAmistadesLabel">Mis Amistades</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <ul class="nav nav-tabs" id="amistadesTabs" role="tablist">
@@ -186,7 +188,7 @@
                             <button class="nav-link" id="bloqueados-tab" data-bs-toggle="tab" data-bs-target="#bloqueados" type="button" role="tab">Bloqueados</button>
                         </li>
                     </ul>
-                    <div class="tab-content">
+                    <div class="tab-content mt-3">
                         <div class="tab-pane fade show active" id="amistades" role="tabpanel">
                             <div id="listaAmistades" class="list-group"></div>
                         </div>
@@ -225,7 +227,71 @@
         </div>
     </div>
 
+    <!-- Modal de Solicitudes -->
+    <div class="modal fade" id="solicitudesModal" tabindex="-1" aria-labelledby="solicitudesModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header" style="background:#9147ff; color:#fff;">
+                    <h5 class="modal-title" id="solicitudesModalLabel">Solicitudes de Amistad</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" id="solicitudesContainer">
+                    <div id="noSolicitudes" style="display:none;">No tienes solicitudes pendientes</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
+        // Función para limpiar correctamente los modales
+        function limpiarModal(modalId) {
+            const modalEl = document.getElementById(modalId);
+            if (!modalEl) return;
+            
+            const modal = bootstrap.Modal.getInstance(modalEl);
+            if (modal) {
+                modal.hide();
+                // Eliminar el backdrop
+                const backdrop = document.querySelector('.modal-backdrop');
+                if (backdrop) {
+                    backdrop.remove();
+                }
+                // Restaurar el scroll del body
+                document.body.classList.remove('modal-open');
+                document.body.style.overflow = '';
+                document.body.style.paddingRight = '';
+                // Ocultar el modal
+                modalEl.style.display = 'none';
+            }
+        }
+
+        // Configurar los event listeners para los modales
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configurar el modal de amistades
+            const modalAmistades = document.getElementById('modalAmistades');
+            if (modalAmistades) {
+                modalAmistades.addEventListener('hidden.bs.modal', function () {
+                    limpiarModal('modalAmistades');
+                });
+            }
+
+            // Configurar el modal de búsqueda
+            const buscarUsuariosModal = document.getElementById('buscarUsuariosModal');
+            if (buscarUsuariosModal) {
+                buscarUsuariosModal.addEventListener('hidden.bs.modal', function () {
+                    limpiarModal('buscarUsuariosModal');
+                });
+            }
+
+            // Configurar el modal de solicitudes
+            const solicitudesModal = document.getElementById('solicitudesModal');
+            if (solicitudesModal) {
+                solicitudesModal.addEventListener('hidden.bs.modal', function () {
+                    limpiarModal('solicitudesModal');
+                });
+            }
+        });
+
         function toggleSidebarPerfil(forceClose = false) {
             const sidebar = document.getElementById('sidebarPerfil');
             if (!sidebar) return;

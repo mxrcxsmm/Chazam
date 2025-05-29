@@ -103,21 +103,6 @@
     </div>
 </div>
 
-<!-- Modal de Solicitudes optimizado -->
-<div class="modal fade" id="solicitudesModal" tabindex="-1" aria-labelledby="solicitudesModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable">
-        <div class="modal-content">
-            <div class="modal-header" style="background:#9147ff; color:#fff;">
-                <h5 class="modal-title" id="solicitudesModalLabel">Solicitudes de Amistad</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body" id="solicitudesContainer">
-                <div id="noSolicitudes" style="display:none;">No tienes solicitudes pendientes</div>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Modal de confirmación -->
 <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -167,3 +152,8 @@
 <script src="{{ asset('js/chatamig.js') }}"></script>
 <script src="{{ asset('js/hamburgerAmig.js') }}"></script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+
+@push('scripts')
+    {{-- <script src="{{ asset('js/chatamig.js') }}"></script> --}}
+    {{-- Otros scripts específicos de friendchat --}}
+@endpush
