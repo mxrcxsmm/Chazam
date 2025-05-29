@@ -105,20 +105,45 @@ class ChatManager {
 
     // Creación de elemento de chat
     createChatElement(chat) {
-        const imgPath = chat.img ? chat.img : CHAT_CONFIG.defaultAvatar;
+        const imgPath = chat.img || '/img/profile_img/avatar-default.png';
+        const framePath = chat.marco 
+            ? `/img/frames/${chat.marco}` 
+            : ''; // si no hay marco, queda vacío
+    
+        // Calcular estilos dinámicos
+        const brightness = chat.brillo !== undefined 
+            ? `brightness(${chat.brillo})` 
+            : '';
+        const rotation = chat.rotacion 
+            ? 'rotate(180deg)' 
+            : '';
+    
         const chatItem = document.createElement('div');
         chatItem.className = 'chat-item';
         chatItem.dataset.chatId = chat.id_chat;
+        if (chat.id_usuario) chatItem.dataset.userId = chat.id_usuario;
     
-        // Guardar el ID del usuario en el elemento
-        const userId = chat.id_usuario || chat.usuario_id || chat.user_id;
-        if (userId) {
-            chatItem.dataset.userId = userId;
-        }
-
         chatItem.innerHTML = `
-            <div class="chat-avatar">
-                <img src="${imgPath}" alt="Avatar" onerror="this.src='${CHAT_CONFIG.defaultAvatar}'">
+            <div class="chat-avatar" style="
+                position: relative;
+                ${framePath ? `background: url('${framePath}') no-repeat center/cover;` : ''}
+                width: 48px;
+                height: 48px;
+            ">
+                <img
+                  src="${imgPath}"
+                  alt="Avatar"
+                  class="avatar-img"
+                  style="
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    filter: ${brightness};
+                    transform: ${rotation};
+                    transition: transform 0.2s, filter 0.2s;
+                  "
+                  onerror="this.src='/img/profile_img/avatar-default.png'"
+                />
             </div>
             <div class="chat-info">
                 <div class="chat-header">
@@ -128,12 +153,12 @@ class ChatManager {
                 <p class="last-message">${chat.last_message || ''}</p>
             </div>
         `;
-      
-        // Click handler
+    
         chatItem.addEventListener('click', () => this.handleChatSelection(chatItem, chat));
-      
+    
         return chatItem;
     }
+    
 
     // Manejo de selección de chat
     handleChatSelection(chatItem, chat) {
