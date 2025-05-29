@@ -578,6 +578,40 @@ body, html {
     margin-bottom: 20px;
 }
 
+.marco-glow {
+    box-shadow: 0 0 10px var(--glow-color, #fff);
+}
+
+.marco-rotate {
+    animation: rotate 10s linear infinite;
+}  
+
+.chat-avatar {
+    width: 48px;
+    height: 48px;
+    position: relative;
+}
+
+.marco-externo {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    background-size: cover;
+    background-position: center;
+    border-radius: 50%;
+    overflow: hidden; /* importante */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .marco-externo img {
+    width: 80%;    /* que sea más pequeño que el contenedor */
+    height: 80%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
 /* Responsive para el chat */
 @media (max-width: 768px) {
     .chat-sidebar {
