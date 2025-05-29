@@ -143,7 +143,8 @@ class ChatManager {
         this.loadMessages(chat.id_chat);
         this.updateChatHeader(chat);
         this.currentChatId = chat.id_chat;
-        this.currentUserId = chat.id_usuario; // Guardar el ID del usuario actual
+        this.currentUserId = chat.id_usuario || chat.usuario_id || chat.user_id; // Guardar el ID del usuario actual
+        console.log('ID de usuario actual:', this.currentUserId); // Log para depuración
     }
 
     // Renderizado de mensajes
@@ -459,7 +460,81 @@ class ChatManager {
 
     // Configuración de handlers de reporte
     setupReportHandlers() {
-        // Eliminar esta sección si la lógica de reportes se maneja en friendship_modals.js
+        const reportButton = document.querySelector('.report-user-btn');
+        if (reportButton) {
+            reportButton.addEventListener('click', async () => {
+                if (!this.currentUserId) {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Selecciona un chat para reportar al usuario',
+                        icon: 'warning'
+                    });
+                    return;
+                }
+
+                try {
+                    const { value: formValues } = await Swal.fire({
+                        title: 'Reportar usuario',
+                        html: `
+                            <div class="mb-3">
+                                <label for="reportTitle" class="form-label">Título del reporte</label>
+                                <input type="text" class="form-control" id="reportTitle" placeholder="Ingrese un título">
+                            </div>
+                            <div class="mb-3">
+                                <label for="reportDescription" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="reportDescription" rows="3" placeholder="Describa el motivo del reporte"></textarea>
+                            </div>
+                        `,
+                        focusConfirm: false,
+                        showCancelButton: true,
+                        confirmButtonText: 'Enviar reporte',
+                        cancelButtonText: 'Cancelar',
+                        preConfirm: () => {
+                            const title = document.getElementById('reportTitle').value;
+                            const description = document.getElementById('reportDescription').value;
+                            if (!title || !description) {
+                                Swal.showValidationMessage('Por favor complete todos los campos');
+                                return false;
+                            }
+                            return { title, description };
+                        }
+                    });
+
+                    if (formValues) {
+                        const response = await fetch('/reportes/crear', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            },
+                            body: JSON.stringify({
+                                id_reportado: this.currentUserId,
+                                titulo: formValues.title,
+                                descripcion: formValues.description
+                            })
+                        });
+
+                        const data = await response.json();
+                        if (data.success) {
+                            Swal.fire({
+                                title: '¡Reporte enviado!',
+                                text: 'El reporte ha sido enviado correctamente.',
+                                icon: 'success'
+                            });
+                        } else {
+                            throw new Error(data.message || 'Error al enviar el reporte');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error al reportar usuario:', error);
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'No se pudo enviar el reporte',
+                        icon: 'error'
+                    });
+                }
+            });
+        }
     }
 
     async cargarSolicitudesAmistad() {
