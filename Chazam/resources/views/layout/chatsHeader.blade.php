@@ -98,7 +98,7 @@
                 
 
                 <!-- Sidebar estilo perfil -->
-                <div id="sidebarPerfil" id="sidebar" class="position-fixed top-0 end-0 text-white p-4" style="width: 260px; height: 100vh; display: none; z-index: 1050; background-color: {{ $sidebar ?? '#4B0082' }};">
+                <div id="sidebar" class="position-fixed top-0 end-0 text-white p-4" style="width: 260px; height: 100vh; display: none; z-index: 1050; background-color: {{ $sidebar ?? '#4B0082' }};">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <div class="text-center">
                             <div id="sidebarGeneral" 
