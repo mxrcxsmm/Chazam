@@ -448,7 +448,7 @@ const FriendshipManager = {
         try {
             const response = await fetch('/amistades/bloqueados');
             if (!response.ok) throw new Error('Error al cargar bloqueados');
-            
+
             const data = await response.json();
             const listaBloqueados = document.getElementById('listaBloqueados');
             if (!listaBloqueados) return;
@@ -467,7 +467,7 @@ const FriendshipManager = {
                             <small class="text-muted">${bloqueado.nombre_completo || ''}</small>
                         </div>
                     </div>
-                    <button class="btn btn-sm btn-outline-success" onclick="window.FriendshipManager.desbloquearUsuario(${bloqueado.id})">
+                    <button class="btn btn-sm btn-outline-success" onclick="window.FriendshipManager.desbloquearUsuario(${bloqueado.id_usuario}, this)">
                         <i class="fas fa-unlock"></i> Desbloquear
                     </button>
                 </div>
@@ -511,38 +511,45 @@ const FriendshipManager = {
     async desbloquearUsuario(idUsuario, button) {
         try {
             const response = await fetch(`/amistades/desbloquear/${idUsuario}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                 }
-        });
+            });
 
             if (!response.ok) throw new Error('Error al desbloquear usuario');
 
-        const data = await response.json();
-        if (data.success) {
-                button.closest('.list-group-item').remove();
+            const data = await response.json();
+            if (data.success) {
+                // Eliminar el elemento de la lista
+                const listItem = button.closest('.list-group-item');
+                if (listItem) {
+                    listItem.remove();
+                }
+                
+                // Verificar si quedan elementos en la lista
                 const listaBloqueados = document.getElementById('listaBloqueados');
                 if (listaBloqueados && listaBloqueados.children.length === 0) {
                     listaBloqueados.innerHTML = '<div class="text-center text-muted">No tienes usuarios bloqueados</div>';
                 }
+
                 Swal.fire({
-                title: '¡Usuario desbloqueado!',
-                text: 'El usuario ha sido desbloqueado correctamente.',
-                icon: 'success',
-                timer: 2000,
-                showConfirmButton: false
+                    title: '¡Usuario desbloqueado!',
+                    text: 'El usuario ha sido desbloqueado correctamente.',
+                    icon: 'success',
+                    timer: 2000,
+                    showConfirmButton: false
+                });
+            }
+        } catch (error) {
+            console.error('Error al desbloquear usuario:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'No se pudo desbloquear al usuario',
+                icon: 'error'
             });
         }
-    } catch (error) {
-        console.error('Error al desbloquear usuario:', error);
-        Swal.fire({
-            title: 'Error',
-                text: 'No se pudo desbloquear al usuario',
-            icon: 'error'
-        });
-    }
     },
 
     async denunciarUsuario(idUsuario) {
